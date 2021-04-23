@@ -21,10 +21,7 @@ func main() {
 }
 
 func histPlot(values plotter.Values) {
-    p, err := plot.New()
-    if err != nil {
-        panic(err)
-    }
+    p := plot.New()
     p.Title.Text = "histogram plot"
 
     hist, err := plotter.NewHist(values, 20)
@@ -33,7 +30,7 @@ func histPlot(values plotter.Values) {
     }
     p.Add(hist)
 
-    if err := p.Save(3*vg.Inch, 3*vg.Inch, "hist.png"); err != nil {
+    if err := p.Save(12*vg.Inch, 12*vg.Inch, "hist.png"); err != nil {
         panic(err)
     }
 }
