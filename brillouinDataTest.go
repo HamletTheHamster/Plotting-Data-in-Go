@@ -31,7 +31,7 @@ func main() {
 func getData(frequencyCSV string, signalCSV string) ([][]float64) {
 
   // Read
-  fmt.Printf("\n\nReading CSV file...")
+  //fmt.Printf("\n\nReading CSV file...")
   file, err := os.Open(frequencyCSV)
   if err != nil {
       fmt.Println(err)
@@ -56,7 +56,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
   */
 
   // Transpose
-  fmt.Printf("\n\nTransposing Values...")
+  //fmt.Printf("\n\nTransposing Values...")
   var frequencyStrT, signalStrT []string
 
   for i := 0; i < 300; i++ {
@@ -73,7 +73,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
   */
 
   // Convert
-  fmt.Printf("\n\nConverting values...")
+  //fmt.Printf("\n\nConverting values...")
   var frequency, signal []float64
 
   for _, freqElem := range frequencyStrT {
@@ -98,7 +98,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
   */
 
   // Combine
-  fmt.Printf("\n\nCombining data...")
+  //fmt.Printf("\n\nCombining data...")
   combined := [][]float64{frequency,signal}
 
   /* Print
