@@ -31,7 +31,6 @@ func main() {
 func getData(frequencyCSV string, signalCSV string) ([][]float64) {
 
   // Read
-  //fmt.Printf("\n\nReading CSV file...")
   file, err := os.Open(frequencyCSV)
   if err != nil {
       fmt.Println(err)
@@ -48,15 +47,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
   reader = csv.NewReader(file)
   signalStr, _ := reader.ReadAll()
 
-  /* Print
-  fmt.Printf("\n\n%T Frequency\n\n", frequencyStr)
-  fmt.Println(frequencyStr)
-  fmt.Printf("\n\n%T Signal\n\n", signalStr)
-  fmt.Println(signalStr)
-  */
-
   // Transpose
-  //fmt.Printf("\n\nTransposing Values...")
   var frequencyStrT, signalStrT []string
 
   for i := 0; i < 300; i++ {
@@ -64,16 +55,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
     signalStrT = append(signalStrT, signalStr[i][0])
   }
 
-  /* Print
-  fmt.Printf("\n\n%T frequencyStrT\n\n", frequencyStrT)
-  fmt.Println(frequencyStrT)
-
-  fmt.Printf("\n\n%T signalStrT\n\n", signalStrT)
-  fmt.Println(signalStrT)
-  */
-
   // Convert
-  //fmt.Printf("\n\nConverting values...")
   var frequency, signal []float64
 
   for _, freqElem := range frequencyStrT {
@@ -90,23 +72,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
     }
   }
 
-  /* Print
-  fmt.Printf("\n\n%T frequency\n\n", frequency)
-  fmt.Println(frequency)
-  fmt.Printf("\n\n%T signal\n\n", signal)
-  fmt.Println(signal)
-  */
-
-  // Combine
-  //fmt.Printf("\n\nCombining data...")
-  combined := [][]float64{frequency,signal}
-
-  /* Print
-  fmt.Printf("\n\n%T combined\n\n", combined)
-  fmt.Println(combined)
-  */
-
-  return combined
+  return [][]float64{frequency,signal}
 }
 
 func plot(
