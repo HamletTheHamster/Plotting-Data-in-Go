@@ -13,25 +13,27 @@ func main() {
 
   label, freqFile, sigFile := readMeta()
 
-  data100 := getData(freqFile[1], sigFile[1])
-  data25 := getData(freqFile[2], sigFile[2])
-  data15 := getData(freqFile[3], sigFile[3])
-  data8 := getData(freqFile[4], sigFile[4])
-  data5 := getData(freqFile[5], sigFile[5])
-  data3 := getData(freqFile[6], sigFile[6])
-  data2 := getData(freqFile[7], sigFile[7])
-  data1 := getData(freqFile[9], sigFile[9])
+  //data100 := getData(freqFile[1], sigFile[1])
+  //data25 := getData(freqFile[2], sigFile[2])
+  //data15 := getData(freqFile[3], sigFile[3])
+  //data8 := getData(freqFile[4], sigFile[4])
+  //data5 := getData(freqFile[5], sigFile[5])
+  //data3 := getData(freqFile[6], sigFile[6])
+  //data2 := getData(freqFile[7], sigFile[7])
+  data2s := getData(freqFile[8], sigFile[8])
+  //data1 := getData(freqFile[9], sigFile[9])
 
 
   plot(
-    data100, label[1],
-    data25, label[2],
-    data15, label[3],
-    data8, label[4],
-    data5, label[5],
-    data3, label[6],
-    data2, label[7],
-    data1, label[9],
+    //data100, label[1],
+    //data25, label[2],
+    //data15, label[3],
+    //data8, label[4],
+    //data5, label[5],
+    //data3, label[6],
+    //data2, label[7],
+    data2s, label[8],
+    //data1, label[9],
   )
 
 }
@@ -83,7 +85,7 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
   // Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := 0; i < 300; i++ {
+  for i := 0; i < 100; i++ {
     frequencyStrT = append(frequencyStrT, frequencyStr[i][0])
     signalStrT = append(signalStrT, signalStr[i][0])
   }
@@ -109,14 +111,15 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
 }
 
 func plot(
-  set [][]float64, name string,
-  set2 [][]float64, name2 string,
-  set3 [][]float64, name3 string,
-  set4 [][]float64, name4 string,
-  set5 [][]float64, name5 string,
-  set6 [][]float64, name6 string,
-  set7 [][]float64, name7 string,
-  set9 [][]float64, name9 string,
+  //set [][]float64, name string,
+  //set2 [][]float64, name2 string,
+  //set3 [][]float64, name3 string,
+  //set4 [][]float64, name4 string,
+  //set5 [][]float64, name5 string,
+  //set6 [][]float64, name6 string,
+  //set7 [][]float64, name7 string,
+  set8[][]float64, name8 string,
+  //set9 [][]float64, name9 string,
 
   ) {
 
@@ -129,12 +132,13 @@ func plot(
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (mV)")
 
-  plot.AddPointGroup(name, "points", set)
-  plot.AddPointGroup(name2, "points", set2)
-  plot.AddPointGroup(name3, "points", set3)
-  plot.AddPointGroup(name4, "points", set4)
-  plot.AddPointGroup(name5, "points", set5)
-  plot.AddPointGroup(name6, "points", set6)
-  plot.AddPointGroup(name7, "points", set7)
-  plot.AddPointGroup(name9, "points", set9)
+  //plot.AddPointGroup(name, "points", set)
+  //plot.AddPointGroup(name2, "points", set2)
+  //plot.AddPointGroup(name3, "points", set3)
+  //plot.AddPointGroup(name4, "points", set4)
+  //plot.AddPointGroup(name5, "points", set5)
+  //plot.AddPointGroup(name6, "points", set6)
+  //plot.AddPointGroup(name7, "points", set7)
+  plot.AddPointGroup(name8, "points", set8)
+  //plot.AddPointGroup(name9, "points", set9)
 }
