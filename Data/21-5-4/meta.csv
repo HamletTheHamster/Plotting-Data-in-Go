@@ -1,0 +1,10 @@
+Date,Label,Pump-at-Sample,Pump-Stokes-at-Sample,Probe-at-Sample,Polarization-Re-adjust,Frequency-Filepath,Signal-Filepath
+21-5-4,100%% (e-VOA),88.45,78.03,9.67,true,Data/100-frequency.csv,Data/100-signal.csv
+21-5-4,25 mW,25.16,24.73,9.67,,Data/25-frequency.csv,Data/25-signal.csv
+21-5-4,16.6 mW,16.77,16.49,11.52,,Data/15-frequency.csv,Data/15-signal.csv
+21-5-4,8.3 mW,8.39,8.24,11.42,true,Data/8-frequency.csv,Data/8-signal.csv
+21-5-4,5 mW,5.03,4.95,11.54,true,Data/5-frequency.csv,Data/5-signal.csv
+21-5-4,3.3 mW,3.35,3.30,11.48,true,Data/3-frequency.csv,Data/3-signal.csv
+21-5-4,2 mW,2.00,2.00,11.5,true,Data/2-frequency.csv,Data/2-signal.csv
+21-5-4,2 mW,2.00,2.00,11.5,true,Data/2s-frequency.csv,Data/2s-signal.csv
+21-5-4,1.6 mW,1.68,1.65,11.48,true,Data/1p5-frequency.csv,Data/1p5-signal.csv
