@@ -5,5 +5,4 @@ Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO 
 21-5-5,3 mW,3.00,3.00,11.55,true,true,Data/3-frequency.csv,Data/3-signal.csv
 21-5-5,2 mW,2.00,2.00,11.53,true,true,Data/2-frequency.csv,Data/2-signal.csv
 21-5-5,1 mW,1.00,1.00,11.59,true,true,Data/1-frequency.csv,Data/1-signal.csv
-21-5-5,1 mW short,1.00,1.00,,po,lo,Data/1s-frequency.csv,Data/1s-signal.csv
-21-5-5,2 mW probe 10 mW,2.00,2.00,10.00,true,true,Data/2probe10-frequency.csv,2probe10-signal.csv
+21-5-5,2 mW probe 10 mW,2.00,2.00,10.00,true,true,Data/2probe10-frequency.csv,Data/2probe10-signal.csv
