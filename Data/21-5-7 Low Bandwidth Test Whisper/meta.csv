@@ -1,0 +1,5 @@
+Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
+21-5-7,100%% 50k Bandwidth,16.71,50.54,8.30,true,true,Data/100-whis-frequency.csv,Data/100-whis-signal.csv,All measurements in whisper mode for both. Low power measurements at 20m range
+21-5-7,100%% 200k Bandwidth,18.68,51.17,8.35,true,true,Data/100-200k-whis-frequency.csv,Data/100-200k-whis-signal.csv,Smaller bandwidth was better. Peak not high because lower pump power (small amp)
+21-5-7,5 mW 50k Bandwidth,5.00,5.00,8.38,true,true,Data/5-50k-whis-frequency.csv,Data/5-50k-whis-signal.csv,Garbage. Waveform shape
+21-5-7,5 mW 200k Bandwidth,5.00,5.00,8.29,true,true,Data/5-200k-whis-frequency.csv,Data/5-200k-whis-signal.csv,Still very noisy but better than 50k bandwidth. Higher bandwidth still better for both high and low powers

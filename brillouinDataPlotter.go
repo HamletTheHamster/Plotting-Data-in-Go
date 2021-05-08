@@ -13,27 +13,27 @@ func main() {
 
   label, freqFile, sigFile := readMeta()
 
-  //data100 := getData(freqFile[1], sigFile[1])
-  //data10 := getData(freqFile[2], sigFile[2])
-  //data5 := getData(freqFile[3], sigFile[3])
-  data3 := getData(freqFile[4], sigFile[4])
-  data2 := getData(freqFile[5], sigFile[5])
-  //data1 := getData(freqFile[6], sigFile[6])
-  //data1s := getData(freqFile[7], sigFile[7])
-  //data2probe10 := getData(freqFile[7], sigFile[7])
-  //data1 := getData(freqFile[9], sigFile[9])
+  //data1 := getData(freqFile[1], sigFile[1])
+  //data2 := getData(freqFile[2], sigFile[2])
+  data3 := getData(freqFile[3], sigFile[3])
+  data4 := getData(freqFile[4], sigFile[4])
+  //data5 := getData(freqFile[5], sigFile[5])
+  //data6 := getData(freqFile[6], sigFile[6])
+  //data7 := getData(freqFile[7], sigFile[7])
+  //data8 := getData(freqFile[7], sigFile[7])
+  //data9 := getData(freqFile[9], sigFile[9])
 
 
   plot(
-    //data100, label[1],
-    //data10, label[2],
-    //data5, label[3],
-    data3, label[4],
-    data2, label[5],
-    //data1, label[6],
-    //data1s, label[7],
-    //data2probe10, label[7],
-    //data1, label[9],
+    //data1, label[1],
+    //data2, label[2],
+    data3, label[3],
+    data4, label[4],
+    //data5, label[5],
+    //data6, label[6],
+    //data7, label[7],
+    //data8, label[7],
+    //data9, label[9],
   )
 
 }
@@ -128,7 +128,7 @@ func plot(
   debug := false
   plot, _ := glot.NewPlot(dimensions, persist, debug)
 
-  plot.SetTitle("SBS in 1cm UHNA3 Fiber")
+  plot.SetTitle("SBS in 1cm UHNA3 Fiber - Whisper Mode")
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (mV)")
 
