@@ -1,0 +1,4 @@
+Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
+21-5-7,5 mW 200k Bandwidth,5.00,5.00,8.61,true,true,Data/5-200k-dith-frequency.csv,Data/5-200k-dith-signal.csv,clear signal - peak ~1.5e-7
+21-5-7,5 mW 50k Bandwidth,5.00,5.00,8.62,true,true,Data/5-50k-dith-frequency.csv,Data/5-50k-dith-signal.csv,hard to tell if more or less noise - peak ~1.25e-7
+21-5-7,5 mW 10k Bandwidth,5.00,5.00,,,,Data/5-10k-dith-frequency.csv,Data/5-10k-dith-signal.csv,definitely worse - peak ~1e-7
