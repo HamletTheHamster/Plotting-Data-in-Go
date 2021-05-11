@@ -13,10 +13,10 @@ func main() {
 
   label, freqFile, sigFile := readMeta()
 
-  data1 := getData(freqFile[1], sigFile[1])
-  data2 := getData(freqFile[2], sigFile[2])
-  data3 := getData(freqFile[3], sigFile[3])
-  //data4 := getData(freqFile[4], sigFile[4])
+  //data1 := getData(freqFile[1], sigFile[1])
+  //data2 := getData(freqFile[2], sigFile[2])
+  //data3 := getData(freqFile[3], sigFile[3])
+  data4 := getData(freqFile[4], sigFile[4])
   //data5 := getData(freqFile[5], sigFile[5])
   //data6 := getData(freqFile[6], sigFile[6])
   //data7 := getData(freqFile[7], sigFile[7])
@@ -25,10 +25,10 @@ func main() {
 
 
   plot(
-    data1, label[1],
-    data2, label[2],
-    data3, label[3],
-    //data4, label[4],
+    //data1, label[1],
+    //data2, label[2],
+    //data3, label[3],
+    data4, label[4],
     //data5, label[5],
     //data6, label[6],
     //data7, label[7],
@@ -112,8 +112,8 @@ func getData(frequencyCSV string, signalCSV string) ([][]float64) {
 
 func plot(
   set [][]float64, name string,
-  set2 [][]float64, name2 string,
-  set3 [][]float64, name3 string,
+  //set2 [][]float64, name2 string,
+  //set3 [][]float64, name3 string,
   //set4 [][]float64, name4 string,
   //set5 [][]float64, name5 string,
   //set6 [][]float64, name6 string,
@@ -128,13 +128,13 @@ func plot(
   debug := false
   plot, _ := glot.NewPlot(dimensions, persist, debug)
 
-  plot.SetTitle("SBS in 1cm UHNA3 Fiber - Dither Mode")
+  plot.SetTitle("SBS in 1cm UHNA3 Fiber 50/50 Probe/LO -> 90/10")
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (uV)")
 
-  //plot.AddPointGroup(name, "points", set)
+  plot.AddPointGroup(name, "points", set)
   //plot.AddPointGroup(name2, "points", set2)
-  plot.AddPointGroup(name3, "points", set3)
+  //plot.AddPointGroup(name3, "points", set3)
   //plot.AddPointGroup(name4, "points", set4)
   //plot.AddPointGroup(name5, "points", set5)
   //plot.AddPointGroup(name6, "points", set6)
