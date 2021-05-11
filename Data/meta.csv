@@ -1,5 +1,0 @@
-Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
-21-5-10,100% 20m Range,18.76,49.77,10.27,true,true,Data/100-frequency.csv,Data/100-signal.csv,Probe amp off whoops
-21-5-10,100% 1.5 Range,18.76,49.77,10.27,true,true,Data/100-higherRange-frequency.csv,Data/100-higherRange.csv,Probe amp off whoops
-21-5-10,100% 20m Range,31.42,85.9,15.98,true,true,Data/100-probeAmpOn-frequency.csv,Data/100-probeAmpOn-signal.csv,4e-7 - 1.5@detector
-21-5-10,5 mW p/ps 40 mW probe,5.00,5.00,39.46,true,true,Data/5-frequency.csv,Data/5-signal.csv,probe & pump-stokes amps switched - 3.5@detector
