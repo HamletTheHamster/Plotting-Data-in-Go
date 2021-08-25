@@ -1,0 +1,4 @@
+Date,Name,Probe Power @ eVOA,Pump Power @ eVOA,Filepath,Notes
+21-8-19,Background,,,Data/b.csv,
+21-8-19,Anti-Stokes,,,Data/as.csv,
+21-8-19,Stokes,,,Data/s.csv,

@@ -17,7 +17,7 @@ func main() {
 
   background1 := getData(file[1])
   as1 := getData(file[2])
-  //s1 := getData(file[3])
+  s1 := getData(file[3])
   //background2 := getData(file[4])
   //as2 := getData(file[5])
   //s2 := getData(file[6])
@@ -25,7 +25,7 @@ func main() {
   plotRaw(
     background1, label[1],
     as1, label[2],
-    //s1, label[3],
+    s1, label[3],
     //background2, label[4],
     //as2, label[5],
     //s2, label[6],
