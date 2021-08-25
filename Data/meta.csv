@@ -1,9 +1,0 @@
-Date,Name,Probe Power @ eVOA,Pump Power @ eVOA,Frequency Filepath,Signal Filepath,Notes
-21-6-21,s - 100 Probe 150 Pump,100.06,150.10,Data/100pr150stokes-frequency.csv,Data/100pr150stokes-signal.csv,peak 1.25e-7 @ 2.28GHz
-21-6-21,as - 100 Probe 150 Pump,100.00,150.10,Data/100pr150antistokes-frequency.csv,Data/100pr150antistokes-signal.csv,bimodal? Some sort of broad peak is actually there
-21-6-21,as - Control no pump,100.02,0.058,Data/controlNoPumpantistokes-frequency.csv,Data/controlNoPumpantistokes-signal.csv,ok that could be a broad peak
-21-6-21,s - Control no pump,101.12,0.058,Data/controlNoPumpstokes-frequency.csv,Data/controlNoPumpstokes-signal.csv,messy but lower than with pump
-21-6-21,s - 100 Probe 100 Pump,100.01,100.07,Data/100pr100stokes-frequency.csv,Data/100pr100stokes-signal.csv,peak 1.7e-7 @ 2.27GHz
-21-6-21,as - 100 Probe 100 Pump,100.10,100.07,Data/100pr100antistokes-frequency.csv,Data/100pr100antistokes-signal.csv,looks like noise
-21-6-21,as - 100 Probe 50 Pump,100.09,50.08,Data/100pr50antistokes-frequency.csv,Data/100pr50antistokes-signal.csv,broad peak .9e-7 @ 2.27GHz
-21-6-21,s - 100 Probe 50 Pump,,50.08,Data/100pr50stokes-frequency.csv,Data/100pr50stokes-signal.csv,bimodal? broad peak 1.2e-7 @ 2.29GHz
