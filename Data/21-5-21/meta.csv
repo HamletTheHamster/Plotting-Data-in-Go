@@ -1,0 +1,4 @@
+Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
+21-5-21,500 uW 10m Range 200 Hz Bandwidth,.5,.5,8.91,t,t,Data/500u-10m-frequency.csv,Data/500u-10m-signal.csv, success! 2 fW
+21-5-21,400 uW 10m Range 200 Hz Bandwidth,.4,.4,8.93,t,t,Data/400u-10m-frequency.csv,Data/400u-10m-signal.csv, Success! 1 fW
+21-5-21,350 uW 10m Range 200 Hz Bandwidth,.35,.35,,,,Data/350u-10m-frequency.csv,Data/350u-10m-signal.csv, Success!!! 980 aW

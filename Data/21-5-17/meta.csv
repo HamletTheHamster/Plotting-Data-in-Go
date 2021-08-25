@@ -1,0 +1,6 @@
+Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
+21-5-17,100%% 20m Range 203k Bandwidth,36.59,87.19,10.61,true,true,Data/100-frequency.csv,Data/100-signal.csv,Nice peak as expected with given powers
+21-5-17,5 mW 20m Range 203k Bandwidth,5.00,5.00,10.59,true,true,Data/5-frequency.csv,Data/5-signal.csv,success
+21-5-17,4 mW 20m Range 203k Bandwidth,4.00,4.00,10.59,false,false,Data/4-frequency.csv,Data/4-signal.csv,success
+21-5-17,3 mW 20m Range 203k Bandwidth,3.00,3.00,10.59,false,false,Data/3-frequency.csv,Data/3-signal.csv,success! picowatts!
+21-5-17,2 mW 20m Range 203k Bandwidth,2.00,2.00,10.59,false,false,Data/2-frequency.csv,Data/2-signal.csv,nope
