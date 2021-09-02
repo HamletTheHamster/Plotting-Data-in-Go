@@ -1,26 +1,40 @@
-Date,Name,Probe Power @ eVOA mW,Filepath,Notes
-21-8-31,60mW bas,0,Data/max/bas.csv,500mW straight out of big amp
-21-8-31,60mW as,10,Data/max/as.csv,
-21-8-31,60mW bs,0,Data/max/bs.csv,
-21-8-31,60mW s,10,Data/max/s.csv,
-21-8-31,40mW bas,0,Data/midHigh/bas.csv,40mW at pump probe after sample
-21-8-31,40mW as,10,Data/midHigh/as.csv,
-21-8-31,40mW bs,0,Data/midHigh/bs.csv,
-21-8-27,40mW s,10,Data/midHigh/s.csv,
-21-8-31,0mW bas,0,Data/min/bas.csv,
-21-8-31,0mW as,10,Data/min/as.csv,
-21-8-31,0mW bs,0,Data/min/bs.csv,
-21-8-27,0mW s,10,Data/min/s.csv,
-21-8-31,20mW bas,0,Data/midLow/bas.csv,20mW at pump probe after sample
-21-8-31,20mW as,10,Data/midLow/as.csv,
-21-8-31,20mW bs,0,Data/midLow/bs.csv,
-21-8-27,20mW s,10,Data/midLow/s.csv,
-21-8-31,10mW bas,0,Data/10/bas.csv,10mW at pump probe after sample
-21-8-31,10mW as,10,Data/10/as.csv,
-21-8-31,10mW bs,0,Data/10/bs.csv,
-21-8-27,10mW s,10,Data/10/s.csv,
-21-8-31,5mW bas,0,Data/5/bas.csv,5mW at pump probe after sample
-21-8-31,5mW as,10,Data/5/as.csv,
-21-8-31,5mW bs,0,Data/5/bs.csv,
-21-8-27,5mW s,10,Data/5/s.csv,
-
+21-9-1,60mW pras,15,Data/60/pras.csv,-
+21-9-1,60mW pas,0,Data/60/pas.csv,-
+21-9-1,60mW pas,15,Data/60/prs.csv,-
+21-9-1,60mW ps,0,Data/60/ps.csv,-
+21-9-1,40mW pras,15,Data/40/pras.csv,-
+21-9-1,40mW pas,0,Data/40/pas.csv,-
+21-9-1,40mW pas,15,Data/40/prs.csv,-
+21-9-1,40mW ps,0,Data/40/ps.csv,-
+21-9-1,20mW pras,15,Data/20/pras.csv,-
+21-9-1,20mW pas,0,Data/20/pas.csv,-
+21-9-1,20mW pas,15,Data/20/prs.csv,-
+21-9-1,20mW ps,0,Data/20/ps.csv,-
+21-9-1,10mW pras,15,Data/10/pras.csv,-
+21-9-1,10mW pas,0,Data/10/pas.csv,-
+21-9-1,10mW pas,15,Data/10/prs.csv,-
+21-9-1,10mW ps,0,Data/10/ps.csv,-
+21-9-1,5mW pras,15,Data/5/pras.csv,-
+21-9-1,5mW pas,0,Data/5/pas.csv,-
+21-9-1,5mW pas,15,Data/5/prs.csv,-
+21-9-1,5mW ps,0,Data/5/ps.csv,-
+21-9-1,4mW pras,15,Data/4/pras.csv,-
+21-9-1,4mW pas,0,Data/4/pas.csv,-
+21-9-1,4mW pas,15,Data/4/prs.csv,-
+21-9-1,4mW ps,0,Data/4/ps.csv,-
+21-9-1,3mW pras,15,Data/3/pras.csv,-
+21-9-1,3mW pas,0,Data/3/pas.csv,-
+21-9-1,3mW pas,15,Data/3/prs.csv,-
+21-9-1,3mW ps,0,Data/3/ps.csv,-
+21-9-1,2mW pras,15,Data/2/pras.csv,-
+21-9-1,2mW pas,0,Data/2/pas.csv,-
+21-9-1,2mW pas,15,Data/2/prs.csv,-
+21-9-1,2mW ps,0,Data/2/ps.csv,-
+21-9-1,1mW pras,15,Data/1/pras.csv,-
+21-9-1,1mW pas,0,Data/1/pas.csv,-
+21-9-1,1mW pas,15,Data/1/prs.csv,-
+21-9-1,1mW ps,0,Data/1/ps.csv,-
+21-9-1,0mW pas,0,Data/0/pas2.csv,-(done again at the end)
+21-9-1,0mW pras,15,Data/0/pras2.csv,
+21-9-1,0mW ps,0,Data/0/ps2.csv,-
+21-9-1,0mW prs,15,Data/0/prs2.csv,

@@ -1,9 +1,26 @@
 Date,Name,Probe Power @ eVOA mW,Filepath,Notes
-21-8-31,pump big amp straight bas,0,Data/max/bas.csv,
-21-8-31,pump big amp straight as,10,Data/max/as.csv,
-21-8-31,pump big amp straight bs,0,Data/max/bs.csv,
-21-8-31,pump big amp straight s,10,Data/max/s.csv,
-21-8-31,pump 0mW bas,0,Data/min/bas.csv,
-21-8-31,pump 0mW as,10,Data/min/as.csv,
-21-8-31,pump 0mW bs,0,Data/min/bs.csv,
-21-8-27,pump 0mW s,10,Data/min/s.csv,
+21-8-31,60mW bas,0,Data/max/bas.csv,500mW straight out of big amp
+21-8-31,60mW as,10,Data/max/as.csv,
+21-8-31,60mW bs,0,Data/max/bs.csv,
+21-8-31,60mW s,10,Data/max/s.csv,
+21-8-31,40mW bas,0,Data/midHigh/bas.csv,40mW at pump probe after sample
+21-8-31,40mW as,10,Data/midHigh/as.csv,
+21-8-31,40mW bs,0,Data/midHigh/bs.csv,
+21-8-27,40mW s,10,Data/midHigh/s.csv,
+21-8-31,0mW bas,0,Data/min/bas.csv,
+21-8-31,0mW as,10,Data/min/as.csv,
+21-8-31,0mW bs,0,Data/min/bs.csv,
+21-8-27,0mW s,10,Data/min/s.csv,
+21-8-31,20mW bas,0,Data/midLow/bas.csv,20mW at pump probe after sample
+21-8-31,20mW as,10,Data/midLow/as.csv,
+21-8-31,20mW bs,0,Data/midLow/bs.csv,
+21-8-27,20mW s,10,Data/midLow/s.csv,
+21-8-31,10mW bas,0,Data/10/bas.csv,10mW at pump probe after sample
+21-8-31,10mW as,10,Data/10/as.csv,
+21-8-31,10mW bs,0,Data/10/bs.csv,
+21-8-27,10mW s,10,Data/10/s.csv,
+21-8-31,5mW bas,0,Data/5/bas.csv,5mW at pump probe after sample
+21-8-31,5mW as,10,Data/5/as.csv,
+21-8-31,5mW bs,0,Data/5/bs.csv,
+21-8-27,5mW s,10,Data/5/s.csv,
+
