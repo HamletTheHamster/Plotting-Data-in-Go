@@ -1,0 +1,25 @@
+Date,Name,Probe Power @ eVOA mW,Pump Power @ eVOA mW,After Sample Tap mW,Filepath,Notes
+21-8-26,Probe Only Max Background,114.4,,,Data/Probe/b.csv,
+21-8-26,Probe Only Max Anti-Stokes,114.4,,16.1,Data/Probe/as.csv,
+21-8-26,Probe Only Max Stokes,114.4,,16.1,Data/Probe/s.csv,bigger than as?
+21-8-26,Probe Only 50mW B,50,,,Data/Probe50/b.csv,
+21-8-26,Probe Only 50mW S,50,,7.07,Data/Probe50/as.csv,
+21-8-26,Probe Only 50mW AS,50,,7.07,Data/Probe50/s.csv,
+21-8-26,Probe Only 25mW B,25,,,Data/Probe25/b.csv,
+21-8-26,Probe Only 25mW S,25,,3.53,Data/Probe25/as.csv,
+21-8-26,Probe Only 25mW AS,25,,3.53,Data/Probe25/s.csv,
+21-8-26,Probe Only 10mW B,10,,,Data/Probe10/b.csv,
+21-8-26,Probe Only 10mW S,10,,1.41,Data/Probe10/as.csv,
+21-8-26,Probe Only 10mW AS,10,,1.41,Data/Probe10/s.csv,
+21-8-26,Probe Only 5mW B,5,,,Data/Probe5/b.csv,
+21-8-26,Probe Only 5mW S,5,,0.70,Data/Probe5/as.csv,
+21-8-26,Probe Only 5mW AS,5,,0.70,Data/Probe5/s.csv,
+21-8-26,Probe Only 2mW B,2,,,Data/Probe2/b.csv,winner
+21-8-26,Probe Only 2mW S,2,,0.27,Data/Probe2/as.csv,winner
+21-8-26,Probe Only 2mW AS,2,,0.27,Data/Probe2/s.csv,winner
+21-8-26,Probe Only 1mW B,1,,,Data/Probe1/b.csv,
+21-8-26,Probe Only 1mW S,1,,0.136,Data/Probe1/as.csv,
+21-8-26,Probe Only 1mW AS,1,,0.136,Data/Probe1/s.csv,
+21-8-26,Probe Only .5mW B,0.5,,,Data/Probe0p5/b.csv,
+21-8-26,Probe Only .5mW S,0.5,,0.067,Data/Probe0p5/as.csv,
+21-8-26,Probe Only .5mW AS,0.5,,0.067,Data/Probe0p5/s.csv,

@@ -1,0 +1,13 @@
+Date,Name,Probe Power @ eVOA mW,Filepath,Notes
+21-8-26,pump 180mW bas,0,Data/Pump180/bas.csv,
+21-8-26,pump 180mW as,10,Data/Pump180/as.csv,
+21-8-26,pump 180mW bs,0,Data/Pump180/bs.csv,
+21-8-26,pump 180mW s,10,Data/Pump180/s.csv,
+21-8-26,pump 100mW bas,0,Data/Pump100/bas.csv,
+21-8-26,pump 100mW as,10,Data/Pump100/as.csv,
+21-8-26,pump 100mW bs,0,Data/Pump100/bs.csv,
+21-8-26,pump 100mW s,10,Data/Pump100/s.csv,
+21-8-26,pump 0mW bas,0,Data/Pump0/bas.csv,
+21-8-26,pump 0mW as,10,Data/Pump0/as.csv,
+21-8-26,pump 0mW bs,0,Data/Pump0/bs.csv,
+21-8-26,pump 0mW s,10,Data/Pump0/s.csv,

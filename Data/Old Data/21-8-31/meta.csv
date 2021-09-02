@@ -1,0 +1,9 @@
+Date,Name,Probe Power @ eVOA mW,Filepath,Notes
+21-8-31,pump big amp straight bas,0,Data/max/bas.csv,
+21-8-31,pump big amp straight as,10,Data/max/as.csv,
+21-8-31,pump big amp straight bs,0,Data/max/bs.csv,
+21-8-31,pump big amp straight s,10,Data/max/s.csv,
+21-8-31,pump 0mW bas,0,Data/min/bas.csv,
+21-8-31,pump 0mW as,10,Data/min/as.csv,
+21-8-31,pump 0mW bs,0,Data/min/bs.csv,
+21-8-27,pump 0mW s,10,Data/min/s.csv,
