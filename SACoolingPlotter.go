@@ -23,6 +23,19 @@ func main() {
   pras, pas, prs, ps := getAllData(file)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
+  fmt.Printf("\n\nVerify Labels\n-------------\n")
+  fmt.Printf("Want | Have\n")
+  fmt.Printf("40mW | %s\n", strings.Trim(prsLabel[0], " prs"))
+  fmt.Printf("40mW | %s\n", strings.Trim(prasLabel[0], " pras"))
+  fmt.Printf(" 0mW | %s\n", strings.Trim(prsLabel[1], " prs"))
+  fmt.Printf(" 0mW | %s\n\n\n", strings.Trim(prasLabel[1], " pras"))
+
+  fmt.Printf("Verify first 3 values of pras signals\n")
+  fmt.Printf("-------------------------------------\n")
+  fmt.Printf("Want                   | Have\n")
+  fmt.Printf("-58.00, -57.98, -57.96 | %.2f, %.2f, %.2f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
+  fmt.Printf("-58.10, -58.08, -58.07 | %.2f, %.2f, %.2f\n\n", pras[1][1][0], pras[1][1][1], pras[1][1][2])
+
   setsToPlotRaw := []int{}
   plotRaw(
     setsToPlotRaw,
@@ -41,7 +54,7 @@ func main() {
     as, prasLabel,
   )
 
-  setsToPlotSubtractedTogether := []int{}
+  setsToPlotSubtractedTogether := []int{0,1}
   plotSubtractedTogether(
   setsToPlotSubtractedTogether,
   s, prsLabel,
