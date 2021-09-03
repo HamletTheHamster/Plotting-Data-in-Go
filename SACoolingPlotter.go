@@ -2,10 +2,11 @@ package main
 
 import (
   "github.com/Arafatk/glot"
-  //"github.com/maorshutman/lm"
   "encoding/csv"
+  "bufio"
   "fmt"
   "os"
+  "io"
   "strconv"
   "strings"
   "math"
@@ -19,114 +20,41 @@ func main() {
 
   label, file := readMeta()
 
-  bas1 := getData(file[1])
-  as1 := getData(file[2])
-  bs1 := getData(file[3])
-  s1 := getData(file[4])
-  bas2 := getData(file[5])
-  as2 := getData(file[6])
-  bs2 := getData(file[7])
-  s2 := getData(file[8])
-  bas3 := getData(file[9])
-  as3 := getData(file[10])
-  bs3 := getData(file[11])
-  s3 := getData(file[12])
-  bas4 := getData(file[13])
-  as4 := getData(file[14])
-  bs4 := getData(file[15])
-  s4 := getData(file[16])
-  bas5 := getData(file[17])
-  as5 := getData(file[18])
-  bs5 := getData(file[19])
-  s5 := getData(file[20])
-  bas6 := getData(file[21])
-  as6 := getData(file[22])
-  bs6 := getData(file[23])
-  s6 := getData(file[24])
+  pras, pas, prs, ps := getAllData(file)
+  prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
+  setsToPlotRaw := []int{}
   plotRaw(
-    bas1, label[1],
-    as1, label[2],
-    bs1, label[3],
-    s1, label[4],
-  )
-  plotRaw(
-    bas2, label[5],
-    as2, label[6],
-    bs2, label[7],
-    s2, label[8],
-  )
-  plotRaw(
-    bas3, label[9],
-    as3, label[10],
-    bs3, label[11],
-    s3, label[12],
-  )
-  plotRaw(
-    bas4, label[13],
-    as4, label[14],
-    bs4, label[15],
-    s4, label[16],
-  )
-  plotRaw(
-    bas5, label[17],
-    as5, label[18],
-    bs5, label[19],
-    s5, label[20],
-  )
-  plotRaw(
-    bas6, label[21],
-    as6, label[22],
-    bs6, label[23],
-    s6, label[24],
+    setsToPlotRaw,
+    pras, prasLabel,
+    pas, pasLabel,
+    prs, prsLabel,
+    ps, psLabel,
   )
 
-  as1data := subtractBackground(bas1, as1)
-  s1data := subtractBackground(bs1, s1)
-  as2data := subtractBackground(bas2, as2)
-  s2data := subtractBackground(bs2, s2)
-  as3data := subtractBackground(bas3, as3)
-  s3data := subtractBackground(bs3, s3)
-  as4data := subtractBackground(bas4, as4)
-  s4data := subtractBackground(bs4, s4)
-  as5data := subtractBackground(bas5, as5)
-  s5data := subtractBackground(bs5, s5)
-  as6data := subtractBackground(bas6, as6)
-  s6data := subtractBackground(bs6, s6)
+  s, as := subtractBackground(pras, pas, prs, ps)
 
+  setsToPlotSubtracted := []int{0,1}
   plotSubtracted(
-    as1data, label[2],
-    s1data, label[4],
-  )
-  plotSubtracted(
-    as2data, label[6],
-    s2data, label[8],
-  )
-  plotSubtracted(
-    as3data, label[10],
-    s3data, label[12],
-  )
-  plotSubtracted(
-    as4data, label[14],
-    s4data, label[16],
-  )
-  plotSubtracted(
-    as5data, label[18],
-    s5data, label[20],
-  )
-  plotSubtracted(
-    as6data, label[22],
-    s6data, label[24],
-  )
-  asplotSubtracted(
-    as1data, label[2],
-    as2data, label[6],
-    as3data, label[10],
-    as4data, label[14],
-    as5data, label[18],
-    as6data, label[22],
+    setsToPlotSubtracted,
+    s, prsLabel,
+    as, prasLabel,
   )
 
+  setsToPlotSubtractedTogether := []int{}
+  plotSubtractedTogether(
+  setsToPlotSubtractedTogether,
+  s, prsLabel,
+  as, prasLabel,
+  )
+
+  setsToPlotSubtractedGrouped := []int{0,1}
+  plotSubtractedGrouped(
+    setsToPlotSubtractedGrouped,
+    s, prsLabel,
+    as, prasLabel,
+  )
+/*
   // Lorentz Fit
   asamp := []float64{0, 0.01, 0.03, 0.1, 0.5, 0.7, 0.1}
   amp := 0.1
@@ -409,6 +337,7 @@ func main() {
     as6Fit, label[22],
     s6Fit, label[24],
   )
+  */
 }
 
 func readMeta() ([]string, []string) {
@@ -435,24 +364,42 @@ func readMeta() ([]string, []string) {
   return label, data
 }
 
+func getAllData(fileNames []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
+
+  var pras, pas, prs, ps [][][]float64
+
+  for i := 1; i < len(fileNames); i += 4 {
+    pras = append(pras, getData(fileNames[i]))
+  }
+  for i := 2; i < len(fileNames); i += 4 {
+    pas = append(pas, getData(fileNames[i]))
+  }
+  for i := 3; i < len(fileNames); i += 4 {
+    prs = append(prs, getData(fileNames[i]))
+  }
+  for i := 4; i < len(fileNames); i += 4 {
+    ps = append(ps, getData(fileNames[i]))
+  }
+  return pras, pas, prs, ps
+}
+
 func getData(csvName string) ([][]float64) {
 
   // Read
-  file, err := os.Open(csvName)
+  f, err := os.Open(csvName)
   if err != nil {
-    fmt.Println(err)
+    panic(err)
   }
-
-  reader := csv.NewReader(file)
-  dataStr, err := reader.ReadAll()
+  defer f.Close()
+  dataStr, err := readCSV(f)
   if err != nil {
-    fmt.Println(err)
+    panic(err)
   }
 
   // Separate, Strip, & Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := 1; i < 601; i++ {
+  for i := 1; i < 602; i++ {
     frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
     signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
   }
@@ -480,46 +427,131 @@ func getData(csvName string) ([][]float64) {
   return [][]float64{frequency, signal}
 }
 
-func plotRaw(
-  set1 [][]float64, label1 string,
-  set2 [][]float64, label2 string,
-  set3 [][]float64, label3 string,
-  set4 [][]float64, label4 string,
-  ) {
+func readCSV(rs io.ReadSeeker) ([][]string, error) {
+    // Skip first row (line)
+    row1, err := bufio.NewReader(rs).ReadSlice('\n')
+    if err != nil {
+        return nil, err
+    }
+    _, err = rs.Seek(int64(len(row1)), io.SeekStart)
+    if err != nil {
+        return nil, err
+    }
 
-  dimensions := 2
-  persist := true
-  debug := false
-  plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-  plot.SetTitle("Raw")
-  plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (dBm)")
-
-  plot.AddPointGroup(label1, "points", set1)
-  plot.AddPointGroup(label2, "points", set2)
-  plot.AddPointGroup(label3, "points", set3)
-  plot.AddPointGroup(label4, "points", set4)
+    // Read remaining rows
+    r := csv.NewReader(rs)
+    rows, err := r.ReadAll()
+    if err != nil {
+        return nil, err
+    }
+    return rows, nil
 }
 
-func subtractBackground(b [][]float64, s [][]float64) ([][]float64) {
+func getAllLabels(label []string) ([]string, []string, []string, []string) {
 
+  var prasLabel, pasLabel, prsLabel, psLabel []string
+
+  for i := 1; i < len(label); i += 4 {
+    prasLabel = append(prasLabel, label[i])
+  }
+  for i := 2; i < len(label); i += 4 {
+    pasLabel = append(pasLabel, label[i])
+  }
+  for i := 3; i < len(label); i += 4 {
+    prsLabel = append(prsLabel, label[i])
+  }
+  for i := 4; i < len(label); i += 4 {
+    psLabel = append(psLabel, label[i])
+  }
+
+  return prasLabel, pasLabel, prsLabel, psLabel
+}
+
+func plotRaw(
+  sets []int,
+  pras [][][]float64, prasLabel []string,
+  pas [][][]float64, pasLabel []string,
+  prs [][][]float64, prsLabel []string,
+  ps [][][]float64, psLabel []string,
+  ) {
+
+  for i := 0; i < len(sets); i++ {
+    dimensions := 2
+    persist := true
+    debug := false
+    plot, _ := glot.NewPlot(dimensions, persist, debug)
+
+    plot.SetTitle("Raw")
+    plot.SetXLabel("Frequency (GHz)")
+    plot.SetYLabel("Signal (dBm)")
+
+    plot.AddPointGroup(prasLabel[sets[i]], "points", pras[sets[i]])
+    plot.AddPointGroup(pasLabel[sets[i]], "points", pas[sets[i]])
+    plot.AddPointGroup(prsLabel[sets[i]], "points", prs[sets[i]])
+    plot.AddPointGroup(psLabel[sets[i]], "points", ps[sets[i]])
+  }
+}
+
+func subtractBackground(
+  pras [][][]float64,
+  pas [][][]float64,
+  prs [][][]float64,
+  ps [][][]float64,
+  ) (
+  [][][]float64,
+  [][][]float64,
+  ) {
+
+  var s, as [][][]float64
+
+  for i := 0; i < len(pras); i++ {
+    s = append(s, subtract(ps[i], prs[i]))
+    as = append(as, subtract(pas[i], pras[i]))
+  }
+
+  return s, as
+}
+
+func subtract(b [][]float64, s [][]float64) ([][]float64) {
+/*
   var shiftUp float64 = 0
 
   if (s[1][0] - b[1][0] < 0) {
     shiftUp = b[1][0] - s[1][0]
   }
-
-  for i := 0; i < 600; i++ {
-    s[1][i] = s[1][i] - b[1][i] + shiftUp
+*/
+  for i := 0; i < len(b[0]); i++ {
+    s[1][i] = s[1][i] - b[1][i]// + shiftUp
   }
 
   return s
 }
 
 func plotSubtracted(
-  set1 [][]float64, label1 string,
-  set2 [][]float64, label2 string,
+  sets []int,
+  s [][][]float64, sLabel []string,
+  as [][][]float64, asLabel []string,
+  ) {
+
+  for i := 0; i < len(sets); i++ {
+    dimensions := 2
+    persist := true
+    debug := false
+    plot, _ := glot.NewPlot(dimensions, persist, debug)
+
+    plot.SetTitle("Background Subtracted")
+    plot.SetXLabel("Frequency (GHz)")
+    plot.SetYLabel("Signal (dBm)")
+
+    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
+    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  }
+}
+
+func plotSubtractedTogether(
+  sets []int,
+  s [][][]float64, sLabel []string,
+  as [][][]float64, asLabel []string,
   ) {
 
   dimensions := 2
@@ -531,35 +563,46 @@ func plotSubtracted(
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (dBm)")
 
-  plot.AddPointGroup(label1, "points", set1)
-  plot.AddPointGroup(label2, "points", set2)
+  for i := 0; i < len(sets); i++ {
+    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
+    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  }
 }
 
-func asplotSubtracted(
-  set1 [][]float64, label1 string,
-  set2 [][]float64, label2 string,
-  set3 [][]float64, label3 string,
-  set4 [][]float64, label4 string,
-  set5 [][]float64, label5 string,
-  set6 [][]float64, label6 string,
+func plotSubtractedGrouped(
+  sets []int,
+  s [][][]float64, sLabel []string,
+  as [][][]float64, asLabel []string,
   ) {
 
+  // s
   dimensions := 2
   persist := true
   debug := false
   plot, _ := glot.NewPlot(dimensions, persist, debug)
 
-  plot.SetTitle("Anti-Stokes Background Subtracted")
+  plot.SetTitle("Background Subtracted")
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (dBm)")
 
-  plot.AddPointGroup(label1, "dots", set1)
-  plot.AddPointGroup(label2, "dots", set2)
-  plot.AddPointGroup(label3, "dots", set3)
-  plot.AddPointGroup(label4, "dots", set4)
-  plot.AddPointGroup(label5, "dots", set5)
-  plot.AddPointGroup(label6, "dots", set6)
+  for i := 0; i < len(sets); i++ {
+    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
   }
+
+  // as
+  dimensions = 2
+  persist = true
+  debug = false
+  plot, _ = glot.NewPlot(dimensions, persist, debug)
+
+  plot.SetTitle("Background Subtracted")
+  plot.SetXLabel("Frequency (GHz)")
+  plot.SetYLabel("Signal (dBm)")
+
+  for i := 0; i < len(sets); i++ {
+    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  }
+}
 
 func normalizeFit(fit []float64) ([]float64) {
 
@@ -728,6 +771,9 @@ func lorentzFit(data [][]float64, fitParams []float64) ([][]float64) {
 }
 */
 
+
+
+/*
 func as1Lorentz(dst, fitParams []float64) {
 
   _, file := readMeta()
@@ -896,7 +942,7 @@ func s6Lorentz(dst, fitParams []float64) {
     dst[i] = fitParams[0] * math.Pow(fitParams[1], 2) / (math.Pow(x - fitParams[2], 2) + math.Pow(fitParams[1], 2)) - y
   }
 }
-
+*/
 
 
 /*
