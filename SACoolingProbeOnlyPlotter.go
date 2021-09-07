@@ -20,64 +20,39 @@ func main() {
 
   label, file := readMeta()
 
-  pras, pas, prs, ps := getAllData(file)
-  prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
-
-/*
-  fmt.Printf("\n\nVerify Labels\n-------------\n")
-  fmt.Printf("Want | Have\n")
-  fmt.Printf("20mW | %s\n", strings.Trim(prsLabel[0], " prs"))
-  fmt.Printf("20mW | %s\n", strings.Trim(prasLabel[0], " pras"))
-  fmt.Printf(" 0mW | %s\n", strings.Trim(prsLabel[1], " prs"))
-  fmt.Printf(" 0mW | %s\n\n\n", strings.Trim(prasLabel[1], " pras"))
-
-  fmt.Printf("Verify first 3 values of pras signals\n")
-  fmt.Printf("-------------------------------------\n")
-  fmt.Printf("Want                   | Have\n")
-  fmt.Printf("-58.20, -58.19, -58.19 | %.2f, %.2f, %.2f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
-  fmt.Printf("-58.10, -58.09, -58.08 | %.2f, %.2f, %.2f\n\n\n", pras[1][1][0], pras[1][1][1], pras[1][1][2])
-*/
+  ras, bas, rs, bs := getAllData(file)
+  rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
 
   setsToPlotRaw := []int{}
   plotRaw(
     setsToPlotRaw,
-    pras, prasLabel,
-    pas, pasLabel,
-    prs, prsLabel,
-    ps, psLabel,
+    ras, rasLabel,
+    bas, basLabel,
+    rs, rsLabel,
+    bs, bsLabel,
   )
 
-  s, as := subtractBackground(pras, pas, prs, ps)
+  s, as := subtractBackground(ras, bas, rs, bs)
 
-/*
-  fmt.Printf("Verify first 3 values of s/as\n")
-  fmt.Printf("-----------------------------\n")
-  fmt.Printf("Power | s/as | Want                | Have\n")
-  fmt.Printf("20mW  | s    | -0.12, -0.10, -0.13 | %.2f, %.2f, %.2f\n", s[0][1][0], s[0][1][1], s[0][1][2])
-  fmt.Printf("20mW  | as   | -0.10, -0.11, -0.12 | %.2f, %.2f, %.2f\n", as[0][1][0], as[0][1][1], as[0][1][2])
-  fmt.Printf("0mW   | s    | -0.12, -0.09, -0.06 | %.2f, %.2f, %.2f\n", s[1][1][0], s[1][1][1], s[1][1][2])
-  fmt.Printf("0mW   | as   |  0.04,  0.07,  0.06 |  %.2f,  %.2f,  %.2f\n\n\n", as[1][1][0], as[1][1][1], as[1][1][2])
-*/
-
-  setsToPlotSubtracted := []int{0,1}
+  setsToPlotSubtracted := []int{}
   plotSubtracted(
     setsToPlotSubtracted,
-    s, prsLabel,
-    as, prasLabel,
+    s, rsLabel,
+    as, rasLabel,
   )
 
-  setsToPlotSubtractedTogether := []int{0,1}
+  setsToPlotSubtractedTogether := []int{4}
   plotSubtractedTogether(
   setsToPlotSubtractedTogether,
-  s, prsLabel,
-  as, prasLabel,
+  s, rsLabel,
+  as, rasLabel,
   )
 
-  setsToPlotSubtractedGrouped := []int{0,1}
+  setsToPlotSubtractedGrouped := []int{}
   plotSubtractedGrouped(
     setsToPlotSubtractedGrouped,
-    s, prsLabel,
-    as, prasLabel,
+    s, rsLabel,
+    as, rasLabel,
   )
 /*
   // Lorentz Fit
@@ -391,21 +366,20 @@ func readMeta() ([]string, []string) {
 
 func getAllData(fileNames []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
 
-  var pras, pas, prs, ps [][][]float64
+  var bas, bs, ras, rs [][][]float64
 
-  for i := 1; i < len(fileNames); i += 4 {
-    pras = append(pras, getData(fileNames[i]))
+  // Background
+  bas = append(bas, getData(fileNames[1]))
+  bs = append(bs, getData(fileNames[2]))
+
+  // s/as at various powers
+  for i := 3; i < len(fileNames); i += 2 {
+    ras = append(ras, getData(fileNames[i]))
   }
-  for i := 2; i < len(fileNames); i += 4 {
-    pas = append(pas, getData(fileNames[i]))
+  for i := 4; i < len(fileNames); i += 2 {
+    rs = append(rs, getData(fileNames[i]))
   }
-  for i := 3; i < len(fileNames); i += 4 {
-    prs = append(prs, getData(fileNames[i]))
-  }
-  for i := 4; i < len(fileNames); i += 4 {
-    ps = append(ps, getData(fileNames[i]))
-  }
-  return pras, pas, prs, ps
+  return ras, bas, rs, bs
 }
 
 func getData(csvName string) ([][]float64) {
@@ -424,12 +398,12 @@ func getData(csvName string) ([][]float64) {
   // Separate, Strip, & Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := 1; i < 602; i++ {
+  for i := 1; i < len(dataStr); i++ {
     frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
     signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
   }
 
-  // Convert to float
+  // Convert
   var frequency, signal []float64
 
   for _, freqElem := range frequencyStrT {
@@ -440,6 +414,17 @@ func getData(csvName string) ([][]float64) {
     if err != nil {
       fmt.Println(err)
     }
+
+    // Convert to Linear if dBm
+    if dataStr[1][3] == " dBm" {
+      var convSignal []float64
+
+      for _, sigElemToConvert := range signal {
+        convSignal = append(convSignal, math.Pow(10, sigElemToConvert/10.))
+      }
+
+      return [][]float64{frequency, convSignal}
+    } else {return [][]float64{frequency, signal}}
   }
 
   for _, sigElem := range signalStrT {
@@ -449,16 +434,7 @@ func getData(csvName string) ([][]float64) {
     }
   }
 
-  // Convert to Linear if dBm
-  if dataStr[1][3] == " dBm" {
-    var convSignal []float64
-
-    for _, sigElemToConvert := range signal {
-      convSignal = append(convSignal, math.Pow(10, sigElemToConvert/10.))
-    }
-
-    return [][]float64{frequency, convSignal}
-  } else {return [][]float64{frequency, signal}}
+  return [][]float64{frequency, signal}
 }
 
 func readCSV(rs io.ReadSeeker) ([][]string, error) {
@@ -483,30 +459,28 @@ func readCSV(rs io.ReadSeeker) ([][]string, error) {
 
 func getAllLabels(label []string) ([]string, []string, []string, []string) {
 
-  var prasLabel, pasLabel, prsLabel, psLabel []string
+  var rasLabel, basLabel, rsLabel, bsLabel []string
 
-  for i := 1; i < len(label); i += 4 {
-    prasLabel = append(prasLabel, label[i])
+  // Background
+  basLabel = append(basLabel, label[1])
+  bsLabel = append(bsLabel, label[2])
+
+  for i := 3; i < len(label); i += 2 {
+    rasLabel = append(rasLabel, label[i])
   }
-  for i := 2; i < len(label); i += 4 {
-    pasLabel = append(pasLabel, label[i])
-  }
-  for i := 3; i < len(label); i += 4 {
-    prsLabel = append(prsLabel, label[i])
-  }
-  for i := 4; i < len(label); i += 4 {
-    psLabel = append(psLabel, label[i])
+  for i := 4; i < len(label); i += 2 {
+    rsLabel = append(rsLabel, label[i])
   }
 
-  return prasLabel, pasLabel, prsLabel, psLabel
+  return rasLabel, basLabel, rsLabel, bsLabel
 }
 
 func plotRaw(
   sets []int,
-  pras [][][]float64, prasLabel []string,
-  pas [][][]float64, pasLabel []string,
-  prs [][][]float64, prsLabel []string,
-  ps [][][]float64, psLabel []string,
+  ras [][][]float64, rasLabel []string,
+  bas [][][]float64, basLabel []string,
+  rs [][][]float64, rsLabel []string,
+  bs [][][]float64, bsLabel []string,
   ) {
 
   for i := 0; i < len(sets); i++ {
@@ -519,18 +493,18 @@ func plotRaw(
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (dBm)")
 
-    plot.AddPointGroup(prasLabel[sets[i]], "points", pras[sets[i]])
-    plot.AddPointGroup(pasLabel[sets[i]], "points", pas[sets[i]])
-    plot.AddPointGroup(prsLabel[sets[i]], "points", prs[sets[i]])
-    plot.AddPointGroup(psLabel[sets[i]], "points", ps[sets[i]])
+    plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
+    plot.AddPointGroup(basLabel[0], "points", bas[sets[0]])
+    plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
+    plot.AddPointGroup(bsLabel[0], "points", bs[sets[0]])
   }
 }
 
 func subtractBackground(
-  pras [][][]float64,
-  pas [][][]float64,
-  prs [][][]float64,
-  ps [][][]float64,
+  ras [][][]float64,
+  bas [][][]float64,
+  rs [][][]float64,
+  bs [][][]float64,
   ) (
   [][][]float64,
   [][][]float64,
@@ -538,9 +512,11 @@ func subtractBackground(
 
   var s, as [][][]float64
 
-  for i := 0; i < len(pras); i++ {
-    s = append(s, subtract(ps[i], prs[i]))
-    as = append(as, subtract(pas[i], pras[i]))
+  fmt.Println(rs[0])
+
+  for i := 0; i < len(ras); i++ {
+    s = append(s, subtract(bs[0], rs[i]))
+    as = append(as, subtract(bas[0], ras[i]))
   }
 
   return s, as
@@ -548,15 +524,17 @@ func subtractBackground(
 
 func subtract(b [][]float64, s [][]float64) ([][]float64) {
 
-  var shiftUp float64 = 0
+  //var shiftUp float64 = 0
 
-  if (s[1][0] - b[1][0] > 0) {
+  //fmt.Println(s)
+
+  /*if (s[1][0] - b[1][0] > 0) {
     shiftUp = b[1][0] - s[1][0]
-  }
+  }*/
 
-  for i := 0; i < len(b[0]); i++ {
+  /*for i := 0; i < len(b[0]); i++ {
     s[1][i] = s[1][i] - b[1][i] + shiftUp
-  }
+  }*/
 
   return s
 }

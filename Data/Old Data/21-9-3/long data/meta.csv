@@ -1,0 +1,9 @@
+Date,Name,probe power @voa,Filepath,Notes
+21-9-3,0mW pras,10,Data/0/pras.csv, 5s sweep - 100avg - 10kHz RBW
+21-9-3,0mW pas,0,Data/0/pas.csv,
+21-9-3,0mW prs,10,Data/0/prs.csv,
+21-9-3,0mW ps,0,Data/0/ps.csv,
+21-9-3,40mW pras,10,Data/40/pras.csv,40mw pump
+21-9-3,40mW pas,0,Data/40/pas.csv,
+21-9-3,40mW prs,10,Data/40/prs.csv,
+21-9-3,40mW ps,0,Data/40/ps.csv,
