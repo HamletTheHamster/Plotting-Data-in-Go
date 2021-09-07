@@ -23,18 +23,20 @@ func main() {
   pras, pas, prs, ps := getAllData(file)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
+/*
   fmt.Printf("\n\nVerify Labels\n-------------\n")
   fmt.Printf("Want | Have\n")
-  fmt.Printf("40mW | %s\n", strings.Trim(prsLabel[0], " prs"))
-  fmt.Printf("40mW | %s\n", strings.Trim(prasLabel[0], " pras"))
+  fmt.Printf("20mW | %s\n", strings.Trim(prsLabel[0], " prs"))
+  fmt.Printf("20mW | %s\n", strings.Trim(prasLabel[0], " pras"))
   fmt.Printf(" 0mW | %s\n", strings.Trim(prsLabel[1], " prs"))
   fmt.Printf(" 0mW | %s\n\n\n", strings.Trim(prasLabel[1], " pras"))
 
   fmt.Printf("Verify first 3 values of pras signals\n")
   fmt.Printf("-------------------------------------\n")
   fmt.Printf("Want                   | Have\n")
-  fmt.Printf("-58.00, -57.98, -57.96 | %.2f, %.2f, %.2f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
-  fmt.Printf("-58.10, -58.08, -58.07 | %.2f, %.2f, %.2f\n\n", pras[1][1][0], pras[1][1][1], pras[1][1][2])
+  fmt.Printf("-58.20, -58.19, -58.19 | %.2f, %.2f, %.2f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
+  fmt.Printf("-58.10, -58.09, -58.08 | %.2f, %.2f, %.2f\n\n\n", pras[1][1][0], pras[1][1][1], pras[1][1][2])
+*/
 
   setsToPlotRaw := []int{}
   plotRaw(
@@ -46,6 +48,16 @@ func main() {
   )
 
   s, as := subtractBackground(pras, pas, prs, ps)
+
+/*
+  fmt.Printf("Verify first 3 values of s/as\n")
+  fmt.Printf("-----------------------------\n")
+  fmt.Printf("Power | s/as | Want                | Have\n")
+  fmt.Printf("20mW  | s    | -0.12, -0.10, -0.13 | %.2f, %.2f, %.2f\n", s[0][1][0], s[0][1][1], s[0][1][2])
+  fmt.Printf("20mW  | as   | -0.10, -0.11, -0.12 | %.2f, %.2f, %.2f\n", as[0][1][0], as[0][1][1], as[0][1][2])
+  fmt.Printf("0mW   | s    | -0.12, -0.09, -0.06 | %.2f, %.2f, %.2f\n", s[1][1][0], s[1][1][1], s[1][1][2])
+  fmt.Printf("0mW   | as   |  0.04,  0.07,  0.06 |  %.2f,  %.2f,  %.2f\n\n\n", as[1][1][0], as[1][1][1], as[1][1][2])
+*/
 
   setsToPlotSubtracted := []int{0,1}
   plotSubtracted(
@@ -526,15 +538,15 @@ func subtractBackground(
 }
 
 func subtract(b [][]float64, s [][]float64) ([][]float64) {
-/*
+
   var shiftUp float64 = 0
 
-  if (s[1][0] - b[1][0] < 0) {
+  if (s[1][0] - b[1][0] > 0) {
     shiftUp = b[1][0] - s[1][0]
   }
-*/
+
   for i := 0; i < len(b[0]); i++ {
-    s[1][i] = s[1][i] - b[1][i]// + shiftUp
+    s[1][i] = s[1][i] - b[1][i] + shiftUp
   }
 
   return s
