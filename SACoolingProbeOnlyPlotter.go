@@ -34,14 +34,14 @@ func main() {
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{}
+  setsToPlotSubtracted := []int{4}
   plotSubtracted(
     setsToPlotSubtracted,
     s, rsLabel,
     as, rasLabel,
   )
 
-  setsToPlotSubtractedTogether := []int{4}
+  setsToPlotSubtractedTogether := []int{}
   plotSubtractedTogether(
   setsToPlotSubtractedTogether,
   s, rsLabel,
@@ -414,17 +414,6 @@ func getData(csvName string) ([][]float64) {
     if err != nil {
       fmt.Println(err)
     }
-
-    // Convert to Linear if dBm
-    if dataStr[1][3] == " dBm" {
-      var convSignal []float64
-
-      for _, sigElemToConvert := range signal {
-        convSignal = append(convSignal, math.Pow(10, sigElemToConvert/10.))
-      }
-
-      return [][]float64{frequency, convSignal}
-    } else {return [][]float64{frequency, signal}}
   }
 
   for _, sigElem := range signalStrT {
@@ -434,7 +423,16 @@ func getData(csvName string) ([][]float64) {
     }
   }
 
-  return [][]float64{frequency, signal}
+  // Convert to Linear if dBm
+  if dataStr[1][3] == " dBm" {
+    var convSignal []float64
+
+    for _, sigElemToConvert := range signal {
+      convSignal = append(convSignal, math.Pow(10, sigElemToConvert/10.))
+    }
+
+    return [][]float64{frequency, convSignal}
+  } else {return [][]float64{frequency, signal}}
 }
 
 func readCSV(rs io.ReadSeeker) ([][]string, error) {
@@ -494,9 +492,9 @@ func plotRaw(
     plot.SetYLabel("Signal (dBm)")
 
     plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
-    plot.AddPointGroup(basLabel[0], "points", bas[sets[0]])
+    plot.AddPointGroup(basLabel[0], "points", bas[0])
     plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
-    plot.AddPointGroup(bsLabel[0], "points", bs[sets[0]])
+    plot.AddPointGroup(bsLabel[0], "points", bs[0])
   }
 }
 
@@ -512,8 +510,6 @@ func subtractBackground(
 
   var s, as [][][]float64
 
-  fmt.Println(rs[0])
-
   for i := 0; i < len(ras); i++ {
     s = append(s, subtract(bs[0], rs[i]))
     as = append(as, subtract(bas[0], ras[i]))
@@ -524,17 +520,15 @@ func subtractBackground(
 
 func subtract(b [][]float64, s [][]float64) ([][]float64) {
 
-  //var shiftUp float64 = 0
+  var shiftUp float64 = 0
 
-  //fmt.Println(s)
-
-  /*if (s[1][0] - b[1][0] > 0) {
+  if (s[1][0] - b[1][0] > 0) {
     shiftUp = b[1][0] - s[1][0]
-  }*/
+  }
 
-  /*for i := 0; i < len(b[0]); i++ {
+  for i := 0; i < len(b[0]); i++ {
     s[1][i] = s[1][i] - b[1][i] + shiftUp
-  }*/
+  }
 
   return s
 }
