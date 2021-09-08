@@ -1,13 +1,9 @@
 Date,Name,probe power @voa,Filepath,Notes
-21-9-7,bas,0,Data/40/bas.csv,-
-21-9-7,bs,0,Data/40/bs.csv,-
-21-9-7,40mW ras,40,Data/40/ras.csv,-power @ sample from tap - 5s sweep - 10kHz RBW - 100 avg
-21-9-7,40mW rs,40,Data/40/rs.csv,-
-21-9-7,20mW ras,20,Data/20/ras.csv,-
-21-9-7,20mW rs,20,Data/20/rs.csv,-
-21-9-7,10mW ras,10,Data/10/ras.csv,
-21-9-7,10mW rs,10,Data/10/rs.csv,
-21-9-7,5mW ras,5,Data/5/ras.csv,
-21-9-7,5mW rs,5,Data/5/rs.csv,
-21-9-7,2mW ras,2,Data/2/ras.csv,
-21-9-7,2mW rs,2,Data/2/rs.csv,
+21-9-3,60mW pras,10,Data/60/pras.csv,64mw pump - 1s sweep - 100avg
+21-9-3,60mW pas,0,Data/60/pas.csv,
+21-9-3,60mW prs,10,Data/60/prs.csv,
+21-9-3,60mW ps,0,Data/60/ps.csv,
+21-9-3,0mW pras,10,Data/0/pras.csv,
+21-9-3,0mW pas,0,Data/0/pas.csv,
+21-9-3,0mW prs,10,Data/0/prs.csv,
+21-9-3,0mW ps,0,Data/0/ps.csv,

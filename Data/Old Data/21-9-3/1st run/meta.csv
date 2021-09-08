@@ -1,9 +1,0 @@
-Date,Name,probe power @voa,Filepath,Notes
-21-9-3,60mW pras,10,Data/60/pras.csv,64mw pump - 1s sweep - 100avg
-21-9-3,60mW pas,0,Data/60/pas.csv,
-21-9-3,60mW prs,10,Data/60/prs.csv,
-21-9-3,60mW ps,0,Data/60/ps.csv,
-21-9-3,0mW pras,10,Data/0/pras.csv,
-21-9-3,0mW pas,0,Data/0/pas.csv,
-21-9-3,0mW prs,10,Data/0/prs.csv,
-21-9-3,0mW ps,0,Data/0/ps.csv,

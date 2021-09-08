@@ -20,7 +20,7 @@ func main() {
 
   label, file := readMeta()
 
-  ras, bas, rs, bs := getAllData(file)
+  ras, bas, rs, bs := getAllData(file, label)
   rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
 
   setsToPlotRaw := []int{}
@@ -34,7 +34,7 @@ func main() {
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{4}
+  setsToPlotSubtracted := []int{0}
   plotSubtracted(
     setsToPlotSubtracted,
     s, rsLabel,
@@ -364,21 +364,23 @@ func readMeta() ([]string, []string) {
   return label, data
 }
 
-func getAllData(fileNames []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
+func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
 
   var bas, bs, ras, rs [][][]float64
 
-  // Background
-  bas = append(bas, getData(fileNames[1]))
-  bs = append(bs, getData(fileNames[2]))
+  // Assign data by name
+  for i, fileName := range fileNames {
+    if strings.Contains(labels[i], "bas") {
+      bas = append(bas, getData(fileName))
+    } else if strings.Contains(labels[i], "bs") {
+      bs = append(bs, getData(fileName))
+    } else if strings.Contains(labels[i], "ras") {
+      ras = append(ras, getData(fileName))
+    } else if strings.Contains(labels[i], "rs") {
+      rs = append(rs, getData(fileName))
+    }
+  }
 
-  // s/as at various powers
-  for i := 3; i < len(fileNames); i += 2 {
-    ras = append(ras, getData(fileNames[i]))
-  }
-  for i := 4; i < len(fileNames); i += 2 {
-    rs = append(rs, getData(fileNames[i]))
-  }
   return ras, bas, rs, bs
 }
 
@@ -428,13 +430,17 @@ func getData(csvName string) ([][]float64) {
     var convSignal []float64
 
     for _, sigElemToConvert := range signal {
-      convSignal = append(convSignal, math.Pow(10, sigElemToConvert/10.))
+      convSignal = append(convSignal, math.Pow(10, 6)*math.Pow(10, sigElemToConvert/10.))
     }
 
     return [][]float64{frequency, convSignal}
+  } else if dataStr[1][3] == "  uV" {
+    return [][]float64{frequency, signal}
   }
-  
+
+  fmt.Println("Warning: check units - not uV or dBm")
   return [][]float64{frequency, signal}
+
 }
 
 func readCSV(rs io.ReadSeeker) ([][]string, error) {
@@ -491,7 +497,7 @@ func plotRaw(
 
     plot.SetTitle("Raw")
     plot.SetXLabel("Frequency (GHz)")
-    plot.SetYLabel("Signal (dBm)")
+    plot.SetYLabel("Signal (uV)")
 
     plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
     plot.AddPointGroup(basLabel[0], "points", bas[0])
@@ -549,7 +555,7 @@ func plotSubtracted(
 
     plot.SetTitle("Background Subtracted")
     plot.SetXLabel("Frequency (GHz)")
-    plot.SetYLabel("Signal (dBm)")
+    plot.SetYLabel("Signal (uV)")
 
     plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
     plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
@@ -569,7 +575,7 @@ func plotSubtractedTogether(
 
   plot.SetTitle("Background Subtracted")
   plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (dBm)")
+  plot.SetYLabel("Signal (uV)")
 
   for i := 0; i < len(sets); i++ {
     plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
@@ -591,7 +597,7 @@ func plotSubtractedGrouped(
 
   plot.SetTitle("Background Subtracted")
   plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (dBm)")
+  plot.SetYLabel("Signal (uV)")
 
   for i := 0; i < len(sets); i++ {
     plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
@@ -605,7 +611,7 @@ func plotSubtractedGrouped(
 
   plot.SetTitle("Background Subtracted")
   plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (dBm)")
+  plot.SetYLabel("Signal (uV)")
 
   for i := 0; i < len(sets); i++ {
     plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
@@ -656,7 +662,7 @@ func plotDataWithFit(
 
   plot.SetTitle("Background Subtracted with Lorentzian Fit")
   plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (dBm)")
+  plot.SetYLabel("Signal (uV)")
 
   plot.AddPointGroup(label1, "points", set1)
   plot.AddPointGroup(label2, "lines", set2)
@@ -700,7 +706,7 @@ plot, _ := glot.NewPlot(dimensions, persist, debug)
 
 plot.SetTitle("Separated")
 plot.SetXLabel("Frequency (GHz)")
-plot.SetYLabel("Signal (dBm)")
+plot.SetYLabel("Signal (uV)")
 
 plot.AddPointGroup(label1, "lines", set1)
 plot.AddPointGroup(label2, "lines", set2)
@@ -732,7 +738,7 @@ plot, _ := glot.NewPlot(dimensions, persist, debug)
 
 plot.SetTitle("Lorentz Fit")
 plot.SetXLabel("Frequency (GHz)")
-plot.SetYLabel("Signal (dBm)")
+plot.SetYLabel("Signal (uV)")
 
 plot.AddPointGroup(label1, "lines", set1)
 plot.AddPointGroup(label2, "lines", set2)
