@@ -34,14 +34,14 @@ func main() {
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
-  setsToPlotSubtracted := []int{0,1}
+  setsToPlotSubtracted := []int{}
   plotSubtracted(
     setsToPlotSubtracted,
     s, prsLabel,
     as, prasLabel,
   )
 
-  setsToPlotSubtractedTogether := []int{0,1}
+  setsToPlotSubtractedTogether := []int{}
   plotSubtractedTogether(
   setsToPlotSubtractedTogether,
   s, prsLabel,
