@@ -432,27 +432,29 @@ func getData(csvName string) ([][]float64) {
     }
 
     return [][]float64{frequency, convSignal}
-  } else {return [][]float64{frequency, signal}}
+  }
+  
+  return [][]float64{frequency, signal}
 }
 
 func readCSV(rs io.ReadSeeker) ([][]string, error) {
-    // Skip first row (line)
-    row1, err := bufio.NewReader(rs).ReadSlice('\n')
-    if err != nil {
-        return nil, err
-    }
-    _, err = rs.Seek(int64(len(row1)), io.SeekStart)
-    if err != nil {
-        return nil, err
-    }
+  // Skip first row (line)
+  row1, err := bufio.NewReader(rs).ReadSlice('\n')
+  if err != nil {
+    return nil, err
+  }
+  _, err = rs.Seek(int64(len(row1)), io.SeekStart)
+  if err != nil {
+    return nil, err
+  }
 
-    // Read remaining rows
-    r := csv.NewReader(rs)
-    rows, err := r.ReadAll()
-    if err != nil {
-        return nil, err
-    }
-    return rows, nil
+  // Read remaining rows
+  r := csv.NewReader(rs)
+  rows, err := r.ReadAll()
+  if err != nil {
+    return nil, err
+  }
+  return rows, nil
 }
 
 func getAllLabels(label []string) ([]string, []string, []string, []string) {
