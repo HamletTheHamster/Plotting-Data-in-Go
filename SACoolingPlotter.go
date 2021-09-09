@@ -23,6 +23,25 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
+  fmt.Printf("\n\nVerify Labels\n-------------\n")
+  fmt.Printf("Want  | Have\n")
+  fmt.Printf("0mW   | %s\n", strings.Trim(prsLabel[0], " prs"))
+  fmt.Printf("0mW   | %s\n", strings.Trim(prasLabel[0], " pras"))
+  fmt.Printf("170mW | %s\n", strings.Trim(prsLabel[3], " prs"))
+  fmt.Printf("170mW | %s\n\n\n", strings.Trim(prasLabel[3], " pras"))
+
+  fmt.Printf("Verify first 3 values of pras signals\n")
+  fmt.Printf("-------------------------------------\n")
+  fmt.Printf("Want                          | Have\n")
+  fmt.Printf("0mW:   1.6368, 1.6443, 1.6519 | %.4f, %.4f, %.4f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
+  fmt.Printf("170mW: 1.6481, 1.6557, 1.6672 | %.4f, %.4f, %.4f\n\n\n", pras[3][1][0], pras[3][1][1], pras[3][1][2])
+
+  fmt.Printf("Verify first 3 values of pas signals\n")
+  fmt.Printf("-------------------------------------\n")
+  fmt.Printf("Want                          | Have\n")
+  fmt.Printf("0mW:   1.6443, 1.6519, 1.6634 | %.4f, %.4f, %.4f\n", pas[0][1][0], pas[0][1][1], pas[0][1][2])
+  fmt.Printf("170mw: 1.6595, 1.6634, 1.6672 | %.4f, %.4f, %.4f\n\n\n", pas[3][1][0], pas[3][1][1], pas[3][1][2])
+
   toPlotRaw := []int{}
   if toPlotRaw != nil {
     plotRaw(
@@ -34,6 +53,14 @@ func main() {
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
+  fmt.Printf("\nVerify first 3 values of s/as\n")
+  fmt.Printf("-----------------------------\n")
+  fmt.Printf("Power | s/as | Want                     | Have\n")
+  fmt.Printf("0mW   | s    | 0.0000, 0.0001, -0.0114  | %.4f, %.4f, %.4f\n", s[0][1][0], s[0][1][1], s[0][1][2])
+  fmt.Printf("0mW   | as   | 0.0000, -0.0000, -0.0038 | %.4f, %.4f, %.4f\n\n", as[0][1][0], as[0][1][1], as[0][1][2])
+  fmt.Printf("170mW | s    | 0.0000, -0.0000, -0.023408327932657125 | %.2f, %.2f, %.2f\n", s[1][1][0], s[1][1][1], s[1][1][2])
+  fmt.Printf("170mW | as   | 0.0000,  0.07,  0.06 |  %.2f,  %.2f,  %.2f\n\n\n", as[1][1][0], as[1][1][1], as[1][1][2])
+
   toPlotSubtracted := []int{}
   if toPlotSubtracted != nil {
     plotSubtracted(toPlotSubtracted, s, as, prsLabel, prasLabel)
@@ -44,7 +71,7 @@ func main() {
     plotSubtractedTogether(toPlotSubtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  toPlotSubtractedGrouped := []int{}
+  toPlotSubtractedGrouped := []int{0,1,2,3}
   if toPlotSubtractedGrouped != nil {
     plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
   }
@@ -363,15 +390,15 @@ func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][
 
   var pras, pas, prs, ps [][][]float64
 
-  // Assign data by name
-  for i, fileName := range fileNames {
-    if strings.Contains(labels[i], "pras") {
+  // Assign data by checking csv name
+  for _, fileName := range fileNames {
+    if strings.Contains(fileName, "pras.") {
       pras = append(pras, getData(&fileName))
-    } else if strings.Contains(labels[i], "pas") {
+    } else if strings.Contains(fileName, "pas.") {
       pas = append(pas, getData(&fileName))
-    } else if strings.Contains(labels[i], "prs") {
+    } else if strings.Contains(fileName, "prs.") {
       prs = append(prs, getData(&fileName))
-    } else if strings.Contains(labels[i], "ps") {
+    } else if strings.Contains(fileName, "ps.") {
       ps = append(ps, getData(&fileName))
     }
   }
@@ -461,17 +488,17 @@ func getAllLabels(label []string) ([]string, []string, []string, []string) {
 
   var prasLabel, pasLabel, prsLabel, psLabel []string
 
-  for i := 1; i < len(label); i += 4 {
-    prasLabel = append(prasLabel, label[i])
-  }
-  for i := 2; i < len(label); i += 4 {
-    pasLabel = append(pasLabel, label[i])
-  }
-  for i := 3; i < len(label); i += 4 {
-    prsLabel = append(prsLabel, label[i])
-  }
-  for i := 4; i < len(label); i += 4 {
-    psLabel = append(psLabel, label[i])
+  // Assign labels by checking label
+  for _, thisLabel := range label {
+    if strings.Contains(thisLabel, "pras") {
+      prasLabel = append(prasLabel, thisLabel)
+    } else if strings.Contains(thisLabel, "pas") {
+      pasLabel = append(pasLabel, thisLabel)
+    } else if strings.Contains(thisLabel, "prs") {
+      prsLabel = append(prsLabel, thisLabel)
+    } else if strings.Contains(thisLabel, "ps") {
+      psLabel = append(psLabel, thisLabel)
+    }
   }
 
   return prasLabel, pasLabel, prsLabel, psLabel
@@ -514,14 +541,15 @@ func subtractBackground(pras, pas, prs, ps [][][]float64) ([][][]float64, [][][]
 
 func subtract(b, s [][]float64) ([][]float64) {
 
-  var shiftUp float64 = 0
+  var sum float64
+  n := 10
 
-  if (s[1][0] - b[1][0] > 0) {
-    shiftUp = b[1][0] - s[1][0]
+  for i := 0; i < n; i++ {
+    sum += b[1][i] - s[1][i]
   }
 
   for i := 0; i < len(b[0]); i++ {
-    s[1][i] = s[1][i] - b[1][i] + shiftUp
+    s[1][i] = s[1][i] - b[1][i] + sum/float64(n)
   }
 
   return s
@@ -529,7 +557,7 @@ func subtract(b, s [][]float64) ([][]float64) {
 
 func plotSubtracted(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
-  for i := 0; i < len(sets); i++ {
+  for _, set := range sets {
     dimensions := 2
     persist := true
     debug := false
@@ -539,8 +567,8 @@ func plotSubtracted(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+    plot.AddPointGroup(strings.Trim(sLabel[set], " prs") + " s", "points", s[set])
+    plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
   }
 }
 
@@ -555,9 +583,9 @@ func plotSubtractedTogether(sets []int, s, as [][][]float64, sLabel, asLabel []s
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (uV)")
 
-  for i := 0; i < len(sets); i++ {
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  for _, set := range sets {
+    plot.AddPointGroup(strings.Trim(sLabel[set], " prs") + " s", "points", s[set])
+    plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
   }
 }
 
@@ -573,8 +601,8 @@ func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []st
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (uV)")
 
-  for i := 0; i < len(sets); i++ {
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
+  for _, set := range sets {
+    plot.AddPointGroup(strings.Trim(sLabel[set], " prs") + " s", "points", s[set])
   }
 
   // as
@@ -587,8 +615,8 @@ func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []st
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (uV)")
 
-  for i := 0; i < len(sets); i++ {
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  for _, set := range sets {
+    plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
   }
 }
 
