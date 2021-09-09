@@ -24,36 +24,45 @@ func main() {
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
   setsToPlotRaw := []int{}
-  plotRaw(
-    setsToPlotRaw,
-    pras, prasLabel,
-    pas, pasLabel,
-    prs, prsLabel,
-    ps, psLabel,
-  )
+  if setsToPlotRaw != nil {
+    plotRaw(
+      setsToPlotRaw,
+      pras, prasLabel,
+      pas, pasLabel,
+      prs, prsLabel,
+      ps, psLabel,
+    )
+  }
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
   setsToPlotSubtracted := []int{}
-  plotSubtracted(
-    setsToPlotSubtracted,
-    s, prsLabel,
-    as, prasLabel,
-  )
+  if setsToPlotSubtracted != nil {
+    plotSubtracted(
+      setsToPlotSubtracted,
+      s, prsLabel,
+      as, prasLabel,
+    )
+  }
 
   setsToPlotSubtractedTogether := []int{}
-  plotSubtractedTogether(
-  setsToPlotSubtractedTogether,
-  s, prsLabel,
-  as, prasLabel,
-  )
+  if setsToPlotSubtractedTogether != nil {
+    plotSubtractedTogether(
+      setsToPlotSubtractedTogether,
+      s, prsLabel,
+      as, prasLabel,
+    )
+  }
 
-  setsToPlotSubtractedGrouped := []int{0,1,2,3}
-  plotSubtractedGrouped(
-    setsToPlotSubtractedGrouped,
-    s, prsLabel,
-    as, prasLabel,
-  )
+  setsToPlotSubtractedGrouped := []int{}
+  if setsToPlotSubtractedGrouped != nil {
+    plotSubtractedGrouped(
+      setsToPlotSubtractedGrouped,
+      s, prsLabel,
+      as, prasLabel,
+    )
+  }
+
 /*
   // Lorentz Fit
   asamp := []float64{0, 0.01, 0.03, 0.1, 0.5, 0.7, 0.1}
@@ -371,23 +380,23 @@ func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][
   // Assign data by name
   for i, fileName := range fileNames {
     if strings.Contains(labels[i], "pras") {
-      pras = append(pras, getData(fileName))
+      pras = append(pras, getData(&fileName))
     } else if strings.Contains(labels[i], "pas") {
-      pas = append(pas, getData(fileName))
+      pas = append(pas, getData(&fileName))
     } else if strings.Contains(labels[i], "prs") {
-      prs = append(prs, getData(fileName))
+      prs = append(prs, getData(&fileName))
     } else if strings.Contains(labels[i], "ps") {
-      ps = append(ps, getData(fileName))
+      ps = append(ps, getData(&fileName))
     }
   }
 
   return pras, pas, prs, ps
 }
 
-func getData(csvName string) ([][]float64) {
+func getData(csvName *string) ([][]float64) {
 
   // Read
-  f, err := os.Open(csvName)
+  f, err := os.Open(*csvName)
   if err != nil {
     panic(err)
   }
