@@ -23,25 +23,6 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
-  fmt.Printf("\n\nVerify Labels\n-------------\n")
-  fmt.Printf("Want  | Have\n")
-  fmt.Printf("0mW   | %s\n", strings.Trim(prsLabel[0], " prs"))
-  fmt.Printf("0mW   | %s\n", strings.Trim(prasLabel[0], " pras"))
-  fmt.Printf("170mW | %s\n", strings.Trim(prsLabel[3], " prs"))
-  fmt.Printf("170mW | %s\n\n\n", strings.Trim(prasLabel[3], " pras"))
-
-  fmt.Printf("Verify first 3 values of pras signals\n")
-  fmt.Printf("-------------------------------------\n")
-  fmt.Printf("Want                          | Have\n")
-  fmt.Printf("0mW:   1.6368, 1.6443, 1.6519 | %.4f, %.4f, %.4f\n", pras[0][1][0], pras[0][1][1], pras[0][1][2])
-  fmt.Printf("170mW: 1.6481, 1.6557, 1.6672 | %.4f, %.4f, %.4f\n\n\n", pras[3][1][0], pras[3][1][1], pras[3][1][2])
-
-  fmt.Printf("Verify first 3 values of pas signals\n")
-  fmt.Printf("-------------------------------------\n")
-  fmt.Printf("Want                          | Have\n")
-  fmt.Printf("0mW:   1.6443, 1.6519, 1.6634 | %.4f, %.4f, %.4f\n", pas[0][1][0], pas[0][1][1], pas[0][1][2])
-  fmt.Printf("170mw: 1.6595, 1.6634, 1.6672 | %.4f, %.4f, %.4f\n\n\n", pas[3][1][0], pas[3][1][1], pas[3][1][2])
-
   toPlotRaw := []int{}
   if toPlotRaw != nil {
     plotRaw(
@@ -53,14 +34,6 @@ func main() {
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
-  fmt.Printf("\nVerify first 3 values of s/as\n")
-  fmt.Printf("-----------------------------\n")
-  fmt.Printf("Power | s/as | Want                     | Have\n")
-  fmt.Printf("0mW   | s    | 0.0000, 0.0001, -0.0114  | %.4f, %.4f, %.4f\n", s[0][1][0], s[0][1][1], s[0][1][2])
-  fmt.Printf("0mW   | as   | 0.0000, -0.0000, -0.0038 | %.4f, %.4f, %.4f\n\n", as[0][1][0], as[0][1][1], as[0][1][2])
-  fmt.Printf("170mW | s    | 0.0000, -0.0000, -0.023408327932657125 | %.2f, %.2f, %.2f\n", s[1][1][0], s[1][1][1], s[1][1][2])
-  fmt.Printf("170mW | as   | 0.0000,  0.07,  0.06 |  %.2f,  %.2f,  %.2f\n\n\n", as[1][1][0], as[1][1][1], as[1][1][2])
-
   toPlotSubtracted := []int{}
   if toPlotSubtracted != nil {
     plotSubtracted(toPlotSubtracted, s, as, prsLabel, prasLabel)
@@ -71,7 +44,7 @@ func main() {
     plotSubtractedTogether(toPlotSubtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  toPlotSubtractedGrouped := []int{0,1,2,3}
+  toPlotSubtractedGrouped := []int{}
   if toPlotSubtractedGrouped != nil {
     plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
   }
