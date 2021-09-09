@@ -23,44 +23,30 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
-  setsToPlotRaw := []int{}
-  if setsToPlotRaw != nil {
+  toPlotRaw := []int{}
+  if toPlotRaw != nil {
     plotRaw(
-      setsToPlotRaw,
-      pras, prasLabel,
-      pas, pasLabel,
-      prs, prsLabel,
-      ps, psLabel,
+      toPlotRaw,
+      pras, pas, prs, ps,
+      prasLabel, pasLabel, prsLabel, psLabel,
     )
   }
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
-  setsToPlotSubtracted := []int{}
-  if setsToPlotSubtracted != nil {
-    plotSubtracted(
-      setsToPlotSubtracted,
-      s, prsLabel,
-      as, prasLabel,
-    )
+  toPlotSubtracted := []int{}
+  if toPlotSubtracted != nil {
+    plotSubtracted(toPlotSubtracted, s, as, prsLabel, prasLabel)
   }
 
-  setsToPlotSubtractedTogether := []int{}
-  if setsToPlotSubtractedTogether != nil {
-    plotSubtractedTogether(
-      setsToPlotSubtractedTogether,
-      s, prsLabel,
-      as, prasLabel,
-    )
+  toPlotSubtractedTogether := []int{}
+  if toPlotSubtractedTogether != nil {
+    plotSubtractedTogether(toPlotSubtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  setsToPlotSubtractedGrouped := []int{}
-  if setsToPlotSubtractedGrouped != nil {
-    plotSubtractedGrouped(
-      setsToPlotSubtractedGrouped,
-      s, prsLabel,
-      as, prasLabel,
-    )
+  toPlotSubtractedGrouped := []int{}
+  if toPlotSubtractedGrouped != nil {
+    plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
   }
 
 /*
@@ -493,10 +479,8 @@ func getAllLabels(label []string) ([]string, []string, []string, []string) {
 
 func plotRaw(
   sets []int,
-  pras [][][]float64, prasLabel []string,
-  pas [][][]float64, pasLabel []string,
-  prs [][][]float64, prsLabel []string,
-  ps [][][]float64, psLabel []string,
+  pras, pas, prs, ps [][][]float64,
+  prasLabel, pasLabel, prsLabel, psLabel []string,
   ) {
 
   for i := 0; i < len(sets); i++ {
@@ -516,15 +500,7 @@ func plotRaw(
   }
 }
 
-func subtractBackground(
-  pras [][][]float64,
-  pas [][][]float64,
-  prs [][][]float64,
-  ps [][][]float64,
-  ) (
-  [][][]float64,
-  [][][]float64,
-  ) {
+func subtractBackground(pras, pas, prs, ps [][][]float64) ([][][]float64, [][][]float64) {
 
   var s, as [][][]float64
 
@@ -536,7 +512,7 @@ func subtractBackground(
   return s, as
 }
 
-func subtract(b [][]float64, s [][]float64) ([][]float64) {
+func subtract(b, s [][]float64) ([][]float64) {
 
   var shiftUp float64 = 0
 
@@ -551,11 +527,7 @@ func subtract(b [][]float64, s [][]float64) ([][]float64) {
   return s
 }
 
-func plotSubtracted(
-  sets []int,
-  s [][][]float64, sLabel []string,
-  as [][][]float64, asLabel []string,
-  ) {
+func plotSubtracted(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
   for i := 0; i < len(sets); i++ {
     dimensions := 2
@@ -572,11 +544,7 @@ func plotSubtracted(
   }
 }
 
-func plotSubtractedTogether(
-  sets []int,
-  s [][][]float64, sLabel []string,
-  as [][][]float64, asLabel []string,
-  ) {
+func plotSubtractedTogether(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
   dimensions := 2
   persist := true
@@ -593,11 +561,7 @@ func plotSubtractedTogether(
   }
 }
 
-func plotSubtractedGrouped(
-  sets []int,
-  s [][][]float64, sLabel []string,
-  as [][][]float64, asLabel []string,
-  ) {
+func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
   // s
   dimensions := 2
