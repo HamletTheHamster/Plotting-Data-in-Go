@@ -48,7 +48,7 @@ func main() {
   as, prasLabel,
   )
 
-  setsToPlotSubtractedGrouped := []int{0,1}
+  setsToPlotSubtractedGrouped := []int{0,1,2,3}
   plotSubtractedGrouped(
     setsToPlotSubtractedGrouped,
     s, prsLabel,
@@ -364,7 +364,7 @@ func readMeta() ([]string, []string) {
   return label, data
 }
 
-func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
+func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
 
   var pras, pas, prs, ps [][][]float64
 

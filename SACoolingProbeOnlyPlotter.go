@@ -34,7 +34,7 @@ func main() {
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{0}
+  setsToPlotSubtracted := []int{3}
   plotSubtracted(
     setsToPlotSubtracted,
     s, rsLabel,
@@ -405,7 +405,7 @@ func getData(csvName string) ([][]float64) {
     signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
   }
 
-  // Convert
+  // Convert to float
   var frequency, signal []float64
 
   for _, freqElem := range frequencyStrT {
@@ -435,12 +435,12 @@ func getData(csvName string) ([][]float64) {
 
     return [][]float64{frequency, convSignal}
   } else if dataStr[1][3] == "  uV" {
+
     return [][]float64{frequency, signal}
   }
 
   fmt.Println("Warning: check units - not uV or dBm")
   return [][]float64{frequency, signal}
-
 }
 
 func readCSV(rs io.ReadSeeker) ([][]string, error) {
