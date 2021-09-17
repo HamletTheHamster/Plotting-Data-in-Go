@@ -44,46 +44,35 @@ func main() {
     plotSubtractedTogether(toPlotSubtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  toPlotSubtractedGrouped := []int{}
+  toPlotSubtractedGrouped := []int{0,1,2}
   if toPlotSubtractedGrouped != nil {
     plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
   }
 
 /*
   // Lorentz Fit
-  asamp := []float64{0, 0.01, 0.03, 0.1, 0.5, 0.7, 0.1}
-  amp := 0.1
-  width := 0.1
+  amp := 0.0018
+  width := 0.2
   center := 2.27
-
-  //fitParams := []float64{amp, width, center}
 
   as1LorentzJac := NumJac{Func: as1Lorentz}
   s1LorentzJac := NumJac{Func: s1Lorentz}
   as2LorentzJac := NumJac{Func: as2Lorentz}
   s2LorentzJac := NumJac{Func: s2Lorentz}
-  as3LorentzJac := NumJac{Func: as3Lorentz}
-  s3LorentzJac := NumJac{Func: s3Lorentz}
-  as4LorentzJac := NumJac{Func: as4Lorentz}
-  s4LorentzJac := NumJac{Func: s4Lorentz}
-  as5LorentzJac := NumJac{Func: as5Lorentz}
-  s5LorentzJac := NumJac{Func: s5Lorentz}
-  as6LorentzJac := NumJac{Func: as6Lorentz}
-  s6LorentzJac := NumJac{Func: s6Lorentz}
 
   as1LorentzProb := LMProblem{
 	  Dim:        3,
- 	  Size:       len(as1data[0]),
+ 	  Size:       len(as[0]),
  	  Func:       as1Lorentz,
  	  Jac:        as1LorentzJac.Jac,
- 	  InitParams: []float64{asamp[1], width, center},
+ 	  InitParams: []float64{amp, width, center},
  	  Tau:        1e-6,
  	  Eps1:       1e-8,
  	  Eps2:       1e-8,
   }
   s1LorentzProb := LMProblem{
 	  Dim:        3,
- 	  Size:       len(s1data[0]),
+ 	  Size:       len(s[0]),
  	  Func:       s1Lorentz,
  	  Jac:        s1LorentzJac.Jac,
  	  InitParams: []float64{amp, width, center},
@@ -93,99 +82,19 @@ func main() {
   }
   as2LorentzProb := LMProblem{
     Dim:        3,
-    Size:       len(as2data[0]),
+    Size:       len(as[0]),
     Func:       as2Lorentz,
     Jac:        as2LorentzJac.Jac,
-    InitParams: []float64{asamp[2], width, center},
+    InitParams: []float64{amp, width, center},
     Tau:        1e-6,
     Eps1:       1e-8,
     Eps2:       1e-8,
   }
   s2LorentzProb := LMProblem{
     Dim:        3,
-    Size:       len(s2data[0]),
+    Size:       len(s[0]),
     Func:       s2Lorentz,
     Jac:        s2LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  as3LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(as3data[0]),
-    Func:       as3Lorentz,
-    Jac:        as3LorentzJac.Jac,
-    InitParams: []float64{asamp[3], width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  s3LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(s3data[0]),
-    Func:       s3Lorentz,
-    Jac:        s3LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  as4LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(as4data[0]),
-    Func:       as4Lorentz,
-    Jac:        as4LorentzJac.Jac,
-    InitParams: []float64{asamp[4], width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  s4LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(s4data[0]),
-    Func:       s4Lorentz,
-    Jac:        s4LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  as5LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(as5data[0]),
-    Func:       as5Lorentz,
-    Jac:        as5LorentzJac.Jac,
-    InitParams: []float64{asamp[5], width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  s5LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(s5data[0]),
-    Func:       s5Lorentz,
-    Jac:        s5LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  as6LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(as6data[0]),
-    Func:       as6Lorentz,
-    Jac:        as6LorentzJac.Jac,
-    InitParams: []float64{asamp[6], width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  s6LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(s6data[0]),
-    Func:       s6Lorentz,
-    Jac:        s6LorentzJac.Jac,
     InitParams: []float64{amp, width, center},
     Tau:        1e-6,
     Eps1:       1e-8,
@@ -196,82 +105,34 @@ func main() {
   s1LorentzResults, _ := LM(s1LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
   as2LorentzResults, _ := LM(as2LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
   s2LorentzResults, _ := LM(s2LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  as3LorentzResults, _ := LM(as3LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s3LorentzResults, _ := LM(s3LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  as4LorentzResults, _ := LM(as4LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s4LorentzResults, _ := LM(s4LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  as5LorentzResults, _ := LM(as5LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s5LorentzResults, _ := LM(s5LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  as6LorentzResults, _ := LM(as6LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s6LorentzResults, _ := LM(s6LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
   fmt.Println(as1LorentzResults.X)
   fmt.Println(s1LorentzResults.X)
   fmt.Println(as2LorentzResults.X)
   fmt.Println(s2LorentzResults.X)
-  fmt.Println(as3LorentzResults.X)
-  fmt.Println(s3LorentzResults.X)
-  fmt.Println(as4LorentzResults.X)
-  fmt.Println(s4LorentzResults.X)
-  fmt.Println(as5LorentzResults.X)
-  fmt.Println(s5LorentzResults.X)
-  fmt.Println(as6LorentzResults.X)
-  fmt.Println(s6LorentzResults.X)
 
   var as1yfit []float64
   var s1yfit []float64
   var as2yfit []float64
   var s2yfit []float64
-  var as3yfit []float64
-  var s3yfit []float64
-  var as4yfit []float64
-  var s4yfit []float64
-  var as5yfit []float64
-  var s5yfit []float64
-  var as6yfit []float64
-  var s6yfit []float64
 
   for i := 0; i < 600; i++ {
     // (amp*wid^2/((x-cen)^2+wid^2))
     as1yfit = append(as1yfit, as1LorentzResults.X[0] * math.Pow(as1LorentzResults.X[1], 2) / (math.Pow(as1data[0][i] - as1LorentzResults.X[2], 2) + math.Pow(as1LorentzResults.X[1], 2)))
     s1yfit = append(s1yfit, s1LorentzResults.X[0] * math.Pow(s1LorentzResults.X[1], 2) / (math.Pow(s1data[0][i] - s1LorentzResults.X[2], 2) + math.Pow(s1LorentzResults.X[1], 2)))
     as2yfit = append(as2yfit, as2LorentzResults.X[0] * math.Pow(as2LorentzResults.X[1], 2) / (math.Pow(as2data[0][i] - as2LorentzResults.X[2], 2) + math.Pow(as2LorentzResults.X[1], 2)))
-    s2yfit = append(s2yfit, s2LorentzResults.X[0] * math.Pow(s2LorentzResults.X[1], 2) / (math.Pow(s2data[0][i] - s2LorentzResults.X[2], 2) + math.Pow(s2LorentzResults.X[1], 2)))
-    as3yfit = append(as3yfit, as3LorentzResults.X[0] * math.Pow(as3LorentzResults.X[1], 2) / (math.Pow(as3data[0][i] - as3LorentzResults.X[2], 2) + math.Pow(as3LorentzResults.X[1], 2)))
-    s3yfit = append(s3yfit, s3LorentzResults.X[0] * math.Pow(s3LorentzResults.X[1], 2) / (math.Pow(s3data[0][i] - s3LorentzResults.X[2], 2) + math.Pow(s3LorentzResults.X[1], 2)))
-    as4yfit = append(as4yfit, as4LorentzResults.X[0] * math.Pow(as4LorentzResults.X[1], 2) / (math.Pow(as4data[0][i] - as4LorentzResults.X[2], 2) + math.Pow(as4LorentzResults.X[1], 2)))
-    s4yfit = append(s4yfit, s4LorentzResults.X[0] * math.Pow(s4LorentzResults.X[1], 2) / (math.Pow(s4data[0][i] - s4LorentzResults.X[2], 2) + math.Pow(s4LorentzResults.X[1], 2)))
-    as5yfit = append(as5yfit, as5LorentzResults.X[0] * math.Pow(as5LorentzResults.X[1], 2) / (math.Pow(as5data[0][i] - as5LorentzResults.X[2], 2) + math.Pow(as5LorentzResults.X[1], 2)))
-    s5yfit = append(s5yfit, s5LorentzResults.X[0] * math.Pow(s5LorentzResults.X[1], 2) / (math.Pow(s5data[0][i] - s5LorentzResults.X[2], 2) + math.Pow(s5LorentzResults.X[1], 2)))
-    as6yfit = append(as6yfit, as6LorentzResults.X[0] * math.Pow(as6LorentzResults.X[1], 2) / (math.Pow(as6data[0][i] - as6LorentzResults.X[2], 2) + math.Pow(as6LorentzResults.X[1], 2)))
-    s6yfit = append(s6yfit, s6LorentzResults.X[0] * math.Pow(s6LorentzResults.X[1], 2) / (math.Pow(s6data[0][i] - s6LorentzResults.X[2], 2) + math.Pow(s6LorentzResults.X[1], 2)))
+    s2yfit = append(s2yfit, s2LorentzResults.X[0] * math.Pow(s2LorentzResults.X[1], 2) / (math.Pow(s2data[0][i] - s2LorentzResults.X[2], 2) + math.Pow(s2LorentzResults.X[1], 2)))s6yfit = append(s6yfit, s6LorentzResults.X[0] * math.Pow(s6LorentzResults.X[1], 2) / (math.Pow(s6data[0][i] - s6LorentzResults.X[2], 2) + math.Pow(s6LorentzResults.X[1], 2)))
   }
 
   normalizeFit(as1yfit)
   normalizeFit(s1yfit)
   normalizeFit(as2yfit)
   normalizeFit(s2yfit)
-  normalizeFit(as3yfit)
-  normalizeFit(s3yfit)
-  normalizeFit(as4yfit)
-  normalizeFit(s4yfit)
-  normalizeFit(as5yfit)
-  normalizeFit(s5yfit)
-  normalizeFit(as6yfit)
-  normalizeFit(s6yfit)
 
   as1Fit := [][]float64{as1data[0], as1yfit}
   s1Fit := [][]float64{s1data[0], s1yfit}
   as2Fit := [][]float64{as2data[0], as2yfit}
   s2Fit := [][]float64{s2data[0], s2yfit}
-  as3Fit := [][]float64{as3data[0], as3yfit}
-  s3Fit := [][]float64{s3data[0], s3yfit}
-  as4Fit := [][]float64{as4data[0], as4yfit}
-  s4Fit := [][]float64{s4data[0], s4yfit}
-  as5Fit := [][]float64{as5data[0], as5yfit}
-  s5Fit := [][]float64{s5data[0], s5yfit}
-  as6Fit := [][]float64{as6data[0], as6yfit}
-  s6Fit := [][]float64{s6data[0], s6yfit}
 
   plotDataWithFit(
     as1, label[2],
@@ -281,41 +142,17 @@ func main() {
     as2, label[6],
     as2Fit, label[6],
     s2, label[8],
-    s2Fit, label[8],
-    as3, label[10],
-    as3Fit, label[10],
-    s3, label[12],
-    s3Fit, label[12],
-    as4, label[14],
-    as4Fit, label[14],
-    s4, label[16],
-    s4Fit, label[16],
-    as5, label[18],
-    as5Fit, label[18],
-    s5, label[20],
-    s5Fit, label[20],
-    as6, label[22],
-    as6Fit, label[22],
-    s6, label[24],
-    s6Fit, label[24],
+    s2Fit, label[8]
   )
 
   plotSeparateFits(
     as1Fit, label[2],
     as2Fit, label[6],
-    as3Fit, label[10],
-    as4Fit, label[14],
-    as5Fit, label[18],
-    as6Fit, label[22],
   )
 
   plotSeparateFits(
     s1Fit, label[4],
     s2Fit, label[8],
-    s3Fit, label[12],
-    s4Fit, label[16],
-    s5Fit, label[20],
-    s6Fit, label[24],
   )
 
   plotFits(
@@ -323,14 +160,6 @@ func main() {
     s1Fit, label[4],
     as2Fit, label[6],
     s2Fit, label[8],
-    as3Fit, label[10],
-    s3Fit, label[12],
-    as4Fit, label[14],
-    s4Fit, label[16],
-    as5Fit, label[18],
-    s5Fit, label[20],
-    as6Fit, label[22],
-    s6Fit, label[24],
   )
   */
 }
@@ -515,7 +344,7 @@ func subtractBackground(pras, pas, prs, ps [][][]float64) ([][][]float64, [][][]
 func subtract(b, s [][]float64) ([][]float64) {
 
   var sum float64
-  n := 10
+  n := 100
 
   for i := 0; i < n; i++ {
     sum += b[1][i] - s[1][i]

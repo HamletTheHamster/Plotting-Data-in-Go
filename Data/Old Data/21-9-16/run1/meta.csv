@@ -1,0 +1,7 @@
+Date,Name,probe@sample mW,Filepath,Notes
+21-9-14,0mW ps,20,Data/0/ps.csv,10kHz RBW - 25 avg - 20s sweep - dither
+,0mW prs,20,Data/0/prs.csv,
+,80mW ps,20,Data/80/ps.csv,
+,80mW prs,20,Data/80/prs.csv,
+,170mW prs,20,Data/170/prs.csv,
+,170mW ps,0,Data/170/ps.csv,

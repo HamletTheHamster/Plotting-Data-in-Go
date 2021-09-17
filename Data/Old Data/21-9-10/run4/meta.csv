@@ -1,0 +1,13 @@
+Date,Name,probe@sample mW,Filepath,Notes
+21-9-10,0mW ps,0,Data/0/ps.csv,
+,0mW pas,0,Data/0/pas.csv,
+,0mW pras,5,Data/0/pras.csv,
+,0mW prs,5,Data/0/prs.csv,
+,85mW ps,0,Data/85/ps.csv,
+,85mW pas,0,Data/85/pas.csv,
+,85mW pras,5,Data/85/pras.csv,
+,85mW prs,5,Data/85/prs.csv,
+,170mW prs,5,Data/170/prs.csv,
+,170mW pras,5,Data/170/pras.csv,
+,170mW pas,0,Data/170/pas.csv,
+,170mW ps,0,Data/170/ps.csv,

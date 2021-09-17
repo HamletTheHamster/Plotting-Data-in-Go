@@ -1,0 +1,9 @@
+Date,Name,probe@sample mW,Filepath,Notes
+21-9-13,20mW ps,20,Data/20/ps.csv,-
+,20mW pas,0,Data/20/pas.csv,-
+,20mW pras,20,Data/20/pras.csv,-
+,20mW prs,20,Data/20/prs.csv,-
+,170mW prs,20,Data/170/prs.csv,
+,170mW pras,20,Data/170/pras.csv,
+,170mW pas,0,Data/170/pas.csv,
+,170mW ps,0,Data/170/ps.csv,
