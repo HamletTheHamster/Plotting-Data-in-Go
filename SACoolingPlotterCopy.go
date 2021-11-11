@@ -50,19 +50,19 @@ func main() {
   }
 
   // Lorentz fit better
-  toFit := []int{0}
+  toFit := []int{0,1,2}
   if toFit != nil {
 
     // Fit parameter guesses
     amp := 0.0025
     wid := 0.2
-    cen := 2.25
+    cen := 2.26
 
     // as
-    //asyFits := make([][]float64,1)
-    var asyFits []float64
     var asFit [][]float64
     var asFits [][][]float64
+
+    var printasWidths []float64
 
     for _, set := range toFit {
 
@@ -80,7 +80,7 @@ func main() {
       jacobian := NumJac{Func: f}
 
       // Solve for fit
-      solve := LMProblem{
+      toBeSolved := LMProblem{
     	  Dim:        3,
      	  Size:       len(as[set][0]),
      	  Func:       f,
@@ -91,7 +91,21 @@ func main() {
      	  Eps2:       1e-8,
       }
 
-      results, _ := LM(solve, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
+      results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+      fmt.Printf("set:")
+      fmt.Println(set)
+      fmt.Printf("width:")
+      fmt.Println(math.Abs(results.X[1]))
+      fmt.Printf("\n")
+
+      printasWidths = append(printasWidths, math.Abs(results.X[1]))
+
+      fmt.Printf("printasWidths[set]:")
+      fmt.Println(printasWidths[set])
+      fmt.Printf("\n\n")
+
+      var asyFits []float64
 
       // Create function according to solved fit parameters
       for i := 0; i < len(as[set][0]); i++ {
@@ -100,7 +114,7 @@ func main() {
           asyFits = append(asyFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
       }
 
-      normalizeFit(asyFits)
+      // Normalize fit
       asFit = [][]float64{as[set][0], asyFits}
       asFits = append(asFits, asFit)
     }
@@ -111,141 +125,91 @@ func main() {
     debug := false
     plot, _ := glot.NewPlot(dimensions, persist, debug)
 
-    plot.SetTitle("Fit")
+    plot.SetTitle("Anti-Stokes Fits")
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
     for _, set := range toFit {
       plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " as", "points", as[set])
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " as fit", "lines", asFits[set])
+      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " as fit; Width: " + strconv.FormatFloat(printasWidths[set], 'f', 6, 64), "lines", asFits[set])
+    }
+
+    // s
+    var sFit [][]float64
+    var sFits [][][]float64
+
+    var printsWidths []float64
+
+    for _, set := range toFit {
+
+      f := func(dst, guess []float64) {
+
+        amp, wid, cen := guess[0], guess[1], guess[2]
+
+        for i := 0; i < len(s[set][0]); i++ {
+          x := s[set][0][i]
+          y := s[set][1][i]
+          dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
+        }
+      }
+
+      jacobian := NumJac{Func: f}
+
+      // Solve for fit
+      toBeSolved := LMProblem{
+    	  Dim:        3,
+     	  Size:       len(s[set][0]),
+     	  Func:       f,
+     	  Jac:        jacobian.Jac,
+     	  InitParams: []float64{amp, wid, cen},
+     	  Tau:        1e-6,
+     	  Eps1:       1e-8,
+     	  Eps2:       1e-8,
+      }
+
+      results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+      fmt.Printf("set:")
+      fmt.Println(set)
+      fmt.Printf("width:")
+      fmt.Println(math.Abs(results.X[1]))
+      fmt.Printf("\n")
+
+      printsWidths = append(printsWidths, math.Abs(results.X[1]))
+
+      fmt.Printf("printsWidths[set]:")
+      fmt.Println(printsWidths[set])
+      fmt.Printf("\n\n")
+
+      var syFits []float64
+
+      // Create function according to solved fit parameters
+      for i := 0; i < len(s[set][0]); i++ {
+          // (amp*wid^2/((x-cen)^2+wid^2))
+          x := s[set][0][i]
+          syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
+      }
+
+      // Normalize fit
+      sFit = [][]float64{s[set][0], syFits}
+      sFits = append(sFits, sFit)
+    }
+
+    // Plot fit
+    dimensions = 2
+    persist = true
+    debug = false
+    plot, _ = glot.NewPlot(dimensions, persist, debug)
+
+    plot.SetTitle("Stokes Fits")
+    plot.SetXLabel("Frequency (GHz)")
+    plot.SetYLabel("Signal (uV)")
+
+    for _, set := range toFit {
+      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + " s", "points", s[set])
+      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + " s fit; Width: " + strconv.FormatFloat(printsWidths[set], 'f', 6, 64), "lines", sFits[set])
     }
   }
-/*
-  var asyfit []float64
-
-  // Create lorentzian according to solved fit parameters
-  for i := 0; i < len(as[0][0]); i++ {
-    // (amp*wid^2/((x-cen)^2+wid^2))
-    asyfit = append(asyfit, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(as[0][0][i] - results.X[2], 2) + math.Pow(results.X[1], 2)))
-  }
-*/
-/*
-  // Lorentz Fit
-  amp := 0.0018
-  width := 0.2
-  center := 2.27
-
-  // Get jacobian for function
-  as1LorentzJac := NumJac{Func: as1Lorentz}
-  s1LorentzJac := NumJac{Func: s1Lorentz}
-  as2LorentzJac := NumJac{Func: as2Lorentz}
-  s2LorentzJac := NumJac{Func: s2Lorentz}
-
-  // Define structure holding settings values for solving the problem
-  as1LorentzProb := LMProblem{
-	  Dim:        3,
- 	  Size:       len(as[0]),
- 	  Func:       as1Lorentz,
- 	  Jac:        as1LorentzJac.Jac,
- 	  InitParams: []float64{amp, width, center},
- 	  Tau:        1e-6,
- 	  Eps1:       1e-8,
- 	  Eps2:       1e-8,
-  }
-  s1LorentzProb := LMProblem{
-	  Dim:        3,
- 	  Size:       len(s[0]),
- 	  Func:       s1Lorentz,
- 	  Jac:        s1LorentzJac.Jac,
- 	  InitParams: []float64{amp, width, center},
- 	  Tau:        1e-6,
- 	  Eps1:       1e-8,
- 	  Eps2:       1e-8,
-  }
-  as2LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(as[0]),
-    Func:       as2Lorentz,
-    Jac:        as2LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-  s2LorentzProb := LMProblem{
-    Dim:        3,
-    Size:       len(s[0]),
-    Func:       s2Lorentz,
-    Jac:        s2LorentzJac.Jac,
-    InitParams: []float64{amp, width, center},
-    Tau:        1e-6,
-    Eps1:       1e-8,
-    Eps2:       1e-8,
-  }
-
-  // Solve for fit parameters: amplitude, width, center not necessarily in that order
-  as1LorentzResults, _ := LM(as1LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s1LorentzResults, _ := LM(s1LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  as2LorentzResults, _ := LM(as2LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-  s2LorentzResults, _ := LM(s2LorentzProb, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
-
-  fmt.Println(as1LorentzResults.X)
-  fmt.Println(s1LorentzResults.X)
-  fmt.Println(as2LorentzResults.X)
-  fmt.Println(s2LorentzResults.X)
-
-  var as1yfit []float64
-  var s1yfit []float64
-  var as2yfit []float64
-  var s2yfit []float64
-
-  // Create lorentzian according to solved fit parameters
-  for i := 0; i < 600; i++ {
-    // (amp*wid^2/((x-cen)^2+wid^2))
-    as1yfit = append(as1yfit, as1LorentzResults.X[0] * math.Pow(as1LorentzResults.X[1], 2) / (math.Pow(as1data[0][i] - as1LorentzResults.X[2], 2) + math.Pow(as1LorentzResults.X[1], 2)))
-    s1yfit = append(s1yfit, s1LorentzResults.X[0] * math.Pow(s1LorentzResults.X[1], 2) / (math.Pow(s1data[0][i] - s1LorentzResults.X[2], 2) + math.Pow(s1LorentzResults.X[1], 2)))
-    as2yfit = append(as2yfit, as2LorentzResults.X[0] * math.Pow(as2LorentzResults.X[1], 2) / (math.Pow(as2data[0][i] - as2LorentzResults.X[2], 2) + math.Pow(as2LorentzResults.X[1], 2)))
-    s2yfit = append(s2yfit, s2LorentzResults.X[0] * math.Pow(s2LorentzResults.X[1], 2) / (math.Pow(s2data[0][i] - s2LorentzResults.X[2], 2) + math.Pow(s2LorentzResults.X[1], 2)))
-  }
-
-  normalizeFit(as1yfit)
-  normalizeFit(s1yfit)
-  normalizeFit(as2yfit)
-  normalizeFit(s2yfit)
-
-  as1Fit := [][]float64{as1data[0], as1yfit}
-  s1Fit := [][]float64{s1data[0], s1yfit}
-  as2Fit := [][]float64{as2data[0], as2yfit}
-  s2Fit := [][]float64{s2data[0], s2yfit}
-
-  plotDataWithFit(
-    as1, label[2],
-    as1Fit, label[2],
-    s1, label[4],
-    s1Fit, label[4],
-    as2, label[6],
-    as2Fit, label[6],
-    s2, label[8],
-    s2Fit, label[8]
-  )
-
-  plotSeparateFits(
-    as1Fit, label[2],
-    as2Fit, label[6],
-  )
-
-  plotSeparateFits(
-    s1Fit, label[4],
-    s2Fit, label[8],
-  )
-
-  plotFits(
-    as1Fit, label[2],
-    s1Fit, label[4],
-    as2Fit, label[6],
-    s2Fit, label[8],
-  )
-  */
 }
 
 func readMeta() ([]string, []string) {
@@ -516,205 +480,8 @@ func normalizeFit(fit []float64) ([]float64) {
   return fit
 }
 
-func plotDataWithFit(
-  set1 [][]float64, label1 string,
-  set2 [][]float64, label2 string,
-  set3 [][]float64, label3 string,
-  set4 [][]float64, label4 string,
-  set5 [][]float64, label5 string,
-  set6 [][]float64, label6 string,
-  set7 [][]float64, label7 string,
-  set8 [][]float64, label8 string,
-  set9 [][]float64, label9 string,
-  set10 [][]float64, label10 string,
-  set11 [][]float64, label11 string,
-  set12 [][]float64, label12 string,
-  set13 [][]float64, label13 string,
-  set14 [][]float64, label14 string,
-  set15 [][]float64, label15 string,
-  set16 [][]float64, label16 string,
-  set17 [][]float64, label17 string,
-  set18 [][]float64, label18 string,
-  set19 [][]float64, label19 string,
-  set20 [][]float64, label20 string,
-  set21 [][]float64, label21 string,
-  set22 [][]float64, label22 string,
-  set23 [][]float64, label23 string,
-  set24 [][]float64, label24 string,
-  ) {
+//----------------------------------------------------------------------------\\
 
-  dimensions := 2
-  persist := true
-  debug := false
-  plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-  plot.SetTitle("Background Subtracted with Lorentzian Fit")
-  plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (uV)")
-
-  plot.AddPointGroup(label1, "points", set1)
-  plot.AddPointGroup(label2, "lines", set2)
-  plot.AddPointGroup(label3, "points", set3)
-  plot.AddPointGroup(label4, "lines", set4)
-  plot.AddPointGroup(label5, "points", set5)
-  plot.AddPointGroup(label6, "lines", set6)
-  plot.AddPointGroup(label7, "points", set7)
-  plot.AddPointGroup(label8, "lines", set8)
-  plot.AddPointGroup(label9, "points", set9)
-  plot.AddPointGroup(label10, "lines", set10)
-  plot.AddPointGroup(label11, "points", set11)
-  plot.AddPointGroup(label12, "lines", set12)
-  plot.AddPointGroup(label13, "points", set13)
-  plot.AddPointGroup(label14, "lines", set14)
-  plot.AddPointGroup(label15, "points", set15)
-  plot.AddPointGroup(label16, "lines", set16)
-  plot.AddPointGroup(label17, "points", set17)
-  plot.AddPointGroup(label18, "lines", set18)
-  plot.AddPointGroup(label19, "points", set19)
-  plot.AddPointGroup(label20, "lines", set20)
-  plot.AddPointGroup(label21, "points", set21)
-  plot.AddPointGroup(label22, "lines", set22)
-  plot.AddPointGroup(label23, "points", set23)
-  plot.AddPointGroup(label24, "lines", set24)
-}
-
-func plotSeparateFits(
-set1 [][]float64, label1 string,
-set2 [][]float64, label2 string,
-set3 [][]float64, label3 string,
-set4 [][]float64, label4 string,
-set5 [][]float64, label5 string,
-set6 [][]float64, label6 string,
-) {
-
-dimensions := 2
-persist := true
-debug := false
-plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-plot.SetTitle("Separated")
-plot.SetXLabel("Frequency (GHz)")
-plot.SetYLabel("Signal (uV)")
-
-plot.AddPointGroup(label1, "lines", set1)
-plot.AddPointGroup(label2, "lines", set2)
-plot.AddPointGroup(label3, "lines", set3)
-plot.AddPointGroup(label4, "lines", set4)
-plot.AddPointGroup(label5, "lines", set5)
-plot.AddPointGroup(label6, "lines", set6)
-}
-
-func plotFits(
-set1 [][]float64, label1 string,
-set2 [][]float64, label2 string,
-set3 [][]float64, label3 string,
-set4 [][]float64, label4 string,
-set5 [][]float64, label5 string,
-set6 [][]float64, label6 string,
-set7 [][]float64, label7 string,
-set8 [][]float64, label8 string,
-set9 [][]float64, label9 string,
-set10 [][]float64, label10 string,
-set11 [][]float64, label11 string,
-set12 [][]float64, label12 string,
-) {
-
-dimensions := 2
-persist := true
-debug := false
-plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-plot.SetTitle("Lorentz Fit")
-plot.SetXLabel("Frequency (GHz)")
-plot.SetYLabel("Signal (uV)")
-
-plot.AddPointGroup(label1, "lines", set1)
-plot.AddPointGroup(label2, "lines", set2)
-plot.AddPointGroup(label3, "lines", set3)
-plot.AddPointGroup(label4, "lines", set4)
-plot.AddPointGroup(label5, "lines", set5)
-plot.AddPointGroup(label6, "lines", set6)
-plot.AddPointGroup(label7, "lines", set7)
-plot.AddPointGroup(label8, "lines", set8)
-plot.AddPointGroup(label9, "lines", set9)
-plot.AddPointGroup(label10, "lines", set10)
-plot.AddPointGroup(label11, "lines", set11)
-plot.AddPointGroup(label12, "lines", set12)
-}
-
-/*
-func lorentzFit(data [][]float64, guess []float64) ([][]float64) {
-
-  // Find Jacobian
-  f := func(dst, guess []float64, data [][]float64) {
-
-    amp, wid, cen := guess[0], guess[1], guess[2]
-
-    for i := 0; i < 600; i++ {
-      x := data[0][i]
-      y := data[1][i]
-      dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
-    }
-  }
-  jacobian := mat.NewDense(len(data[0]), 3, nil)
-  fd.Jacobian(jacobian, f, guess, &fd.JacobianSettings{
-    Formula:  fd.Central,
-    Concurrent: true,
-  })
-//
-
-  jacobian := lm.NumJac{Func: lorentzian}
-
-  solve := lm.LMProblem{
-	  Dim:        3,
- 	  Size:       len(data[0]),
- 	  Func:       lorentzian,
- 	  Jac:        jacobian.Jac,
- 	  InitParams: []float64{guess[0], guess[1], guess[2]},
- 	  Tau:        1e-6,
- 	  Eps1:       1e-8,
- 	  Eps2:       1e-8,
-  }
-
-  results, _ := lm.LM(solve, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
-
-  fmt.Println(results.X)
-
-  var yfit []float64
-
-  for i := 0; i < 600; i++ {
-    // (amp*wid^2/((x-cen)^2+wid^2))
-    yfit = append(yfit, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(data[0][i] - results.X[2], 2) + math.Pow(results.X[1], 2)))
-  }
-
-  return [][]float64{data[0], yfit}
-}
-
-
-func lorentzian(dst, x []float64) {
-
-  amp, wid, cen := 0.002, 0.2, 2.27
-
-  for i := 0; i < 600; i++ {
-    dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x[i] - cen, 2) + math.Pow(wid, 2))
-  }
-}
-
-func s1Lorentz(dst, fitParams []float64) {
-
-  _, file := readMeta()
-  bs1 := getData(file[3])
-  s1 := getData(file[4])
-  s1Sub := subtractBackground(bs1, s1)
-
-  for i := 0; i < 600; i++ {
-    x := s1Sub[0][i]
-    y := s1Sub[1][i]
-    //fitParams = {amp, width, center}
-    dst[i] = fitParams[0] * math.Pow(fitParams[1], 2) / (math.Pow(x - fitParams[2], 2) + math.Pow(fitParams[1], 2)) - y
-  }
-}
-*/
 /*
 Package lm implements optimization routines for non-linear least squares problems
 using the Levenberg-Marquardt method.
