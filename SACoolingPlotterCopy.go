@@ -135,9 +135,7 @@ func main() {
     }
 
     // Width vs pump power
-    var asWidthPoints [][]float64
-
-    asWidthPoints = [][]float64{{0, 80, 170},{asfwhm[0], asfwhm[1], asfwhm[2]}}
+    asWidthPoints := [][]float64{{0, 80, 170},{asfwhm[0], asfwhm[1], asfwhm[2]}}
 
     // s
     fmt.Println("\nStokes\n")
@@ -206,7 +204,7 @@ func main() {
     debug = false
     plot, _ = glot.NewPlot(dimensions, persist, debug)
 
-    plot.SetTitle("Stokes Fits")
+    plot.SetTitle("Stokes")
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (nV)")
 
@@ -217,9 +215,7 @@ func main() {
     }
 
     // Width vs pump power
-    var sWidthPoints [][]float64
-
-    sWidthPoints = [][]float64{{0, 80, 170},{sfwhm[0], sfwhm[1], sfwhm[2]}}
+    sWidthPoints := [][]float64{{0, 80, 170},{sfwhm[0], sfwhm[1], sfwhm[2]}}
 
     // Plot width points
     dimensions = 2
