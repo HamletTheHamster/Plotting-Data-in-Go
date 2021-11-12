@@ -54,7 +54,7 @@ func main() {
   if toFit != nil {
 
     // Fit parameter guesses
-    amp := 0.0025
+    amp := 2.5
     wid := 0.2
     cen := 2.26
 
@@ -62,8 +62,9 @@ func main() {
     fmt.Println("\nAnti-Stokes\n")
     var asFit [][]float64
     var asFits [][][]float64
-
-    var printasWidths []float64
+    var asWidthLine [][]float64
+    var asWidthLines [][][]float64
+    var asfwhm []float64
 
     for _, set := range toFit {
 
@@ -73,7 +74,7 @@ func main() {
 
         for i := 0; i < len(as[set][0]); i++ {
           x := as[set][0][i]
-          y := as[set][1][i]
+          y := 1000 * as[set][1][i]
           dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
         }
       }
@@ -94,9 +95,11 @@ func main() {
 
       results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
-      fmt.Printf("set %d | width: %.6f | peak: %.6f | center: %.4f\n", set, math.Abs(results.X[1]), results.X[0], results.X[2])
+      amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
 
-      printasWidths = append(printasWidths, math.Abs(results.X[1]))
+      asfwhm = append(asfwhm, wid*2000)
+
+      fmt.Printf("set %d | width: %.2f MHz | peak: %.6f uV | center: %.4f GHz\n", set, wid*2000, amp, cen)
 
       var asyFits []float64
 
@@ -104,15 +107,16 @@ func main() {
       for i := 0; i < len(as[set][0]); i++ {
           // (amp*wid^2/((x-cen)^2+wid^2))
           x := as[set][0][i]
-          asyFits = append(asyFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
+          asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
       }
 
-      // Normalize fit
+      // Width lines
+      asWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
+      asWidthLines = append(asWidthLines, asWidthLine)
+
       asFit = [][]float64{as[set][0], asyFits}
       asFits = append(asFits, asFit)
     }
-
-    
 
     // Plot fit
     dimensions := 2
@@ -120,21 +124,28 @@ func main() {
     debug := false
     plot, _ := glot.NewPlot(dimensions, persist, debug)
 
-    plot.SetTitle("Anti-Stokes Fits")
+    plot.SetTitle("Anti-Stokes")
     plot.SetXLabel("Frequency (GHz)")
-    plot.SetYLabel("Signal (uV)")
+    plot.SetYLabel("Signal (nV)")
 
     for _, set := range toFit {
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "points", as[set])
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + "; Width: " + strconv.FormatFloat(printasWidths[set], 'f', 6, 64), "lines", asFits[set])
+      //plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "points", as[set])
+      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "lines", asFits[set])
+      plot.AddPointGroup(strconv.FormatFloat(asfwhm[set], 'f', 1, 64) + " MHz", "lines", asWidthLines[set])
     }
+
+    // Width vs pump power
+    var asWidthPoints [][]float64
+
+    asWidthPoints = [][]float64{{0, 80, 170},{asfwhm[0], asfwhm[1], asfwhm[2]}}
 
     // s
     fmt.Println("\nStokes\n")
     var sFit [][]float64
     var sFits [][][]float64
-
-    var printsWidths []float64
+    var sWidthLine [][]float64
+    var sWidthLines [][][]float64
+    var sfwhm []float64
 
     for _, set := range toFit {
 
@@ -144,7 +155,7 @@ func main() {
 
         for i := 0; i < len(s[set][0]); i++ {
           x := s[set][0][i]
-          y := s[set][1][i]
+          y := 1000 * s[set][1][i]
           dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
         }
       }
@@ -165,9 +176,11 @@ func main() {
 
       results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
-      fmt.Printf("set %d | width: %.6f | peak: %.6f | center: %.4f\n", set, math.Abs(results.X[1]), results.X[0], results.X[2])
+      amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
 
-      printsWidths = append(printsWidths, math.Abs(results.X[1]))
+      sfwhm = append(sfwhm, wid*2000)
+
+      fmt.Printf("set %d | width: %.2f MHz | peak: %.6f uV | center: %.4f GHz\n", set, wid*2000, amp, cen)
 
       var syFits []float64
 
@@ -178,7 +191,10 @@ func main() {
           syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
       }
 
-      // Normalize fit
+      // Width lines
+      sWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
+      sWidthLines = append(sWidthLines, sWidthLine)
+
       sFit = [][]float64{s[set][0], syFits}
       sFits = append(sFits, sFit)
     }
@@ -192,12 +208,31 @@ func main() {
 
     plot.SetTitle("Stokes Fits")
     plot.SetXLabel("Frequency (GHz)")
-    plot.SetYLabel("Signal (uV)")
+    plot.SetYLabel("Signal (nV)")
 
     for _, set := range toFit {
-      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "points", s[set])
-      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + "; Width: " + strconv.FormatFloat(printsWidths[set], 'f', 6, 64), "lines", sFits[set])
+      //plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "points", s[set])
+      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "lines", sFits[set])
+      plot.AddPointGroup(strconv.FormatFloat(sfwhm[set], 'f', 1, 64) + " MHz", "lines", sWidthLines[set])
     }
+
+    // Width vs pump power
+    var sWidthPoints [][]float64
+
+    sWidthPoints = [][]float64{{0, 80, 170},{sfwhm[0], sfwhm[1], sfwhm[2]}}
+
+    // Plot width points
+    dimensions = 2
+    persist = true
+    debug = false
+    plot, _ = glot.NewPlot(dimensions, persist, debug)
+
+    plot.SetTitle("Pump Power vs Width")
+    plot.SetXLabel("Pump Power (mW)")
+    plot.SetYLabel("FWHM (MHz)")
+
+    plot.AddPointGroup("Anti-Stokes", "circle", asWidthPoints)
+    plot.AddPointGroup("Stokes", "circle", sWidthPoints)
   }
 }
 
