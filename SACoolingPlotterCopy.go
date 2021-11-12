@@ -59,6 +59,7 @@ func main() {
     cen := 2.26
 
     // as
+    fmt.Println("\nAnti-Stokes\n")
     var asFit [][]float64
     var asFits [][][]float64
 
@@ -93,17 +94,9 @@ func main() {
 
       results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
-      fmt.Printf("set:")
-      fmt.Println(set)
-      fmt.Printf("width:")
-      fmt.Println(math.Abs(results.X[1]))
-      fmt.Printf("\n")
+      fmt.Printf("set %d | width: %.6f | peak: %.6f | center: %.4f\n", set, math.Abs(results.X[1]), results.X[0], results.X[2])
 
       printasWidths = append(printasWidths, math.Abs(results.X[1]))
-
-      fmt.Printf("printasWidths[set]:")
-      fmt.Println(printasWidths[set])
-      fmt.Printf("\n\n")
 
       var asyFits []float64
 
@@ -119,6 +112,8 @@ func main() {
       asFits = append(asFits, asFit)
     }
 
+    
+
     // Plot fit
     dimensions := 2
     persist := true
@@ -130,11 +125,12 @@ func main() {
     plot.SetYLabel("Signal (uV)")
 
     for _, set := range toFit {
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " as", "points", as[set])
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " as fit; Width: " + strconv.FormatFloat(printasWidths[set], 'f', 6, 64), "lines", asFits[set])
+      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "points", as[set])
+      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + "; Width: " + strconv.FormatFloat(printasWidths[set], 'f', 6, 64), "lines", asFits[set])
     }
 
     // s
+    fmt.Println("\nStokes\n")
     var sFit [][]float64
     var sFits [][][]float64
 
@@ -169,17 +165,9 @@ func main() {
 
       results, _ := LM(toBeSolved, &Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
-      fmt.Printf("set:")
-      fmt.Println(set)
-      fmt.Printf("width:")
-      fmt.Println(math.Abs(results.X[1]))
-      fmt.Printf("\n")
+      fmt.Printf("set %d | width: %.6f | peak: %.6f | center: %.4f\n", set, math.Abs(results.X[1]), results.X[0], results.X[2])
 
       printsWidths = append(printsWidths, math.Abs(results.X[1]))
-
-      fmt.Printf("printsWidths[set]:")
-      fmt.Println(printsWidths[set])
-      fmt.Printf("\n\n")
 
       var syFits []float64
 
@@ -194,6 +182,7 @@ func main() {
       sFit = [][]float64{s[set][0], syFits}
       sFits = append(sFits, sFit)
     }
+    fmt.Printf("\n")
 
     // Plot fit
     dimensions = 2
@@ -206,8 +195,8 @@ func main() {
     plot.SetYLabel("Signal (uV)")
 
     for _, set := range toFit {
-      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + " s", "points", s[set])
-      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + " s fit; Width: " + strconv.FormatFloat(printsWidths[set], 'f', 6, 64), "lines", sFits[set])
+      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "points", s[set])
+      plot.AddPointGroup(strings.Trim(prsLabel[set], " prs") + "; Width: " + strconv.FormatFloat(printsWidths[set], 'f', 6, 64), "lines", sFits[set])
     }
   }
 }
