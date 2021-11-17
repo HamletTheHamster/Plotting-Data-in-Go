@@ -687,7 +687,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     p.Legend.ThumbnailWidth = vg.Points(50)
 
     setColors := make([]color.RGBA, len(sets))
-    setColors[0] = color.RGBA{R: 31, G: 249, B: 155, A: 255}
+    setColors[0] = color.RGBA{R: 31, G: 211, B: 148, A: 255}
     setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
 
