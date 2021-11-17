@@ -528,7 +528,7 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Title.Text = "Anti-Stokes"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 32
+  p.Title.TextStyle.Font.Size = 34
   p.Title.Padding = font.Length(50)
 
   p.X.Label.Text = "Frequency (GHz)"
