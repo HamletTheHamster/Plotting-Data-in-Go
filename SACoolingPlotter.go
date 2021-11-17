@@ -17,6 +17,7 @@ import (
 	"gonum.org/v1/plot/vg"
   "gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/vg/draw"
+  "time"
 )
 
 func main() {
@@ -53,13 +54,13 @@ func main() {
   }
 
   // gonum/plot
-  numPlot := []int{}
+  numPlot := []int{0,1,2}
   if len(numPlot) > 0 {
     gonumPlot(numPlot, s, as, prsLabel, prasLabel)
   }
 
   // Lorentz fit better
-  toFit := []int{0,1,2}
+  toFit := []int{}
   if len(toFit) > 0 {
 
     // Fit parameter guesses
@@ -610,7 +611,23 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     p.Legend.Add(strings.Trim(asLabel[set], " pras"), plotSet)
   }
 
-  savePlotAs := "Anti-Stokes Background Subtracted"
+  date := time.Now()
+
+  // Make current date folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  // Make current time folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  savePlotAs := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/Anti-Stokes Background Subtracted"
   // Save the plot to a PNG file.
   if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".png"); err != nil {
   	panic(err)
