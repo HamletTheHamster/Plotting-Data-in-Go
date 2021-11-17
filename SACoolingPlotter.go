@@ -1,6 +1,7 @@
 package main
 
 import (
+  "image/color"
   "github.com/Arafatk/glot"
   "encoding/csv"
   "bufio"
@@ -14,10 +15,14 @@ import (
 	"gonum.org/v1/gonum/mat"
 	"gonum.org/v1/gonum/diff/fd"
 	"gonum.org/v1/gonum/optimize"
-  //"gonum.org/v1/plot"
-  //"gonum.org/v1/plot/plotter"
-	//"gonum.org/v1/plot/vg"
-	//"gonum.org/v1/plot/vg/draw"
+  "gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
+	"gonum.org/v1/plot/vg"
+  "gonum.org/v1/plot/font"
+	"gonum.org/v1/plot/vg/draw"
+  //"gonum.org/v1/plot/vg/vgsvg"
+  //"golang.org/x/image/font/gofont/goregular"
+  //"github.com/golang/freetype/truetype"
 )
 
 func main() {
@@ -53,8 +58,14 @@ func main() {
     plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
   }
 
+  // gonum/plot
+  numPlot := []int{0,1,2}
+  if len(numPlot) > 0 {
+    gonumPlot(numPlot, s, as, prsLabel, prasLabel)
+  }
+
   // Lorentz fit better
-  toFit := []int{0,1,2}
+  toFit := []int{}
   if len(toFit) > 0 {
 
     // Fit parameter guesses
@@ -503,6 +514,129 @@ func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []st
   for _, set := range sets {
     plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
   }
+}
+
+func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
+
+  /*goFont, err := truetype.Parse(goregular.TTF)
+  if err != nil {
+    panic(err)
+  }*/
+
+  // as
+  p := plot.New()
+  p.Title.Text = "Anti-Stokes"
+  p.Title.TextStyle.Font.Typeface = "liberation"
+  p.Title.TextStyle.Font.Variant = "Sans"
+  p.Title.TextStyle.Font.Size = 32
+  p.Title.Padding = font.Length(50)
+
+  p.X.Label.Text = "Frequency (GHz)"
+  p.X.Label.TextStyle.Font.Variant = "Sans"
+  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.Padding = font.Length(20)
+  p.X.LineStyle.Width = vg.Points(1.5)
+  p.X.Tick.LineStyle.Width = vg.Points(1.5)
+  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Variant = "Sans"
+  p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+  		{Value: 2.0, Label: "2"},
+      {Value: 2.05, Label: ""},
+      {Value: 2.1, Label: "2.1"},
+      {Value: 2.15, Label: ""},
+      {Value: 2.2, Label: "2.2"},
+      {Value: 2.25, Label: ""},
+      {Value: 2.3, Label: "2.3"},
+      {Value: 2.35, Label: ""},
+      {Value: 2.4, Label: "2.4"},
+      {Value: 2.45, Label: ""},
+      {Value: 2.5, Label: "2.5"},
+  	})
+  p.X.Padding = vg.Points(25)
+
+  p.Y.Label.Text = "Signal (nV)"
+  p.Y.Label.TextStyle.Font.Variant = "Sans"
+  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.Padding = font.Length(20)
+  p.Y.LineStyle.Width = vg.Points(1.5)
+  p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Variant = "Sans"
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+  		{Value: -1, Label: "-1"},
+      {Value: -.75, Label: ""},
+      {Value: -.5, Label: "-.5"},
+      {Value: -.25, Label: ""},
+      {Value: 0, Label: "0"},
+      {Value: .25, Label: ""},
+      {Value: .5, Label: ".5"},
+      {Value: .75, Label: ""},
+      {Value: 1, Label: "1"},
+      {Value: 1.25, Label: ""},
+      {Value: 1.5, Label: "1.5"},
+      {Value: 1.75, Label: ""},
+      {Value: 2, Label: "2"},
+      {Value: 2.25, Label: ""},
+      {Value: 2.5, Label: "2.5"},
+      {Value: 2.75, Label: ""},
+      {Value: 3, Label: "3"},
+
+  	})
+  p.Y.Padding = vg.Points(25)
+
+  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Variant = "Sans"
+  p.Legend.Top = true
+  p.Legend.XOffs = vg.Points(-50)
+  p.Legend.YOffs = vg.Points(-50)
+  p.Legend.Padding = vg.Points(10)
+  p.Legend.ThumbnailWidth = vg.Points(50)
+
+  setColors := make([]color.RGBA, len(sets))
+  setColors[0] = color.RGBA{R: 31, G: 249, B: 155, A: 255}
+  setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+  setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+
+
+  for _, set := range sets {
+
+    asPts := buildData(as[set])
+
+  	// Make a scatter plotter and set its style.
+  	plotSet, err := plotter.NewScatter(asPts)
+  	if err != nil {
+  		panic(err)
+  	}
+
+  	plotSet.GlyphStyle.Color = setColors[set]
+    plotSet.GlyphStyle.Radius = vg.Points(3)
+    plotSet.Shape = draw.CircleGlyph{}
+
+    p.Add(plotSet)
+    p.Legend.Add(strings.Trim(asLabel[set], " pras"), plotSet)
+  }
+
+  savePlotAs := "Anti-Stokes Background Subtracted"
+  // Save the plot to a PNG file.
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".png"); err != nil {
+  	panic(err)
+  }
+
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".svg"); err != nil {
+    panic(err)
+  }
+}
+
+func buildData(data [][]float64) (plotter.XYs) {
+
+  xy := make(plotter.XYs, len(data[0]))
+
+  for i := range xy {
+    xy[i].X = data[0][i]
+    xy[i].Y = data[1][i]
+  }
+
+  return xy
 }
 
 func normalizeFit(fit []float64) ([]float64) {
