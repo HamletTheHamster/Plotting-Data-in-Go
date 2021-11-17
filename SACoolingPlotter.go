@@ -27,10 +27,10 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
-  toPlotRaw := []int{}
-  if len(toPlotRaw) > 0 {
+  raw := []int{}
+  if len(raw) > 0 {
     plotRaw(
-      toPlotRaw,
+      raw,
       pras, pas, prs, ps,
       prasLabel, pasLabel, prsLabel, psLabel,
     )
@@ -38,30 +38,24 @@ func main() {
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
-  toPlotSubtracted := []int{}
-  if len(toPlotSubtracted) > 0 {
-    plotSubtracted(toPlotSubtracted, s, as, prsLabel, prasLabel)
+  subtracted := []int{}
+  if len(subtracted) > 0 {
+    plotSubtracted(subtracted, s, as, prsLabel, prasLabel)
   }
 
-  toPlotSubtractedTogether := []int{}
-  if len(toPlotSubtractedTogether) > 0 {
-    plotSubtractedTogether(toPlotSubtractedTogether, s, as, prsLabel, prasLabel)
+  subtractedTogether := []int{}
+  if len(subtractedTogether) > 0 {
+    plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  toPlotSubtractedGrouped := []int{}
-  if len(toPlotSubtractedGrouped) > 0 {
-    plotSubtractedGrouped(toPlotSubtractedGrouped, s, as, prsLabel, prasLabel)
-  }
-
-  // gonum/plot
-  numPlot := []int{0,1,2}
-  if len(numPlot) > 0 {
-    gonumPlot(numPlot, s, as, prsLabel, prasLabel)
+  subtractedGrouped := []int{}
+  if len(subtractedGrouped) > 0 {
+    goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
 
   // Lorentz fit better
-  toFit := []int{}
-  if len(toFit) > 0 {
+  fitSets := []int{0,1,2}
+  if len(fitSets) > 0 {
 
     // Fit parameter guesses
     amp := 2.5
@@ -76,7 +70,7 @@ func main() {
     var asWidthLines [][][]float64
     var asfwhm []float64
 
-    for _, set := range toFit {
+    for _, set := range fitSets {
 
       f := func(dst, guess []float64) {
 
@@ -128,7 +122,10 @@ func main() {
       asFits = append(asFits, asFit)
     }
 
-    // Plot fit
+    // goPlot as fits
+    goPlotasFits(fitSets, as, prasLabel, asFits, asWidthLines, asfwhm)
+
+    /* Plot fit
     dimensions := 2
     persist := true
     debug := false
@@ -138,7 +135,7 @@ func main() {
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (nV)")
 
-    for _, set := range toFit {
+    for _, set := range fitSets {
       plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "points", as[set])
       plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " fit", "lines", asFits[set])
       plot.AddPointGroup(strconv.FormatFloat(asfwhm[set], 'f', 1, 64) + " MHz", "lines", asWidthLines[set])
@@ -158,7 +155,7 @@ func main() {
       var sWidthLines [][][]float64
       var sfwhm []float64
 
-      for _, set := range toFit {
+      for _, set := range fitSets {
 
         f := func(dst, guess []float64) {
 
@@ -221,7 +218,7 @@ func main() {
       plot.SetXLabel("Frequency (GHz)")
       plot.SetYLabel("Signal (nV)")
 
-      for _, set := range toFit {
+      for _, set := range fitSets {
         //plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "points", s[set])
         plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "lines", sFits[set])
         plot.AddPointGroup(strconv.FormatFloat(sfwhm[set], 'f', 1, 64) + " MHz", "lines", sWidthLines[set])
@@ -243,7 +240,7 @@ func main() {
 
     plot.AddPointGroup("Anti-Stokes", "circle", asWidthPoints)
     //plot.AddPointGroup("Stokes", "circle", sWidthPoints)
-
+*/
   }
 }
 
@@ -395,6 +392,18 @@ func getAllLabels(label []string) ([]string, []string, []string, []string) {
   return prasLabel, pasLabel, prsLabel, psLabel
 }
 
+func buildData(data [][]float64) (plotter.XYs) {
+
+  xy := make(plotter.XYs, len(data[0]))
+
+  for i := range xy {
+    xy[i].X = data[0][i]
+    xy[i].Y = data[1][i]
+  }
+
+  return xy
+}
+
 func plotRaw(
   sets []int,
   pras, pas, prs, ps [][][]float64,
@@ -480,38 +489,7 @@ func plotSubtractedTogether(sets []int, s, as [][][]float64, sLabel, asLabel []s
   }
 }
 
-func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
-
-  // s
-  dimensions := 2
-  persist := true
-  debug := false
-  plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-  plot.SetTitle("Background Subtracted")
-  plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (nV)")
-
-  for _, set := range sets {
-    plot.AddPointGroup(strings.Trim(sLabel[set], " prs") + " s", "points", s[set])
-  }
-
-  // as
-  dimensions = 2
-  persist = true
-  debug = false
-  plot, _ = glot.NewPlot(dimensions, persist, debug)
-
-  plot.SetTitle("Background Subtracted")
-  plot.SetXLabel("Frequency (GHz)")
-  plot.SetYLabel("Signal (nV)")
-
-  for _, set := range sets {
-    plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
-  }
-}
-
-func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
+func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
   // as
   p := plot.New()
@@ -635,16 +613,152 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   }
 }
 
-func buildData(data [][]float64) (plotter.XYs) {
+func goPlotasFits(sets []int, as [][][]float64, labels []string,
+  fits [][][]float64, widthLines [][][]float64, widths []float64) {
 
-  xy := make(plotter.XYs, len(data[0]))
+    p := plot.New()
+    p.Title.Text = "Anti-Stokes"
+    p.Title.TextStyle.Font.Typeface = "liberation"
+    p.Title.TextStyle.Font.Variant = "Sans"
+    p.Title.TextStyle.Font.Size = 34
+    p.Title.Padding = font.Length(50)
 
-  for i := range xy {
-    xy[i].X = data[0][i]
-    xy[i].Y = data[1][i]
-  }
+    p.X.Label.Text = "Frequency (GHz)"
+    p.X.Label.TextStyle.Font.Variant = "Sans"
+    p.X.Label.TextStyle.Font.Size = 24
+    p.X.Label.Padding = font.Length(20)
+    p.X.LineStyle.Width = vg.Points(1.5)
+    p.X.Min = 2
+    p.X.Max = 2.5
+    p.X.Tick.LineStyle.Width = vg.Points(1.5)
+    p.X.Tick.Label.Font.Size = 24
+    p.X.Tick.Label.Font.Variant = "Sans"
 
-  return xy
+    p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+      {Value: 2.05, Label: ""},
+      {Value: 2.1, Label: "2.1"},
+      {Value: 2.15, Label: ""},
+      {Value: 2.2, Label: "2.2"},
+      {Value: 2.25, Label: ""},
+      {Value: 2.3, Label: "2.3"},
+      {Value: 2.35, Label: ""},
+      {Value: 2.4, Label: "2.4"},
+      {Value: 2.45, Label: ""},
+      {Value: 2.5, Label: "2.5"},
+    })
+    p.X.Padding = vg.Points(-8.5)
+
+    p.Y.Label.Text = "Signal (nV)"
+    p.Y.Label.TextStyle.Font.Variant = "Sans"
+    p.Y.Label.TextStyle.Font.Size = 24
+    p.Y.Label.Padding = font.Length(20)
+    p.Y.LineStyle.Width = vg.Points(1.5)
+    p.Y.Min = -1
+    p.Y.Max = 2.75
+    p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+    p.Y.Tick.Label.Font.Size = 24
+    p.Y.Tick.Label.Font.Variant = "Sans"
+    p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+      {Value: -.75, Label: ""},
+      {Value: -.5, Label: "-.5"},
+      {Value: -.25, Label: ""},
+      {Value: 0, Label: "0"},
+      {Value: .25, Label: ""},
+      {Value: .5, Label: ".5"},
+      {Value: .75, Label: ""},
+      {Value: 1, Label: "1"},
+      {Value: 1.25, Label: ""},
+      {Value: 1.5, Label: "1.5"},
+      {Value: 1.75, Label: ""},
+      {Value: 2, Label: "2"},
+      {Value: 2.25, Label: ""},
+      {Value: 2.5, Label: "2.5"},
+      {Value: 2.75, Label: ""},
+      {Value: 3, Label: "3"},
+    })
+    p.Y.Padding = vg.Points(-3.75)
+
+    p.Legend.TextStyle.Font.Size = 24
+    p.Legend.TextStyle.Font.Variant = "Sans"
+    p.Legend.Top = true
+    p.Legend.XOffs = vg.Points(-50)
+    p.Legend.YOffs = vg.Points(-50)
+    p.Legend.Padding = vg.Points(10)
+    p.Legend.ThumbnailWidth = vg.Points(50)
+
+    setColors := make([]color.RGBA, len(sets))
+    setColors[0] = color.RGBA{R: 31, G: 249, B: 155, A: 255}
+    setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+
+
+    for _, set := range sets {
+
+      pts := buildData(as[set])
+      fit := buildData(fits[set])
+      wid := buildData(widthLines[set])
+
+      // Plot points
+      plotPts, err := plotter.NewScatter(pts)
+      if err != nil {
+        panic(err)
+      }
+
+      plotPts.GlyphStyle.Color = setColors[set]
+      plotPts.GlyphStyle.Radius = vg.Points(3)
+      plotPts.Shape = draw.CircleGlyph{}
+
+      // Plot fit
+      plotFit, err := plotter.NewLine(fit)
+      if err != nil {
+        panic(err)
+      }
+
+      plotFit.LineStyle.Color = setColors[set]
+      plotFit.LineStyle.Width = vg.Points(3)
+
+      // Width lines
+      plotWid, err := plotter.NewLine(wid)
+      if err != nil {
+        panic(err)
+      }
+
+      plotWid.LineStyle.Color = setColors[set]
+      plotWid.LineStyle.Width = vg.Points(3)
+      plotWid.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
+
+      // Add set plots to p
+      p.Add(plotPts, plotFit, plotWid)
+      p.Legend.Add(strings.Trim(labels[set], " pras"), plotPts)
+    }
+
+    // Save plot
+    name := "Anti-Stokes w Fits"
+    date := time.Now()
+
+    // Make current date folder if it doesn't already exist
+    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+        panic(err)
+      }
+    }
+
+    // Make current time folder if it doesn't already exist
+    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
+      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+        panic(err)
+      }
+    }
+
+    path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
+    // Save the plot to a PNG file.
+    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
+    	panic(err)
+    }
+
+    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
+      panic(err)
+    }
 }
 
 func normalizeFit(fit []float64) ([]float64) {
