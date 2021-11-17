@@ -48,7 +48,7 @@ func main() {
     plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  subtractedGrouped := []int{}
+  subtractedGrouped := []int{0,1,2}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
@@ -128,25 +128,7 @@ func main() {
     // goPlot power vs width
     goPlotasPowerVsWid(fitSets, prasLabel, asfwhm)
 
-    /* Plot fit
-    dimensions := 2
-    persist := true
-    debug := false
-    plot, _ := glot.NewPlot(dimensions, persist, debug)
-
-    plot.SetTitle("Anti-Stokes")
-    plot.SetXLabel("Frequency (GHz)")
-    plot.SetYLabel("Signal (nV)")
-
-    for _, set := range fitSets {
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras"), "points", as[set])
-      plot.AddPointGroup(strings.Trim(prasLabel[set], " pras") + " fit", "lines", asFits[set])
-      plot.AddPointGroup(strconv.FormatFloat(asfwhm[set], 'f', 1, 64) + " MHz", "lines", asWidthLines[set])
-    }
-
-    // Width vs pump power
-    asWidthPoints := [][]float64{{0, 80, 170},{asfwhm[0], asfwhm[1], asfwhm[2]}}
-
+    /*
     // s
     fitStokes := []int{}
     if len(fitStokes) > 0 {
@@ -210,40 +192,7 @@ func main() {
         sFits = append(sFits, sFit)
       }
       fmt.Printf("\n")
-
-      // Plot fit
-      dimensions = 2
-      persist = true
-      debug = false
-      plot, _ = glot.NewPlot(dimensions, persist, debug)
-
-      plot.SetTitle("Stokes")
-      plot.SetXLabel("Frequency (GHz)")
-      plot.SetYLabel("Signal (nV)")
-
-      for _, set := range fitSets {
-        //plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "points", s[set])
-        plot.AddPointGroup(strings.Trim(prsLabel[set], " prs"), "lines", sFits[set])
-        plot.AddPointGroup(strconv.FormatFloat(sfwhm[set], 'f', 1, 64) + " MHz", "lines", sWidthLines[set])
-      }
-
-      // Width vs pump power
-      //sWidthPoints := [][]float64{{0, 80, 170},{sfwhm[0], sfwhm[1], sfwhm[2]}}
-    }
-
-    // Plot width points
-    dimensions = 2
-    persist = true
-    debug = false
-    plot, _ = glot.NewPlot(dimensions, persist, debug)
-
-    plot.SetTitle("Pump Power vs Width")
-    plot.SetXLabel("Pump Power (mW)")
-    plot.SetYLabel("FWHM (MHz)")
-
-    plot.AddPointGroup("Anti-Stokes", "circle", asWidthPoints)
-    //plot.AddPointGroup("Stokes", "circle", sWidthPoints)
-*/
+    }*/
   }
 }
 
@@ -566,7 +515,7 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Legend.ThumbnailWidth = vg.Points(50)
 
   setColors := make([]color.RGBA, len(sets))
-  setColors[0] = color.RGBA{R: 31, G: 249, B: 155, A: 255}
+  setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
   setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
   setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
 
@@ -881,7 +830,7 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
     }
 
     plotDash.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
-    plotDash.LineStyle.Width = vg.Points(0.5)
+    plotDash.LineStyle.Width = vg.Points(1)
     plotDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
     // Add set plots to p
