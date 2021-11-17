@@ -13,10 +13,10 @@ import (
   "strings"
   "math"
   "gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
+  "gonum.org/v1/plot/plotter"
+  "gonum.org/v1/plot/vg"
   "gonum.org/v1/plot/font"
-	"gonum.org/v1/plot/vg/draw"
+  "gonum.org/v1/plot/vg/draw"
   "time"
 )
 
@@ -93,14 +93,14 @@ func main() {
 
       // Solve for fit
       toBeSolved := lm.LMProblem{
-    	  Dim:        3,
-     	  Size:       len(as[set][0]),
-     	  Func:       f,
-     	  Jac:        jacobian.Jac,
-     	  InitParams: []float64{amp, wid, cen},
-     	  Tau:        1e-6,
-     	  Eps1:       1e-8,
-     	  Eps2:       1e-8,
+        Dim:        3,
+        Size:       len(as[set][0]),
+        Func:       f,
+        Jac:        jacobian.Jac,
+        InitParams: []float64{amp, wid, cen},
+        Tau:        1e-6,
+        Eps1:       1e-8,
+        Eps2:       1e-8,
       }
 
       results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
@@ -115,9 +115,9 @@ func main() {
 
       // Create function according to solved fit parameters
       for i := 0; i < len(as[set][0]); i++ {
-          // (amp*wid^2/((x-cen)^2+wid^2))
-          x := as[set][0][i]
-          asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
+        // (amp*wid^2/((x-cen)^2+wid^2))
+        x := as[set][0][i]
+        asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
       }
 
       // Width lines
@@ -197,9 +197,9 @@ func main() {
 
         // Create function according to solved fit parameters
         for i := 0; i < len(s[set][0]); i++ {
-            // (amp*wid^2/((x-cen)^2+wid^2))
-            x := s[set][0][i]
-            syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
+          // (amp*wid^2/((x-cen)^2+wid^2))
+          x := s[set][0][i]
+          syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
         }
 
         // Width lines
@@ -533,18 +533,17 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.X.Tick.Label.Font.Variant = "Sans"
 
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-  		//{Value: 2.0, Label: "2"},
-      {Value: 2.05, Label: ""},
-      {Value: 2.1, Label: "2.1"},
-      {Value: 2.15, Label: ""},
-      {Value: 2.2, Label: "2.2"},
-      {Value: 2.25, Label: ""},
-      {Value: 2.3, Label: "2.3"},
-      {Value: 2.35, Label: ""},
-      {Value: 2.4, Label: "2.4"},
-      {Value: 2.45, Label: ""},
-      {Value: 2.5, Label: "2.5"},
-  	})
+    {Value: 2.05, Label: ""},
+    {Value: 2.1, Label: "2.1"},
+    {Value: 2.15, Label: ""},
+    {Value: 2.2, Label: "2.2"},
+    {Value: 2.25, Label: ""},
+    {Value: 2.3, Label: "2.3"},
+    {Value: 2.35, Label: ""},
+    {Value: 2.4, Label: "2.4"},
+    {Value: 2.45, Label: ""},
+    {Value: 2.5, Label: "2.5"},
+  })
   p.X.Padding = vg.Points(-8.5)
 
   p.Y.Label.Text = "Signal (nV)"
@@ -558,25 +557,23 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Y.Tick.Label.Font.Size = 24
   p.Y.Tick.Label.Font.Variant = "Sans"
   p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-  		//{Value: -1, Label: "-1"},
-      {Value: -.75, Label: ""},
-      {Value: -.5, Label: "-.5"},
-      {Value: -.25, Label: ""},
-      {Value: 0, Label: "0"},
-      {Value: .25, Label: ""},
-      {Value: .5, Label: ".5"},
-      {Value: .75, Label: ""},
-      {Value: 1, Label: "1"},
-      {Value: 1.25, Label: ""},
-      {Value: 1.5, Label: "1.5"},
-      {Value: 1.75, Label: ""},
-      {Value: 2, Label: "2"},
-      {Value: 2.25, Label: ""},
-      {Value: 2.5, Label: "2.5"},
-      {Value: 2.75, Label: ""},
-      {Value: 3, Label: "3"},
-
-  	})
+    {Value: -.75, Label: ""},
+    {Value: -.5, Label: "-.5"},
+    {Value: -.25, Label: ""},
+    {Value: 0, Label: "0"},
+    {Value: .25, Label: ""},
+    {Value: .5, Label: ".5"},
+    {Value: .75, Label: ""},
+    {Value: 1, Label: "1"},
+    {Value: 1.25, Label: ""},
+    {Value: 1.5, Label: "1.5"},
+    {Value: 1.75, Label: ""},
+    {Value: 2, Label: "2"},
+    {Value: 2.25, Label: ""},
+    {Value: 2.5, Label: "2.5"},
+    {Value: 2.75, Label: ""},
+    {Value: 3, Label: "3"},
+  })
   p.Y.Padding = vg.Points(-3.75)
 
   p.Legend.TextStyle.Font.Size = 24
@@ -597,13 +594,13 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
     asPts := buildData(as[set])
 
-  	// Make a scatter plotter and set its style.
-  	plotSet, err := plotter.NewScatter(asPts)
-  	if err != nil {
-  		panic(err)
-  	}
+    // Make a scatter plotter and set its style.
+    plotSet, err := plotter.NewScatter(asPts)
+    if err != nil {
+      panic(err)
+    }
 
-  	plotSet.GlyphStyle.Color = setColors[set]
+    plotSet.GlyphStyle.Color = setColors[set]
     plotSet.GlyphStyle.Radius = vg.Points(3)
     plotSet.Shape = draw.CircleGlyph{}
 
