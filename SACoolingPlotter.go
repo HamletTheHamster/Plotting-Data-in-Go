@@ -536,11 +536,13 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.X.Label.TextStyle.Font.Size = 24
   p.X.Label.Padding = font.Length(20)
   p.X.LineStyle.Width = vg.Points(1.5)
+  p.X.Min = 2
+  p.X.Max = 2.5
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
   p.X.Tick.Label.Font.Size = 24
   p.X.Tick.Label.Font.Variant = "Sans"
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-  		{Value: 2.0, Label: "2"},
+  		//{Value: 2.0, Label: "2"},
       {Value: 2.05, Label: ""},
       {Value: 2.1, Label: "2.1"},
       {Value: 2.15, Label: ""},
@@ -552,18 +554,20 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
       {Value: 2.45, Label: ""},
       {Value: 2.5, Label: "2.5"},
   	})
-  p.X.Padding = vg.Points(25)
+  p.X.Padding = vg.Points(-8.5)
 
   p.Y.Label.Text = "Signal (nV)"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
   p.Y.Label.TextStyle.Font.Size = 24
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
+  p.Y.Min = -1
+  p.Y.Max = 2.75
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
   p.Y.Tick.Label.Font.Size = 24
   p.Y.Tick.Label.Font.Variant = "Sans"
   p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-  		{Value: -1, Label: "-1"},
+  		//{Value: -1, Label: "-1"},
       {Value: -.75, Label: ""},
       {Value: -.5, Label: "-.5"},
       {Value: -.25, Label: ""},
@@ -582,7 +586,7 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
       {Value: 3, Label: "3"},
 
   	})
-  p.Y.Padding = vg.Points(25)
+  p.Y.Padding = vg.Points(-3.75)
 
   p.Legend.TextStyle.Font.Size = 24
   p.Legend.TextStyle.Font.Variant = "Sans"
