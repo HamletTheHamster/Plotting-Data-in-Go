@@ -686,10 +686,15 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     p.Legend.Padding = vg.Points(10)
     p.Legend.ThumbnailWidth = vg.Points(50)
 
-    setColors := make([]color.RGBA, len(sets))
-    setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-    setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-    setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    setPtColors := make([]color.RGBA, len(sets))
+    setPtColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    setPtColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    setPtColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+
+    setFitColors := make([]color.RGBA, len(sets))
+    setFitColors[0] = color.RGBA{R: 25, G: 158, B: 129, A: 255}
+    setFitColors[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+    setFitColors[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
 
 
     for _, set := range sets {
@@ -704,7 +709,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
         panic(err)
       }
 
-      plotPts.GlyphStyle.Color = setColors[set]
+      plotPts.GlyphStyle.Color = setPtColors[set]
       plotPts.GlyphStyle.Radius = vg.Points(3)
       plotPts.Shape = draw.CircleGlyph{}
 
@@ -714,7 +719,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
         panic(err)
       }
 
-      plotFit.LineStyle.Color = setColors[set]
+      plotFit.LineStyle.Color = setFitColors[set]
       plotFit.LineStyle.Width = vg.Points(3)
 
       // Width lines
@@ -723,7 +728,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
         panic(err)
       }
 
-      plotWid.LineStyle.Color = setColors[set]
+      plotWid.LineStyle.Color = setFitColors[set]
       plotWid.LineStyle.Width = vg.Points(3)
       plotWid.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
