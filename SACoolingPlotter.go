@@ -692,7 +692,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     setPtColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
 
     setFitColors := make([]color.RGBA, len(sets))
-    setFitColors[0] = color.RGBA{R: 25, G: 158, B: 129, A: 255}
+    setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
     setFitColors[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
     setFitColors[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
 
