@@ -445,6 +445,7 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
   // as
   p := plot.New()
+  p.BackgroundColor = color.RGBA{A:0}
   p.Title.Text = "Anti-Stokes"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
@@ -569,6 +570,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
   fits [][][]float64, widthLines [][][]float64, widths []float64) {
 
     p := plot.New()
+    p.BackgroundColor = color.RGBA{A:0}
     p.Title.Text = "Anti-Stokes"
     p.Title.TextStyle.Font.Typeface = "liberation"
     p.Title.TextStyle.Font.Variant = "Sans"
@@ -721,6 +723,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
 func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
 
   p := plot.New()
+  p.BackgroundColor = color.RGBA{A:0}
   p.Title.Text = "Pump Power vs Fit Widths"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
