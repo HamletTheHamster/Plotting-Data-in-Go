@@ -20,9 +20,6 @@ import (
 	"gonum.org/v1/plot/vg"
   "gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/vg/draw"
-  //"gonum.org/v1/plot/vg/vgsvg"
-  //"golang.org/x/image/font/gofont/goregular"
-  //"github.com/golang/freetype/truetype"
 )
 
 func main() {
@@ -518,11 +515,6 @@ func plotSubtractedGrouped(sets []int, s, as [][][]float64, sLabel, asLabel []st
 
 func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
 
-  /*goFont, err := truetype.Parse(goregular.TTF)
-  if err != nil {
-    panic(err)
-  }*/
-
   // as
   p := plot.New()
   p.Title.Text = "Anti-Stokes"
@@ -541,6 +533,8 @@ func gonumPlot(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
   p.X.Tick.Label.Font.Size = 24
   p.X.Tick.Label.Font.Variant = "Sans"
+  //p.X.Tick.lengthOffset = vg.Points(3)
+
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
   		//{Value: 2.0, Label: "2"},
       {Value: 2.05, Label: ""},
@@ -654,7 +648,31 @@ func normalizeFit(fit []float64) ([]float64) {
 }
 
 //----------------------------------------------------------------------------\\
+// [EXT] Gonum Plot Stuff
+type Tick struct {
+	// Value is the data value marked by this Tick.
+	Value float64
 
+	// Label is the text to display at the tick mark.
+	// If Label is an empty string then this is a minor
+	// tick mark.
+	Label string
+}
+
+func (t Tick) IsMinor() bool {
+	return t.Label == ""
+}
+
+func (t Tick) lengthOffset(len vg.Length) vg.Length {
+	if t.IsMinor() {
+		return 3 * len / 2
+	}
+	return len
+}
+//----------------------------------------------------------------------------//
+
+//----------------------------------------------------------------------------\\
+// [EXT] Fitting Stuff
 /*
 Package lm implements optimization routines for non-linear least squares problems
 using the Levenberg-Marquardt method.
