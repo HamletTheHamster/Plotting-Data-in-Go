@@ -125,6 +125,9 @@ func main() {
     // goPlot as fits
     goPlotasFits(fitSets, as, prasLabel, asFits, asWidthLines, asfwhm)
 
+    // goPlot power vs width
+    goPlotasPowerVsWid(fitSets, prasLabel, asfwhm)
+
     /* Plot fit
     dimensions := 2
     persist := true
@@ -764,6 +767,155 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
       panic(err)
     }
+}
+
+func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
+
+  p := plot.New()
+  p.Title.Text = "Pump Power vs Fit Widths"
+  p.Title.TextStyle.Font.Typeface = "liberation"
+  p.Title.TextStyle.Font.Variant = "Sans"
+  p.Title.TextStyle.Font.Size = 34
+  p.Title.Padding = font.Length(50)
+
+  p.X.Label.Text = "Pump Power (mW)"
+  p.X.Label.TextStyle.Font.Variant = "Sans"
+  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.Padding = font.Length(20)
+  p.X.LineStyle.Width = vg.Points(1.5)
+  p.X.Min = 0
+  p.X.Max = 200
+  p.X.Tick.LineStyle.Width = vg.Points(1.5)
+  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Variant = "Sans"
+
+  p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 0, Label: "0"},
+    {Value: 25, Label: ""},
+    {Value: 50, Label: "50"},
+    {Value: 75, Label: ""},
+    {Value: 100, Label: "100"},
+    {Value: 125, Label: ""},
+    {Value: 150, Label: "150"},
+    {Value: 175, Label: ""},
+    {Value: 200, Label: "200"},
+  })
+  p.X.Padding = vg.Points(-5.75)
+
+  p.Y.Label.Text = "Frequency (MHz)"
+  p.Y.Label.TextStyle.Font.Variant = "Sans"
+  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.Padding = font.Length(20)
+  p.Y.LineStyle.Width = vg.Points(1.5)
+  p.Y.Min = 90
+  p.Y.Max = 130
+  p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Variant = "Sans"
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 90, Label: "90"},
+    {Value: 95, Label: ""},
+    {Value: 100, Label: "100"},
+    {Value: 105, Label: ""},
+    {Value: 110, Label: "110"},
+    {Value: 115, Label: ""},
+    {Value: 120, Label: "120"},
+    {Value: 125, Label: ""},
+    {Value: 130, Label: "130"},
+  })
+  p.Y.Padding = vg.Points(2.5)
+
+  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Variant = "Sans"
+  p.Legend.Top = true
+  p.Legend.XOffs = vg.Points(-50)
+  p.Legend.YOffs = vg.Points(-50)
+  p.Legend.Padding = vg.Points(10)
+  p.Legend.ThumbnailWidth = vg.Points(50)
+
+  setFitColors := make([]color.RGBA, len(sets))
+  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+  setFitColors[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+  setFitColors[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+
+  for _, set := range sets {
+
+    pts := make(plotter.XYs, 1)
+
+    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW pras"), 64); err == nil {
+      pts[0].X = pow
+    } else {
+      panic(err)
+    }
+
+    pts[0].Y = widths[set]
+
+    // Plot points
+    plotPts, err := plotter.NewScatter(pts)
+    if err != nil {
+      panic(err)
+    }
+
+    plotPts.GlyphStyle.Color = setFitColors[set]
+    plotPts.GlyphStyle.Radius = vg.Points(5)
+    plotPts.Shape = draw.CircleGlyph{}
+
+    // Gray dashed eye guide lines
+    dash := make(plotter.XYs, 4)
+
+    // Vertical
+    dash[0].X = pts[0].X
+    dash[0].Y = 90
+    dash[1].X = pts[0].X
+    dash[1].Y = pts[0].Y
+
+    // Horizontal
+    dash[2].X = -15
+    dash[2].Y = pts[0].Y
+    dash[3].X = pts[0].X
+    dash[3].Y = pts[0].Y
+
+    plotDash, err := plotter.NewLine(dash)
+    if err != nil {
+      panic(err)
+    }
+
+    plotDash.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
+    plotDash.LineStyle.Width = vg.Points(0.5)
+    plotDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
+
+    // Add set plots to p
+    p.Add(plotPts, plotDash)
+    p.Legend.Add(strings.Trim(labels[set], " pras"), plotPts)
+  }
+
+  // Save plot
+  name := "Pow vs Wid"
+  date := time.Now()
+
+  // Make current date folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  // Make current time folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
+  // Save the plot to a PNG file.
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
+    panic(err)
+  }
+
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
+    panic(err)
+  }
 }
 
 func normalizeFit(fit []float64) ([]float64) {
