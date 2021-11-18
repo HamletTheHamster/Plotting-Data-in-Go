@@ -1,13 +1,33 @@
-Date,Name,probe@sample mW,Filepath,Notes
-21-9-14,0mW ps,20,Data/0/ps.csv,10kHz RBW - 25 avg - 20s sweep - dither
-,0 mW pas,0,Data/0/pas.csv,
-,0 mW pras,20,Data/0/pras.csv, (57.07mW@probeVOA)
-,0 mW prs,20,Data/0/prs.csv,
-,80 mW ps,20,Data/80/ps.csv,
-,80 mW pas,0,Data/80/pas.csv,
-,80 mW pras,20,Data/80/pras.csv,
-,80 mW prs,20,Data/80/prs.csv,
-,170 mW prs,20,Data/170/prs.csv,
-,170 mW pras,20,Data/170/pras.csv,
-,170 mW pas,0,Data/170/pas.csv,
-,170 mW ps,0,Data/170/ps.csv,
+Date,Name,Probe Power @ eVOA mW,Filepath,Notes
+21-8-26,114.4 mW bas,114.4,Data/Probe/b.csv,
+21-8-26,114.4 mW bs,114.4,Data/Probe/b.csv,
+21-8-26,114.4 mW ras,114.4,Data/Probe/as.csv,
+21-8-26,114.4 mW rs,114.4,Data/Probe/s.csv,bigger than as?
+21-8-26,50 mW bas,50,Data/Probe50/b.csv,
+21-8-26,50 mW bs,50,Data/Probe50/b.csv,
+21-8-26,50 mW ras,50,Data/Probe50/as.csv,
+21-8-26,50 mW rs,50,Data/Probe50/s.csv,
+21-8-26,25 mW bas,25,Data/Probe25/b.csv,
+21-8-26,25 mW bs,25,Data/Probe25/b.csv,
+21-8-26,25 mW ras,25,Data/Probe25/as.csv,
+21-8-26,25 mW rs,25,Data/Probe25/s.csv,
+21-8-26,10 mW bas,10,Data/Probe10/b.csv,
+21-8-26,10 mW bs,10,Data/Probe10/b.csv,
+21-8-26,10 mW ras,10,Data/Probe10/as.csv,
+21-8-26,10 mW rs,10,Data/Probe10/s.csv,
+21-8-26,5 mW bas,5,Data/Probe5/b.csv,
+21-8-26,5 mW bs,5,Data/Probe5/b.csv,
+21-8-26,5 mW ras,5,Data/Probe5/as.csv,
+21-8-26,5 mW rs,5,Data/Probe5/s.csv,
+21-8-26,2 mW bas,2,Data/Probe2/b.csv,winner
+21-8-26,2 mW bs,2,Data/Probe2/b.csv,winner
+21-8-26,2 mW ras,2,Data/Probe2/as.csv,winner
+21-8-26,2 mW rs,2,Data/Probe2/s.csv,winner
+21-8-26,1 mW bas,1,Data/Probe1/b.csv,
+21-8-26,1 mW bs,1,Data/Probe1/b.csv,
+21-8-26,1 mW ras,1,Data/Probe1/as.csv,
+21-8-26,1 mW rs,1,Data/Probe1/s.csv,
+21-8-26,.5 mW bas,0.5,Data/Probe0p5/b.csv,
+21-8-26,.5 mW bs,0.5,Data/Probe0p5/b.csv,
+21-8-26,.5 mW ras,0.5,Data/Probe0p5/as.csv,
+21-8-26,.5 mW rs,0.5,Data/Probe0p5/s.csv,

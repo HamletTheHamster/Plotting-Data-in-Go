@@ -27,7 +27,7 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
-  raw := []int{}
+  raw := []int{0}
   if len(raw) > 0 {
     plotRaw(
       raw,
@@ -48,7 +48,7 @@ func main() {
     plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  subtractedGrouped := []int{0}
+  subtractedGrouped := []int{}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
@@ -515,7 +515,7 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
 
-  setColors := make([]color.RGBA, len(sets))
+  setColors := make([]color.RGBA, 3)
   setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
   setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
   setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
