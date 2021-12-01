@@ -372,27 +372,20 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = 0
-  p.Y.Max = 0.75
+  p.Y.Max = 17.5
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
   p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
-  /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-    {Value: .05, Label: ""},
-    {Value: .1, Label: ".1"},
-    {Value: .15, Label: ""},
-    {Value: .2, Label: ".2"},
-    {Value: .25, Label: ""},
-    {Value: .3, Label: ".3"},
-    {Value: .35, Label: ""},
-    {Value: .4, Label: ".4"},
-    {Value: .45, Label: ""},
-    {Value: .5, Label: ".5"},
-    {Value: .55, Label: ""},
-    {Value: .6, Label: ".6"},
-    {Value: .65, Label: ""},
-    {Value: .7, Label: ".7"},
-    {Value: .75, Label: ""},
-  })*/
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 0, Label: "0"},
+    {Value: 2.5, Label: ""},
+    {Value: 5, Label: "5"},
+    {Value: 7.5, Label: ""},
+    {Value: 10, Label: "10"},
+    {Value: 12.5, Label: ""},
+    {Value: 15, Label: "15"},
+    {Value: 17.5, Label: ""},
+  })
   p.Y.Padding = vg.Points(-3.75)
 
   p.Legend.TextStyle.Font.Size = 36
@@ -517,27 +510,20 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = 0
-  p.Y.Max = 0.75
+  p.Y.Max = 17.5
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
-  /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-    {Value: .05, Label: ""},
-    {Value: .1, Label: ".1"},
-    {Value: .15, Label: ""},
-    {Value: .2, Label: ".2"},
-    {Value: .25, Label: ""},
-    {Value: .3, Label: ".3"},
-    {Value: .35, Label: ""},
-    {Value: .4, Label: ".4"},
-    {Value: .45, Label: ""},
-    {Value: .5, Label: ".5"},
-    {Value: .55, Label: ""},
-    {Value: .6, Label: ".6"},
-    {Value: .65, Label: ""},
-    {Value: .7, Label: ".7"},
-    {Value: .75, Label: ""},
-  })*/
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 0, Label: "0"},
+    {Value: 2.5, Label: ""},
+    {Value: 5, Label: "5"},
+    {Value: 7.5, Label: ""},
+    {Value: 10, Label: "10"},
+    {Value: 12.5, Label: ""},
+    {Value: 15, Label: "15"},
+    {Value: 17.5, Label: ""},
+  })
   p.Y.Padding = vg.Points(-3.75)
 
   p.Legend.TextStyle.Font.Size = 36
