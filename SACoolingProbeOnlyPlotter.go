@@ -52,7 +52,7 @@ func main() {
   as, rasLabel,
   )
 
-  subtractedGrouped := []int{0,1,2,3,4}
+  subtractedGrouped := []int{0,4,8,12,15}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, rsLabel, rasLabel)
   }
@@ -148,17 +148,28 @@ func getData(csvName string) ([][]float64) {
 
   // Convert to Linear if dBm
   if dataStr[1][3] == " dBm" {
-    var convSignal []float64
+    var nV []float64
 
-    for _, sigElemToConvert := range signal {
-      convSignal = append(convSignal, math.Pow(10, 6)*math.Pow(10, sigElemToConvert/10.))
+    for _, dBm := range signal {
+      nV = append(nV, 1000*math.Pow(10, 6)*math.Pow(10, dBm/10.))
     }
 
-    return [][]float64{frequency, convSignal}
+    return [][]float64{frequency, nV}
   } else if dataStr[1][3] == "  uV" {
+    var nV []float64
 
-    return [][]float64{frequency, signal}
-  }
+    for _, uV := range signal {
+      nV = append(nV, 1000*uV)
+    }
+
+    /* Conver to picovolts
+    var pV []float64
+    for _, uV := range signal {
+      pV = append(pV, 1000*uV)
+    }*/
+
+    return [][]float64{frequency, nV}
+    }
 
   fmt.Println("Warning: check units - not uV or dBm")
   return [][]float64{frequency, signal}
@@ -323,44 +334,49 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   // as
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
-  p.Title.Text = "Anti-Stokes No Probe"
+  p.Title.Text = "Anti-Stokes Pump-only Spectra"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 34
+  p.Title.TextStyle.Font.Size = 50
   p.Title.Padding = font.Length(50)
 
   p.X.Label.Text = "Frequency (GHz)"
   p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.TextStyle.Font.Size = 36
   p.X.Label.Padding = font.Length(20)
   p.X.LineStyle.Width = vg.Points(1.5)
-  p.X.Min = 2.1
-  p.X.Max = 2.4
+  p.X.Min = 2
+  p.X.Max = 2.5
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Size = 36
   p.X.Tick.Label.Font.Variant = "Sans"
 
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 2, Label: "2"},
+    {Value: 2.05, Label: ""},
+    {Value: 2.1, Label: "2.1"},
     {Value: 2.15, Label: ""},
     {Value: 2.2, Label: "2.2"},
     {Value: 2.25, Label: ""},
     {Value: 2.3, Label: "2.3"},
     {Value: 2.35, Label: ""},
     {Value: 2.4, Label: "2.4"},
+    {Value: 2.45, Label: ""},
+    {Value: 2.5, Label: "2.5"},
   })
   p.X.Padding = vg.Points(-8.5)
 
-  p.Y.Label.Text = "Signal (nV)"
+  p.Y.Label.Text = "Spectral Density (nV)"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.TextStyle.Font.Size = 36
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = 0
   p.Y.Max = 0.75
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
-  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+  /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
     {Value: .05, Label: ""},
     {Value: .1, Label: ".1"},
     {Value: .15, Label: ""},
@@ -376,24 +392,35 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     {Value: .65, Label: ""},
     {Value: .7, Label: ".7"},
     {Value: .75, Label: ""},
-  })
+  })*/
   p.Y.Padding = vg.Points(-3.75)
 
-  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Size = 36
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
   p.Legend.YOffs = vg.Points(-50)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
+  p.Legend.Add("Pump")
 
-  setColors := make([]color.RGBA, 5)
+  setColors := make([]color.RGBA, 16)
   setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-  setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
-  setColors[3] = color.RGBA{R: 255, G: 243, B: 117, A: 255}
-  setColors[4] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-
+  setColors[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+  setColors[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+  setColors[12] = color.RGBA{R: 255, G: 243, B: 117, A: 255}
+  setColors[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
+  setColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+  setColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+  setColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+  setColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+  setColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+  setColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+  setColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+  setColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+  setColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+  setColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+  setColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
 
   for _, set := range sets {
 
@@ -410,7 +437,17 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     plotSet.Shape = draw.CircleGlyph{}
 
     p.Add(plotSet)
-    p.Legend.Add(strings.Trim(asLabel[set], " pras"), plotSet)
+
+    // Legend
+    l, err := plotter.NewScatter(asPts)
+    if err != nil {
+      panic(err)
+    }
+
+    l.GlyphStyle.Color = setColors[set]
+    l.GlyphStyle.Radius = vg.Points(6)
+    l.Shape = draw.CircleGlyph{}
+    p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
   }
 
   date := time.Now()
@@ -442,36 +479,41 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   // s
   p = plot.New()
   p.BackgroundColor = color.RGBA{A:0}
-  p.Title.Text = "Stokes No Probe"
+  p.Title.Text = "Stokes Pump-only Spectra"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 34
+  p.Title.TextStyle.Font.Size = 50
   p.Title.Padding = font.Length(50)
 
   p.X.Label.Text = "Frequency (GHz)"
   p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.TextStyle.Font.Size = 36
   p.X.Label.Padding = font.Length(20)
   p.X.LineStyle.Width = vg.Points(1.5)
-  p.X.Min = 2.1
-  p.X.Max = 2.4
+  p.X.Min = 2
+  p.X.Max = 2.5
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Size = 36
   p.X.Tick.Label.Font.Variant = "Sans"
 
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 2, Label: "2"},
+    {Value: 2.05, Label: ""},
+    {Value: 2.1, Label: "2.1"},
     {Value: 2.15, Label: ""},
     {Value: 2.2, Label: "2.2"},
     {Value: 2.25, Label: ""},
     {Value: 2.3, Label: "2.3"},
     {Value: 2.35, Label: ""},
     {Value: 2.4, Label: "2.4"},
+    {Value: 2.45, Label: ""},
+    {Value: 2.5, Label: "2.5"},
   })
   p.X.Padding = vg.Points(-8.5)
 
-  p.Y.Label.Text = "Signal (nV)"
+  p.Y.Label.Text = "Spectral Density (nV)"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.TextStyle.Font.Size = 36
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = 0
@@ -479,7 +521,7 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
   p.Y.Tick.Label.Font.Size = 24
   p.Y.Tick.Label.Font.Variant = "Sans"
-  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+  /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
     {Value: .05, Label: ""},
     {Value: .1, Label: ".1"},
     {Value: .15, Label: ""},
@@ -495,16 +537,17 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     {Value: .65, Label: ""},
     {Value: .7, Label: ".7"},
     {Value: .75, Label: ""},
-  })
+  })*/
   p.Y.Padding = vg.Points(-3.75)
 
-  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Size = 36
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
   p.Legend.YOffs = vg.Points(-50)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
+  p.Legend.Add("Pump")
 
   for _, set := range sets {
 
@@ -521,7 +564,18 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     plotSet.Shape = draw.CircleGlyph{}
 
     p.Add(plotSet)
-    p.Legend.Add(strings.Trim(sLabel[set], " rs"), plotSet)
+
+    // Legend
+    l, err := plotter.NewScatter(sPts)
+    if err != nil {
+      panic(err)
+    }
+
+    l.GlyphStyle.Color = setColors[set]
+    l.GlyphStyle.Radius = vg.Points(6)
+    l.Shape = draw.CircleGlyph{}
+
+    p.Legend.Add(strings.Trim(sLabel[set], " rs"), l)
   }
 
   // Make current date folder if it doesn't already exist

@@ -48,13 +48,13 @@ func main() {
     plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  subtractedGrouped := []int{0}
+  subtractedGrouped := []int{0,1,2}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
 
   // Lorentz fit better
-  fitSets := []int{}
+  fitSets := []int{0,1,2}
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
@@ -297,6 +297,12 @@ func getData(csvName *string) ([][]float64) {
       nV = append(nV, 1000*uV)
     }
 
+    /* Conver to picovolts
+    var pV []float64
+    for _, uV := range signal {
+      pV = append(pV, 1000*uV)
+    }*/
+
     return [][]float64{frequency, nV}
   }
 
@@ -446,21 +452,21 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   // as
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
-  p.Title.Text = "Anti-Stokes"
+  p.Title.Text = "Anti-Stokes Probe Spectra"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 34
+  p.Title.TextStyle.Font.Size = 50
   p.Title.Padding = font.Length(50)
 
   p.X.Label.Text = "Frequency (GHz)"
   p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.TextStyle.Font.Size = 36
   p.X.Label.Padding = font.Length(20)
   p.X.LineStyle.Width = vg.Points(1.5)
   p.X.Min = 2
   p.X.Max = 2.5
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Size = 36
   p.X.Tick.Label.Font.Variant = "Sans"
 
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
@@ -475,17 +481,17 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     {Value: 2.45, Label: ""},
     {Value: 2.5, Label: "2.5"},
   })
-  p.X.Padding = vg.Points(-8.5)
+  p.X.Padding = vg.Points(-12.5)
 
-  p.Y.Label.Text = "Signal (nV)"
+  p.Y.Label.Text = "Spectral Density (nV)"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.TextStyle.Font.Size = 36
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = -1
   p.Y.Max = 2.75
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
   p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
     {Value: -.75, Label: ""},
@@ -505,20 +511,26 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     {Value: 2.75, Label: ""},
     {Value: 3, Label: "3"},
   })
-  p.Y.Padding = vg.Points(-3.75)
+  p.Y.Padding = vg.Points(-4.75)
 
-  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Size = 36
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
   p.Legend.YOffs = vg.Points(-50)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
+  p.Legend.Add("Pump")
 
   setColors := make([]color.RGBA, len(sets))
   setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
   setColors[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
   setColors[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+
+  setFitColors := make([]color.RGBA, len(sets))
+  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+  setFitColors[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+  setFitColors[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
 
 
   for _, set := range sets {
@@ -536,7 +548,17 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     plotSet.Shape = draw.CircleGlyph{}
 
     p.Add(plotSet)
-    p.Legend.Add(strings.Trim(asLabel[set], " pras"), plotSet)
+
+    // Legend
+    l, err := plotter.NewScatter(asPts)
+    if err != nil {
+      panic(err)
+    }
+
+    l.GlyphStyle.Color = setFitColors[set]
+    l.GlyphStyle.Radius = vg.Points(6)
+    l.Shape = draw.CircleGlyph{}
+    p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
   }
 
   date := time.Now()
@@ -571,21 +593,21 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
 
     p := plot.New()
     p.BackgroundColor = color.RGBA{A:0}
-    p.Title.Text = "Anti-Stokes"
+    p.Title.Text = "Anti-Stokes Probe Spectra"
     p.Title.TextStyle.Font.Typeface = "liberation"
     p.Title.TextStyle.Font.Variant = "Sans"
-    p.Title.TextStyle.Font.Size = 34
+    p.Title.TextStyle.Font.Size = 50
     p.Title.Padding = font.Length(50)
 
     p.X.Label.Text = "Frequency (GHz)"
     p.X.Label.TextStyle.Font.Variant = "Sans"
-    p.X.Label.TextStyle.Font.Size = 24
+    p.X.Label.TextStyle.Font.Size = 36
     p.X.Label.Padding = font.Length(20)
     p.X.LineStyle.Width = vg.Points(1.5)
     p.X.Min = 2
     p.X.Max = 2.5
     p.X.Tick.LineStyle.Width = vg.Points(1.5)
-    p.X.Tick.Label.Font.Size = 24
+    p.X.Tick.Label.Font.Size = 36
     p.X.Tick.Label.Font.Variant = "Sans"
 
     p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
@@ -600,17 +622,17 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
       {Value: 2.45, Label: ""},
       {Value: 2.5, Label: "2.5"},
     })
-    p.X.Padding = vg.Points(-8.5)
+    p.X.Padding = vg.Points(-12.5)
 
-    p.Y.Label.Text = "Signal (nV)"
+    p.Y.Label.Text = "Spectral Density (nV)"
     p.Y.Label.TextStyle.Font.Variant = "Sans"
-    p.Y.Label.TextStyle.Font.Size = 24
+    p.Y.Label.TextStyle.Font.Size = 36
     p.Y.Label.Padding = font.Length(20)
     p.Y.LineStyle.Width = vg.Points(1.5)
     p.Y.Min = -1
     p.Y.Max = 2.75
     p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-    p.Y.Tick.Label.Font.Size = 24
+    p.Y.Tick.Label.Font.Size = 36
     p.Y.Tick.Label.Font.Variant = "Sans"
     p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
       {Value: -.75, Label: ""},
@@ -630,15 +652,16 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
       {Value: 2.75, Label: ""},
       {Value: 3, Label: "3"},
     })
-    p.Y.Padding = vg.Points(-3.75)
+    p.Y.Padding = vg.Points(-4.75)
 
-    p.Legend.TextStyle.Font.Size = 24
+    p.Legend.TextStyle.Font.Size = 36
     p.Legend.TextStyle.Font.Variant = "Sans"
     p.Legend.Top = true
     p.Legend.XOffs = vg.Points(-50)
     p.Legend.YOffs = vg.Points(-50)
     p.Legend.Padding = vg.Points(10)
     p.Legend.ThumbnailWidth = vg.Points(50)
+    p.Legend.Add("Pump")
 
     setPtColors := make([]color.RGBA, len(sets))
     setPtColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
@@ -683,12 +706,22 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
       }
 
       plotWid.LineStyle.Color = setFitColors[set]
-      plotWid.LineStyle.Width = vg.Points(3)
-      plotWid.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
+      plotWid.LineStyle.Width = vg.Points(4)
+      plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
       // Add set plots to p
       p.Add(plotPts, plotFit, plotWid)
-      p.Legend.Add(strings.Trim(labels[set], " pras"), plotPts)
+
+      // Legend
+      l, err := plotter.NewScatter(pts)
+      if err != nil {
+        panic(err)
+      }
+
+      l.GlyphStyle.Color = setFitColors[set]
+      l.GlyphStyle.Radius = vg.Points(6)
+      l.Shape = draw.CircleGlyph{}
+      p.Legend.Add(strings.Trim(labels[set], " pras"), l)
     }
 
     // Save plot
@@ -724,21 +757,21 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
-  p.Title.Text = "Pump Power vs Fit Widths"
+  p.Title.Text = "Pump Power vs Widths of Fits"
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 34
+  p.Title.TextStyle.Font.Size = 50
   p.Title.Padding = font.Length(50)
 
   p.X.Label.Text = "Pump Power (mW)"
   p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.Label.TextStyle.Font.Size = 24
+  p.X.Label.TextStyle.Font.Size = 36
   p.X.Label.Padding = font.Length(20)
   p.X.LineStyle.Width = vg.Points(1.5)
   p.X.Min = 0
   p.X.Max = 200
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Size = 24
+  p.X.Tick.Label.Font.Size = 36
   p.X.Tick.Label.Font.Variant = "Sans"
 
   p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
@@ -752,17 +785,17 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
     {Value: 175, Label: ""},
     {Value: 200, Label: "200"},
   })
-  p.X.Padding = vg.Points(-5.75)
+  p.X.Padding = vg.Points(-8.25)
 
-  p.Y.Label.Text = "Frequency (MHz)"
+  p.Y.Label.Text = "Full Width Half Max (MHz)"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.Label.TextStyle.Font.Size = 24
+  p.Y.Label.TextStyle.Font.Size = 36
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = 90
   p.Y.Max = 130
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Size = 24
+  p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
   p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
     {Value: 90, Label: "90"},
@@ -775,9 +808,9 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
     {Value: 125, Label: ""},
     {Value: 130, Label: "130"},
   })
-  p.Y.Padding = vg.Points(2.5)
+  p.Y.Padding = vg.Points(1)
 
-  p.Legend.TextStyle.Font.Size = 24
+  p.Legend.TextStyle.Font.Size = 36
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
@@ -809,35 +842,45 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
     }
 
     plotPts.GlyphStyle.Color = setFitColors[set]
-    plotPts.GlyphStyle.Radius = vg.Points(5)
+    plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
-    // Gray dashed eye guide lines
-    dash := make(plotter.XYs, 4)
+    // Dashed eye guide lines
+    v := make(plotter.XYs, 2)
+    h := make(plotter.XYs, 2)
 
     // Vertical
-    dash[0].X = pts[0].X
-    dash[0].Y = 90
-    dash[1].X = pts[0].X
-    dash[1].Y = pts[0].Y
+    v[0].X = pts[0].X
+    v[0].Y = 90
+    v[1].X = pts[0].X
+    v[1].Y = pts[0].Y
 
-    // Horizontal
-    dash[2].X = -15
-    dash[2].Y = pts[0].Y
-    dash[3].X = pts[0].X
-    dash[3].Y = pts[0].Y
-
-    plotDash, err := plotter.NewLine(dash)
+    vDash, err := plotter.NewLine(v)
     if err != nil {
       panic(err)
     }
 
-    plotDash.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
-    plotDash.LineStyle.Width = vg.Points(1)
-    plotDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
+    vDash.LineStyle.Color = setFitColors[set]
+    vDash.LineStyle.Width = vg.Points(4)
+    vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
+
+    // Horizontal
+    h[0].X = -15
+    h[0].Y = pts[0].Y
+    h[1].X = pts[0].X
+    h[1].Y = pts[0].Y
+
+    hDash, err := plotter.NewLine(h)
+    if err != nil {
+      panic(err)
+    }
+
+    hDash.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
+    hDash.LineStyle.Width = vg.Points(1)
+    hDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, plotDash)
+    p.Add(plotPts, vDash, hDash)
     p.Legend.Add(strings.Trim(labels[set], " pras"), plotPts)
   }
 

@@ -27,7 +27,7 @@ func main() {
   pras, pas, prs, ps := getAllData(file, label)
   prasLabel, pasLabel, prsLabel, psLabel := getAllLabels(label)
 
-  raw := []int{0}
+  raw := []int{}
   if len(raw) > 0 {
     plotRaw(
       raw,
@@ -48,7 +48,7 @@ func main() {
     plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  subtractedGrouped := []int{}
+  subtractedGrouped := []int{0,1,2}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
@@ -222,22 +222,22 @@ func readMeta() ([]string, []string) {
 
 func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
 
-  var pras, pas, prs, ps [][][]float64
+  var ras, bas, rs, bs [][][]float64
 
   // Assign data by checking csv name
   for _, fileName := range fileNames {
-    if strings.Contains(fileName, "pras.") {
-      pras = append(pras, getData(&fileName))
-    } else if strings.Contains(fileName, "pas.") {
-      pas = append(pas, getData(&fileName))
-    } else if strings.Contains(fileName, "prs.") {
-      prs = append(prs, getData(&fileName))
-    } else if strings.Contains(fileName, "ps.") {
-      ps = append(ps, getData(&fileName))
+    if strings.Contains(fileName, "ras.") {
+      ras = append(ras, getData(&fileName))
+    } else if strings.Contains(fileName, "bas.") {
+      bas = append(bas, getData(&fileName))
+    } else if strings.Contains(fileName, "rs.") {
+      rs = append(rs, getData(&fileName))
+    } else if strings.Contains(fileName, "bs.") {
+      bs = append(bs, getData(&fileName))
     }
   }
 
-  return pras, pas, prs, ps
+  return ras, bas, rs, bs
 }
 
 func getData(csvName *string) ([][]float64) {
