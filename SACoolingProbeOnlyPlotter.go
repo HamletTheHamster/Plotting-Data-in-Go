@@ -777,29 +777,21 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     p.Y.Label.TextStyle.Font.Size = 36
     p.Y.Label.Padding = font.Length(20)
     p.Y.LineStyle.Width = vg.Points(1.5)
-    p.Y.Min = -1
-    p.Y.Max = 2.75
+    p.Y.Min = 0
+    p.Y.Max = 17.5
     p.Y.Tick.LineStyle.Width = vg.Points(1.5)
     p.Y.Tick.Label.Font.Size = 36
     p.Y.Tick.Label.Font.Variant = "Sans"
-    /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-      {Value: -.75, Label: ""},
-      {Value: -.5, Label: "-.5"},
-      {Value: -.25, Label: ""},
+    p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
       {Value: 0, Label: "0"},
-      {Value: .25, Label: ""},
-      {Value: .5, Label: ".5"},
-      {Value: .75, Label: ""},
-      {Value: 1, Label: "1"},
-      {Value: 1.25, Label: ""},
-      {Value: 1.5, Label: "1.5"},
-      {Value: 1.75, Label: ""},
-      {Value: 2, Label: "2"},
-      {Value: 2.25, Label: ""},
-      {Value: 2.5, Label: "2.5"},
-      {Value: 2.75, Label: ""},
-      {Value: 3, Label: "3"},
-    })*/
+      {Value: 2.5, Label: ""},
+      {Value: 5, Label: "5"},
+      {Value: 7.5, Label: ""},
+      {Value: 10, Label: "10"},
+      {Value: 12.5, Label: ""},
+      {Value: 15, Label: "15"},
+      {Value: 17.5, Label: ""},
+    })
     p.Y.Padding = vg.Points(-4.75)
 
     p.Legend.TextStyle.Font.Size = 36
@@ -1141,29 +1133,21 @@ func goPlotsFits(sets []int, s [][][]float64, labels []string,
     p.Y.Label.TextStyle.Font.Size = 36
     p.Y.Label.Padding = font.Length(20)
     p.Y.LineStyle.Width = vg.Points(1.5)
-    p.Y.Min = -1
-    p.Y.Max = 2.75
+    p.Y.Min = 0
+    p.Y.Max = 17.5
     p.Y.Tick.LineStyle.Width = vg.Points(1.5)
     p.Y.Tick.Label.Font.Size = 36
     p.Y.Tick.Label.Font.Variant = "Sans"
-    /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-      {Value: -.75, Label: ""},
-      {Value: -.5, Label: "-.5"},
-      {Value: -.25, Label: ""},
+    p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
       {Value: 0, Label: "0"},
-      {Value: .25, Label: ""},
-      {Value: .5, Label: ".5"},
-      {Value: .75, Label: ""},
-      {Value: 1, Label: "1"},
-      {Value: 1.25, Label: ""},
-      {Value: 1.5, Label: "1.5"},
-      {Value: 1.75, Label: ""},
-      {Value: 2, Label: "2"},
-      {Value: 2.25, Label: ""},
-      {Value: 2.5, Label: "2.5"},
-      {Value: 2.75, Label: ""},
-      {Value: 3, Label: "3"},
-    })*/
+      {Value: 2.5, Label: ""},
+      {Value: 5, Label: "5"},
+      {Value: 7.5, Label: ""},
+      {Value: 10, Label: "10"},
+      {Value: 12.5, Label: ""},
+      {Value: 15, Label: "15"},
+      {Value: 17.5, Label: ""},
+    })
     p.Y.Padding = vg.Points(-4.75)
 
     p.Legend.TextStyle.Font.Size = 36
