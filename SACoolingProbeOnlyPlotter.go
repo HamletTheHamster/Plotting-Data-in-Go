@@ -53,19 +53,19 @@ func main() {
   )
 
   //0,4,8,12,15
-  subtractedGrouped := []int{0,4,8,12,15}
+  subtractedGrouped := []int{}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, rsLabel, rasLabel)
   }
 
   // Lorentz fit
-  fitSets := []int{0,4,8,12,15}
+  fitSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
     amp := 5.
     wid := 0.1
-    cen := 2.26
+    cen := 2.24
 
     // as
     fmt.Println("\nAnti-Stokes\n")
@@ -74,9 +74,16 @@ func main() {
     var asWidthLine [][]float64
     var asWidthLines [][][]float64
     var asAmps []float64
+    var asLinewidths []float64
     var asfwhm []float64
 
-    for _, set := range fitSets {
+    for key, set := range fitSets {
+
+      // Test //
+      // Feed previous width into next set guess -- no change
+      /*if key > 0 {
+        wid = asLinewidths[key - 1]/1000
+        }*/
 
       f := func(dst, guess []float64) {
 
@@ -127,6 +134,9 @@ func main() {
       // For height ratios
       asAmps = append(asAmps, amp)
 
+      // For linewidths
+      asLinewidths = append(asLinewidths, asfwhm[key])
+
       asFit = [][]float64{as[set][0], asyFits}
       asFits = append(asFits, asFit)
     }
@@ -139,7 +149,7 @@ func main() {
 
 
     // s
-    fitStokes := []int{0,4,8,12,15}
+    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
     if len(fitStokes) > 0 {
 
       fmt.Println("\nStokes\n")
@@ -148,6 +158,7 @@ func main() {
       var sWidthLine [][]float64
       var sWidthLines [][][]float64
       var ampRatios []float64
+      var sLinewidths []float64
       var sfwhm []float64
 
       for key, set := range fitSets {
@@ -201,19 +212,21 @@ func main() {
         // For height ratio
         ampRatios = append(ampRatios, amp/asAmps[key])
 
+        // For linewidth
+        sLinewidths = append(sLinewidths, sfwhm[key])
+
         sFit = [][]float64{s[set][0], syFits}
         sFits = append(sFits, sFit)
       }
       fmt.Printf("\n")
 
-      // goPlot as fits
       goPlotsFits(fitSets, s, rsLabel, sFits, sWidthLines, sfwhm)
 
-      // goPlot power vs width
       goPlotsPowerVsWid(fitSets, rsLabel, sfwhm)
 
-      // goPlot power ratios
       goPlotHeightRatios(fitSets, ampRatios, rsLabel)
+
+      goPlotLinewidths(fitSets, asLinewidths, sLinewidths, rsLabel)
     }
   }
 
@@ -1635,7 +1648,7 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
       panic(err)
     }
 
-    plotPts.GlyphStyle.Color = setFitColors[set]
+    plotPts.GlyphStyle.Color = color.RGBA{R: 27, G: 170, B: 139, A: 255}
     plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1646,6 +1659,312 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
 
   // Save plot
   name := "height ratios"
+  date := time.Now()
+
+  // Make current date folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  // Make current time folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
+  // Save the plot to a PNG file.
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
+    panic(err)
+  }
+
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
+    panic(err)
+  }
+}
+
+func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []string) {
+
+  p := plot.New()
+  p.BackgroundColor = color.RGBA{A:0}
+  p.Title.Text = "Linewidths vs Power"
+  p.Title.TextStyle.Font.Typeface = "liberation"
+  p.Title.TextStyle.Font.Variant = "Sans"
+  p.Title.TextStyle.Font.Size = 50
+  p.Title.Padding = font.Length(50)
+
+  p.X.Label.Text = "Pump Power (mW)"
+  p.X.Label.TextStyle.Font.Variant = "Sans"
+  p.X.Label.TextStyle.Font.Size = 36
+  p.X.Label.Padding = font.Length(20)
+  p.X.LineStyle.Width = vg.Points(1.5)
+  p.X.Min = 25
+  p.X.Max = 200
+  p.X.Tick.LineStyle.Width = vg.Points(1.5)
+  p.X.Tick.Label.Font.Size = 36
+  p.X.Tick.Label.Font.Variant = "Sans"
+
+  p.X.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 0, Label: "0"},
+    {Value: 25, Label: ""},
+    {Value: 50, Label: "50"},
+    {Value: 75, Label: ""},
+    {Value: 100, Label: "100"},
+    {Value: 125, Label: ""},
+    {Value: 150, Label: "150"},
+    {Value: 175, Label: ""},
+    {Value: 200, Label: "200"},
+  })
+  p.X.Padding = vg.Points(-8.25)
+
+  p.Y.Label.Text = "Full Width Half Max (MHz)"
+  p.Y.Label.TextStyle.Font.Variant = "Sans"
+  p.Y.Label.TextStyle.Font.Size = 36
+  p.Y.Label.Padding = font.Length(20)
+  p.Y.LineStyle.Width = vg.Points(1.5)
+  p.Y.Min = 50
+  p.Y.Max = 125
+  p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+  p.Y.Tick.Label.Font.Size = 36
+  p.Y.Tick.Label.Font.Variant = "Sans"
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 50, Label: "50"},
+    {Value: 62.5, Label: ""},
+    {Value: 75, Label: "75"},
+    {Value: 87.5, Label: ""},
+    {Value: 100, Label: "100"},
+    {Value: 112.5, Label: ""},
+    {Value: 125, Label: "125"},
+  })
+  p.Y.Padding = vg.Points(-.75)
+
+  p.Legend.TextStyle.Font.Size = 36
+  p.Legend.TextStyle.Font.Variant = "Sans"
+  p.Legend.Top = true
+  p.Legend.XOffs = vg.Points(-50)
+  p.Legend.YOffs = vg.Points(-50)
+  p.Legend.Padding = vg.Points(10)
+  p.Legend.ThumbnailWidth = vg.Points(50)
+
+  setFitColors := make([]color.RGBA, 16)
+  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
+  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
+  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+
+  // as linear fit
+
+  // Fit parameter guesses
+  m := 1.
+  b := 100.
+
+  f := func(dst, guess []float64) {
+
+    var x float64
+    m, b := guess[0], guess[1]
+
+    for key, set := range sets {
+
+      if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+        x = pow
+      } else {
+        panic(err)
+      }
+
+      y := asLinewidths[key]
+
+      dst[key] = m * x + b - y
+    }
+  }
+
+  jacobian := lm.NumJac{Func: f}
+
+  // Solve for fit
+  toBeSolved := lm.LMProblem{
+    Dim:        2,
+    Size:       len(sets),
+    Func:       f,
+    Jac:        jacobian.Jac,
+    InitParams: []float64{m, b},
+    Tau:        1e-6,
+    Eps1:       1e-8,
+    Eps2:       1e-8,
+  }
+
+  results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+  m, b = results.X[0], results.X[1]
+
+  var asyFit []float64
+  var asxFit []float64
+
+  // Create function according to solved fit parameters
+  for _, set := range sets {
+    var x float64
+
+    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+      x = pow
+    } else {
+      panic(err)
+    }
+
+    asxFit = append(asxFit, x)
+    asyFit = append(asyFit, m * x + b)
+  }
+
+  asfit := buildData([][]float64{asxFit, asyFit})
+
+  // Plot as fit
+  asPlotFit, err := plotter.NewLine(asfit)
+  if err != nil {
+    panic(err)
+  }
+
+  asPlotFit.LineStyle.Color = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+  asPlotFit.LineStyle.Width = vg.Points(3)
+
+  // s linear fit
+
+  f = func(dst, guess []float64) {
+
+    var x float64
+    m, b := guess[0], guess[1]
+
+    for key, set := range sets {
+
+      if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+        x = pow
+      } else {
+        panic(err)
+      }
+
+      y := sLinewidths[key]
+
+      dst[key] = m * x + b - y
+    }
+  }
+
+  jacobian = lm.NumJac{Func: f}
+
+  // Solve for fit
+  toBeSolved = lm.LMProblem{
+    Dim:        2,
+    Size:       len(sets),
+    Func:       f,
+    Jac:        jacobian.Jac,
+    InitParams: []float64{m, b},
+    Tau:        1e-6,
+    Eps1:       1e-8,
+    Eps2:       1e-8,
+  }
+
+  results, _ = lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+  m, b = results.X[0], results.X[1]
+
+  var syFit []float64
+  var sxFit []float64
+
+  // Create function according to solved fit parameters
+  for _, set := range sets {
+    var x float64
+
+    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+      x = pow
+    } else {
+      panic(err)
+    }
+
+    sxFit = append(sxFit, x)
+    syFit = append(syFit, m * x + b)
+  }
+
+  sfit := buildData([][]float64{sxFit, syFit})
+
+  // Plot as fit
+  sPlotFit, err := plotter.NewLine(sfit)
+  if err != nil {
+    panic(err)
+  }
+
+  sPlotFit.LineStyle.Color = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+  sPlotFit.LineStyle.Width = vg.Points(3)
+
+  p.Add(asPlotFit, sPlotFit)
+  p.Legend.Add("Anti-Stokes", asPlotFit)
+  p.Legend.Add("Stokes", sPlotFit)
+
+  // as points
+  for key, set := range sets {
+
+    pts := make(plotter.XYs, 1)
+
+    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+      pts[0].X = pow
+    } else {
+      panic(err)
+    }
+
+    pts[0].Y = asLinewidths[key]
+
+    // Plot points
+    asPlotPts, err := plotter.NewScatter(pts)
+    if err != nil {
+      panic(err)
+    }
+
+    asPlotPts.GlyphStyle.Color = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+    asPlotPts.GlyphStyle.Radius = vg.Points(6)
+    asPlotPts.Shape = draw.CircleGlyph{}
+
+    // Add set plots to p
+    p.Add(asPlotPts)
+  }
+
+  // s points
+  for key, set := range sets {
+
+    pts := make(plotter.XYs, 1)
+
+    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
+      pts[0].X = pow
+    } else {
+      panic(err)
+    }
+
+    pts[0].Y = sLinewidths[key]
+
+    // Plot points
+    sPlotPts, err := plotter.NewScatter(pts)
+    if err != nil {
+      panic(err)
+    }
+
+    sPlotPts.GlyphStyle.Color = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+    sPlotPts.GlyphStyle.Radius = vg.Points(6)
+    sPlotPts.Shape = draw.CircleGlyph{}
+
+    // Add set plots to p
+    p.Add(sPlotPts)
+  }
+
+  // Save plot
+  name := "linewidths"
   date := time.Now()
 
   // Make current date folder if it doesn't already exist
