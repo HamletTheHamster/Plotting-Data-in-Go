@@ -22,7 +22,7 @@ import (
 
 func main() {
 
-  label, file := readMeta()
+  label, file, asNotes, sNotes := readMeta()
 
   ras, bas, rs, bs := getAllData(file, label)
   rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
@@ -145,7 +145,7 @@ func main() {
     goPlotasFits(fitSets, as, rasLabel, asFits, asWidthLines, asfwhm)
 
     // goPlot power vs width
-    goPlotasPowerVsWid(fitSets, rasLabel, asfwhm)
+    goPlotasPowerVsWid(fitSets, rasLabel, asNotes, asfwhm)
 
 
     // s
@@ -222,17 +222,17 @@ func main() {
 
       goPlotsFits(fitSets, s, rsLabel, sFits, sWidthLines, sfwhm)
 
-      goPlotsPowerVsWid(fitSets, rsLabel, sfwhm)
+      goPlotsPowerVsWid(fitSets, rsLabel, asNotes, sfwhm)
 
-      goPlotHeightRatios(fitSets, ampRatios, rsLabel)
+      goPlotHeightRatios(fitSets, ampRatios, asNotes, rsLabel)
 
-      goPlotLinewidths(fitSets, asLinewidths, sLinewidths, rsLabel)
+      goPlotLinewidths(fitSets, asLinewidths, sLinewidths, asNotes, sNotes, rsLabel)
     }
   }
 
 }
 
-func readMeta() ([]string, []string) {
+func readMeta() ([]string, []string, []float64, []float64) {
 
   // Read
   metaFile, err := os.Open("Data/meta.csv")
@@ -247,13 +247,27 @@ func readMeta() ([]string, []string) {
   }
 
   var label, data []string
+  var asNotes, sNotes []float64
 
   for _, value := range meta {
     label = append(label, value[1])
     data = append(data, value[3])
+    if strings.Contains(value[1], "ras") {
+      if asNote, err := strconv.ParseFloat(value[4], 64); err == nil {
+        asNotes = append(asNotes, asNote)
+      } else {
+        panic(err)
+      }
+    } else if strings.Contains(value[1], "rs") {
+      if sNote, err := strconv.ParseFloat(value[4], 64); err == nil {
+        sNotes = append(sNotes, sNote)
+      } else {
+        panic(err)
+      }
+    }
   }
 
-  return label, data
+  return label, data, asNotes, sNotes
 }
 
 func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
@@ -944,7 +958,7 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     }
 }
 
-func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
+func goPlotasPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1031,12 +1045,7 @@ func goPlotasPowerVsWid(sets []int, labels []string, widths []float64) {
 
     pts := make(plotter.XYs, 1)
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW pras"), 64); err == nil {
-      pts[0].X = pow
-    } else {
-      panic(err)
-    }
-
+    pts[0].X = powers[key]
     pts[0].Y = widths[key]
 
     // Plot points
@@ -1301,7 +1310,7 @@ func goPlotsFits(sets []int, s [][][]float64, labels []string,
     }
 }
 
-func goPlotsPowerVsWid(sets []int, labels []string, widths []float64) {
+func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1388,12 +1397,7 @@ func goPlotsPowerVsWid(sets []int, labels []string, widths []float64) {
 
     pts := make(plotter.XYs, 1)
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      pts[0].X = pow
-    } else {
-      panic(err)
-    }
-
+    pts[0].X = powers[key]
     pts[0].Y = widths[key]
 
     // Plot points
@@ -1474,7 +1478,7 @@ func goPlotsPowerVsWid(sets []int, labels []string, widths []float64) {
   }
 }
 
-func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
+func goPlotHeightRatios(sets []int, heightRatios, powers []float64, labels []string) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1568,14 +1572,9 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, set := range sets {
+    for key, _ := range sets {
 
-      if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-        x = pow
-      } else {
-        panic(err)
-      }
-
+      x = powers[key]
       y := heightRatios[key]
 
       dst[key] = m * x + b - y
@@ -1604,14 +1603,10 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
   var xFit []float64
 
   // Create function according to solved fit parameters
-  for _, set := range sets {
+  for key, _ := range sets {
     var x float64
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      x = pow
-    } else {
-      panic(err)
-    }
+    x = powers[key]
 
     xFit = append(xFit, x)
     yFit = append(yFit, m * x + b)
@@ -1630,16 +1625,11 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
   plotFit.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
   plotFit.LineStyle.Width = vg.Points(3)
 
-  for key, set := range sets {
+  for key, _ := range sets {
 
     pts := make(plotter.XYs, 1)
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      pts[0].X = pow
-    } else {
-      panic(err)
-    }
-
+    pts[0].X = powers[key]
     pts[0].Y = heightRatios[key]
 
     // Plot points
@@ -1686,7 +1676,7 @@ func goPlotHeightRatios(sets []int, heightRatios []float64, labels []string) {
   }
 }
 
-func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []string) {
+func goPlotLinewidths(sets []int, asLinewidths, sLinewidths, asPowers, sPowers []float64, labels []string) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1778,14 +1768,9 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, set := range sets {
+    for key, _ := range sets {
 
-      if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-        x = pow
-      } else {
-        panic(err)
-      }
-
+      x = asPowers[key]
       y := asLinewidths[key]
 
       dst[key] = m * x + b - y
@@ -1814,14 +1799,10 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
   var asxFit []float64
 
   // Create function according to solved fit parameters
-  for _, set := range sets {
+  for key, _ := range sets {
     var x float64
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      x = pow
-    } else {
-      panic(err)
-    }
+    x = asPowers[key]
 
     asxFit = append(asxFit, x)
     asyFit = append(asyFit, m * x + b)
@@ -1845,14 +1826,9 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, set := range sets {
+    for key, _ := range sets {
 
-      if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-        x = pow
-      } else {
-        panic(err)
-      }
-
+      x = sPowers[key]
       y := sLinewidths[key]
 
       dst[key] = m * x + b - y
@@ -1881,14 +1857,10 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
   var sxFit []float64
 
   // Create function according to solved fit parameters
-  for _, set := range sets {
+  for key, _ := range sets {
     var x float64
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      x = pow
-    } else {
-      panic(err)
-    }
+    x = sPowers[key]
 
     sxFit = append(sxFit, x)
     syFit = append(syFit, m * x + b)
@@ -1910,16 +1882,11 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
   p.Legend.Add("Stokes", sPlotFit)
 
   // as points
-  for key, set := range sets {
+  for key, _ := range sets {
 
     pts := make(plotter.XYs, 1)
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      pts[0].X = pow
-    } else {
-      panic(err)
-    }
-
+    pts[0].X = asPowers[key]
     pts[0].Y = asLinewidths[key]
 
     // Plot points
@@ -1937,16 +1904,11 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths []float64, labels []
   }
 
   // s points
-  for key, set := range sets {
+  for key, _ := range sets {
 
     pts := make(plotter.XYs, 1)
 
-    if pow, err := strconv.ParseFloat(strings.Trim(labels[set], " mW prs"), 64); err == nil {
-      pts[0].X = pow
-    } else {
-      panic(err)
-    }
-
+    pts[0].X = sPowers[key]
     pts[0].Y = sLinewidths[key]
 
     // Plot points
