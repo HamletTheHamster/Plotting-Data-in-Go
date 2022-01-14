@@ -59,7 +59,7 @@ func main() {
   }
 
   // Lorentz fit
-  fitSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+  fitSets := []int{0,1,2,3}
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
@@ -149,7 +149,7 @@ func main() {
 
 
     // s
-    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+    fitStokes := []int{0,1,2,3}
     if len(fitStokes) > 0 {
 
       fmt.Println("\nStokes\n")
