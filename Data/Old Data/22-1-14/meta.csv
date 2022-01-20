@@ -1,0 +1,17 @@
+Date,Name,Pump Power @ Sample mW,Filepath,Notes (temp)
+21-1-14,177 mW bs,177,177/bs.csv,
+21-1-14,177 mW rs,177,177/rs.csv,6.22
+21-1-14,177 mW bas,177,177/bas.csv,
+21-1-14,177 mW ras,177,177/ras.csv,6.22
+21-1-14,88 mW bs,88,088/bs.csv,
+21-1-14,88 mW rs,88,088/rs.csv,6.20
+21-1-14,88 mW bas,88,088/bas.csv,
+21-1-14,88 mW ras,88,088/ras.csv,6.20
+21-1-14,44 mW bs,44,044/bs.csv,
+21-1-14,44 mW rs,44,044/rs.csv,6.18
+21-1-14,44 mW bas,44,044/bas.csv,
+21-1-14,44 mW ras,44,044/ras.csv,6.18
+21-1-14,22 mW bs,22,022/bs.csv,
+21-1-14,22 mW rs,22,022/rs.csv,6.21
+21-1-14,22 mW bas,22,022/bas.csv,
+21-1-14,22 mW ras,22,022/ras.csv,6.21

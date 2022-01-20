@@ -18,9 +18,16 @@ import (
   "gonum.org/v1/plot/font"
   "gonum.org/v1/plot/vg/draw"
   "time"
+  "flag"
 )
 
 func main() {
+
+  // Flags
+  var temp, lcof bool
+  flag.BoolVar(&temp, "t", false, "parse sample temps")
+  flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
+  flag.Parse()
 
   label, file, asNotes, sNotes := readMeta()
 
@@ -38,7 +45,7 @@ func main() {
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{0,1,2}
+  setsToPlotSubtracted := []int{}
   plotSubtracted(
     setsToPlotSubtracted,
     s, rsLabel,
@@ -52,7 +59,6 @@ func main() {
   as, rasLabel,
   )
 
-  //0,4,8,12,15
   subtractedGrouped := []int{}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, rsLabel, rasLabel)
@@ -63,96 +69,108 @@ func main() {
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
-    amp := 3.
+    amp := 12.
     wid := 0.1
     cen := 1.18
 
-    // as
-    fmt.Println("\nAnti-Stokes\n")
-    var asFit [][]float64
-    var asFits [][][]float64
-    var asWidthLine [][]float64
-    var asWidthLines [][][]float64
     var asAmps []float64
     var asLinewidths []float64
-    var asfwhm []float64
 
-    for key, set := range fitSets {
+    fitAntiStokes := []int{}
+    if len(fitAntiStokes) > 0 {
 
-      // Test //
-      // Feed previous width into next set guess -- no change
-      /*if key > 0 {
-        wid = asLinewidths[key - 1]/1000
-        }*/
+      if len(fitAntiStokes) > len(fitSets) {
+        panic("fitAntiStokes must not be greater than fitSets")
+      }
 
-      f := func(dst, guess []float64) {
+      // as
+      fmt.Println("\nAnti-Stokes\n")
+      var asFit [][]float64
+      var asFits [][][]float64
+      var asWidthLine [][]float64
+      var asWidthLines [][][]float64
+      var asfwhm []float64
 
-        amp, wid, cen := guess[0], guess[1], guess[2]
+      for key, set := range fitAntiStokes {
 
-        for i := 0; i < len(as[set][0]); i++ {
-          x := as[set][0][i]
-          y := as[set][1][i]
-          dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
+        // Test //
+        // Feed previous width into next set guess -- no change
+        /*if key > 0 {
+          wid = asLinewidths[key - 1]/1000
+          }*/
+
+        f := func(dst, guess []float64) {
+
+          amp, wid, cen := guess[0], guess[1], guess[2]
+
+          for i := 0; i < len(as[set][0]); i++ {
+            x := as[set][0][i]
+            y := as[set][1][i]
+            dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
+          }
         }
+
+        jacobian := lm.NumJac{Func: f}
+
+        // Solve for fit
+        toBeSolved := lm.LMProblem{
+          Dim:        3,
+          Size:       len(as[set][0]),
+          Func:       f,
+          Jac:        jacobian.Jac,
+          InitParams: []float64{amp, wid, cen},
+          Tau:        1e-6,
+          Eps1:       1e-8,
+          Eps2:       1e-8,
+        }
+
+        results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+        amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
+
+        asfwhm = append(asfwhm, wid*2000)
+
+        fmt.Printf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+
+        var asyFits []float64
+
+        // Create function according to solved fit parameters
+        for i := 0; i < len(as[set][0]); i++ {
+          // (amp*wid^2/((x-cen)^2+wid^2))
+          x := as[set][0][i]
+          asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
+        }
+
+        // Width lines
+        asWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
+        asWidthLines = append(asWidthLines, asWidthLine)
+
+        // For height ratios
+        asAmps = append(asAmps, amp)
+
+        // For linewidths
+        asLinewidths = append(asLinewidths, asfwhm[key])
+
+        asFit = [][]float64{as[set][0], asyFits}
+        asFits = append(asFits, asFit)
       }
 
-      jacobian := lm.NumJac{Func: f}
+      // goPlot as fits
+      goPlotasFits(fitAntiStokes, as, rasLabel, asFits, asWidthLines, asfwhm)
 
-      // Solve for fit
-      toBeSolved := lm.LMProblem{
-        Dim:        3,
-        Size:       len(as[set][0]),
-        Func:       f,
-        Jac:        jacobian.Jac,
-        InitParams: []float64{amp, wid, cen},
-        Tau:        1e-6,
-        Eps1:       1e-8,
-        Eps2:       1e-8,
-      }
-
-      results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
-
-      amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
-
-      asfwhm = append(asfwhm, wid*2000)
-
-      fmt.Printf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
-
-      var asyFits []float64
-
-      // Create function according to solved fit parameters
-      for i := 0; i < len(as[set][0]); i++ {
-        // (amp*wid^2/((x-cen)^2+wid^2))
-        x := as[set][0][i]
-        asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
-      }
-
-      // Width lines
-      asWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
-      asWidthLines = append(asWidthLines, asWidthLine)
-
-      // For height ratios
-      asAmps = append(asAmps, amp)
-
-      // For linewidths
-      asLinewidths = append(asLinewidths, asfwhm[key])
-
-      asFit = [][]float64{as[set][0], asyFits}
-      asFits = append(asFits, asFit)
+      // goPlot power vs width
+      goPlotasPowerVsWid(fitAntiStokes, rasLabel, asNotes, asfwhm)
     }
 
-    // goPlot as fits
-    goPlotasFits(fitSets, as, rasLabel, asFits, asWidthLines, asfwhm)
-
-    // goPlot power vs width
-    goPlotasPowerVsWid(fitSets, rasLabel, asNotes, asfwhm)
-
-
-    // s
-    fitStokes := []int{0,1,2,3}
+    fitStokes := []int{0,1,2}
     if len(fitStokes) > 0 {
 
+      if len(fitStokes) > len(fitSets) {
+        panic("fitStokes must not be greater than fitSets")
+      }
+
       fmt.Println("\nStokes\n")
+
       var sFit [][]float64
       var sFits [][][]float64
       var sWidthLine [][]float64
@@ -161,7 +179,7 @@ func main() {
       var sLinewidths []float64
       var sfwhm []float64
 
-      for key, set := range fitSets {
+      for key, set := range fitStokes {
 
         f := func(dst, guess []float64) {
 
@@ -209,8 +227,10 @@ func main() {
         sWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
         sWidthLines = append(sWidthLines, sWidthLine)
 
-        // For height ratio
-        ampRatios = append(ampRatios, amp/asAmps[key])
+        if len(fitStokes) == len(fitAntiStokes) {
+          // For height ratio
+          ampRatios = append(ampRatios, amp/asAmps[key])
+        }
 
         // For linewidth
         sLinewidths = append(sLinewidths, sfwhm[key])
@@ -220,17 +240,33 @@ func main() {
       }
       fmt.Printf("\n")
 
-      goPlotsFits(fitSets, s, rsLabel, sFits, sWidthLines, sfwhm)
+      goPlotsFits(fitStokes, s, rsLabel, sFits, sWidthLines, sfwhm)
 
-      goPlotsPowerVsWid(fitSets, rsLabel, asNotes, sfwhm)
+      goPlotsPowerVsWid(fitStokes, rsLabel, sNotes, sfwhm)
 
-      goPlotHeightRatios(fitSets, ampRatios, asNotes, rsLabel)
-
-      goPlotLinewidths(fitSets, asLinewidths, sLinewidths, asNotes, sNotes, rsLabel)
+      eq := true
+      if len(fitAntiStokes) != len(fitStokes) {
+        eq = false
+      } else {
+        for i, v := range fitAntiStokes {
+          if v != fitStokes[i] {
+            eq = false
+            break
+          }
+        }
+      }
+      if eq {
+        goPlotHeightRatios(fitStokes, ampRatios, asNotes, rsLabel)
+        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asNotes, sNotes, rsLabel)
+      } else {
+        fmt.Println("Stokes & AntiStokes sets not equal")
+        fmt.Println("(Height ratio and linewidth plots not produced)\n")
+      }
     }
   }
-
 }
+
+//--------------------------------------------------------//
 
 func readMeta() ([]string, []string, []float64, []float64) {
 
@@ -293,7 +329,7 @@ func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float
 func getData(csvName string) ([][]float64) {
 
   // Read
-  f, err := os.Open(csvName)
+  f, err := os.Open("Data/" + csvName)
   if err != nil {
     panic(err)
   }
@@ -430,8 +466,8 @@ func plotRaw(
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
-    plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
-    plot.AddPointGroup(basLabel[0], "points", bas[0])
+    //plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
+    //plot.AddPointGroup(basLabel[0], "points", bas[0])
     plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
     plot.AddPointGroup(bsLabel[0], "points", bs[0])
   }
@@ -449,8 +485,11 @@ func subtractBackground(
 
   var s, as [][][]float64
 
-  for i := 0; i < len(ras); i++ {
+  for i := range rs {
     s = append(s, subtract(bs[0], rs[i]))
+  }
+
+  for i := range ras {
     as = append(as, subtract(bas[0], ras[i]))
   }
 
@@ -459,14 +498,16 @@ func subtractBackground(
 
 func subtract(b [][]float64, s [][]float64) ([][]float64) {
 
-  var shiftUp float64 = 0
+  /*var shiftUp float64 = 0
 
-  if (s[1][0] - b[1][0] < 0) {
+  if (s[1][0] - b[1][0] > 0) {
     shiftUp = b[1][0] - s[1][0]
-  }
+  } else {
+    shiftUp = s[1][600] - b[1][600]
+  }*/
 
   for i := 0; i < len(b[0]); i++ {
-    s[1][i] = s[1][i] - b[1][i] + shiftUp
+    s[1][i] = s[1][i] - b[1][i] //+ shiftUp
   }
 
   return s
@@ -488,7 +529,7 @@ func plotSubtracted(
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
+    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " rs") + " s", "points", s[sets[i]])
     plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
   }
 }
@@ -1347,22 +1388,24 @@ func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
   p.Y.Label.TextStyle.Font.Size = 36
   p.Y.Label.Padding = font.Length(20)
   p.Y.LineStyle.Width = vg.Points(1.5)
-  p.Y.Min = 90
-  p.Y.Max = 130
+  p.Y.Min = 0
+  p.Y.Max = 500
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
   p.Y.Tick.Label.Font.Size = 36
   p.Y.Tick.Label.Font.Variant = "Sans"
-  /*p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
-    {Value: 90, Label: "90"},
-    {Value: 95, Label: ""},
+  p.Y.Tick.Marker = plot.ConstantTicks([]plot.Tick{
+    {Value: 0, Label: "0"},
+    {Value: 50, Label: ""},
     {Value: 100, Label: "100"},
-    {Value: 105, Label: ""},
-    {Value: 110, Label: "110"},
-    {Value: 115, Label: ""},
-    {Value: 120, Label: "120"},
-    {Value: 125, Label: ""},
-    {Value: 130, Label: "130"},
-  })*/
+    {Value: 150, Label: ""},
+    {Value: 200, Label: "200"},
+    {Value: 250, Label: ""},
+    {Value: 300, Label: "300"},
+    {Value: 350, Label: ""},
+    {Value: 400, Label: "400"},
+    {Value: 450, Label: ""},
+    {Value: 500, Label: "500"},
+  })
   p.Y.Padding = vg.Points(1)
 
   p.Legend.TextStyle.Font.Size = 36
@@ -1414,7 +1457,7 @@ func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
     // Vertical
     v[0].X = pts[0].X
-    v[0].Y = 90
+    v[0].Y = 0
     v[1].X = pts[0].X
     v[1].Y = pts[0].Y
 

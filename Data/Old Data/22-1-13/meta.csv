@@ -1,0 +1,17 @@
+Date,Name,Pump Power @ Sample mW,Filepath,Notes
+21-1-13,185 mW bs,185,Data/185/bs.csv,temp: 8k power at 1% tap before cryostat
+21-1-13,185 mW bas,185,Data/185/bas.csv,
+21-1-13,185 mW rs,185,Data/185/ps.csv,185
+21-1-13,185 mW ras,185,Data/185/pas.csv,185
+21-1-13,90 mW bs,90,Data/90/bs.csv,temp: 8.8k
+21-1-13,90 mW bas,90,Data/90/bas.csv,
+21-1-13,90 mW rs,90,Data/90/ps.csv,90
+21-1-13,90 mW ras,90,Data/90/pas.csv,90
+21-1-13,45 mW bs,45,Data/45/bs.csv,temp: 9.1k
+21-1-13,45 mW bas,45,Data/45/bas.csv,
+21-1-13,45 mW rs,45,Data/45/ps.csv,45
+21-1-13,45 mW ras,45,Data/45/pas.csv,45
+21-1-13,20 mW bs,20,Data/20/bs.csv,temp: 7.7k
+21-1-13,20 mW bas,20,Data/20/bas.csv,
+21-1-13,20 mW rs,20,Data/20/ps.csv,20
+21-1-13,20 mW ras,20,Data/20/pas.csv,20
