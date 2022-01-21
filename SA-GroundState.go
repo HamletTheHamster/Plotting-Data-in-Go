@@ -29,6 +29,15 @@ func main() {
   flag.BoolVar(&lcof, "l", false, "liquid-core optical fiber sample")
   flag.Parse()
 
+  if temp {
+    fmt.Printf("\n")
+    fmt.Println("*Temperature-dependent data*")
+  }
+  if lcof {
+    fmt.Printf("\n")
+    fmt.Println("*liquid-core optical fiber sample*")
+  }
+
   label, file, asNotes, sNotes := readMeta(temp)
 
   ras, bas, rs, bs := getAllData(file, label)
@@ -46,11 +55,7 @@ func main() {
   s, as := subtractBackground(ras, bas, rs, bs)
 
   setsToPlotSubtracted := []int{}
-  plotSubtracted(
-    setsToPlotSubtracted,
-    s, rsLabel,
-    as, rasLabel,
-  )
+  plotSubtracted(setsToPlotSubtracted, s, as, rsLabel, rasLabel)
 
   setsToPlotSubtractedTogether := []int{}
   plotSubtractedTogether(
@@ -519,8 +524,8 @@ func subtract(b [][]float64, s [][]float64) ([][]float64) {
 
 func plotSubtracted(
   sets []int,
-  s [][][]float64, sLabel []string,
-  as [][][]float64, asLabel []string,
+  s, as [][][]float64,
+  sLabel, asLabel []string,
   ) {
 
   for i := 0; i < len(sets); i++ {
