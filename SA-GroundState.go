@@ -26,10 +26,10 @@ func main() {
   // Flags
   var temp, lcof bool
   flag.BoolVar(&temp, "t", false, "parse sample temps")
-  flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&lcof, "l", false, "liquid-core optical fiber sample")
   flag.Parse()
 
-  label, file, asNotes, sNotes := readMeta()
+  label, file, asNotes, sNotes := readMeta(temp)
 
   ras, bas, rs, bs := getAllData(file, label)
   rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
@@ -156,10 +156,10 @@ func main() {
       }
 
       // goPlot as fits
-      goPlotasFits(fitAntiStokes, as, rasLabel, asFits, asWidthLines, asfwhm)
+      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, rasLabel, asfwhm, asNotes)
 
       // goPlot power vs width
-      goPlotasPowerVsWid(fitAntiStokes, rasLabel, asNotes, asfwhm)
+      goPlotasPowerVsWid(fitAntiStokes, rasLabel, asNotes, asfwhm, temp)
     }
 
     fitStokes := []int{0,1,2}
@@ -240,9 +240,9 @@ func main() {
       }
       fmt.Printf("\n")
 
-      goPlotsFits(fitStokes, s, rsLabel, sFits, sWidthLines, sfwhm)
+      goPlotsFits(fitStokes, s, sFits, sWidthLines, rsLabel, sfwhm, sNotes, temp)
 
-      goPlotsPowerVsWid(fitStokes, rsLabel, sNotes, sfwhm)
+      goPlotsPowerVsWid(fitStokes, rsLabel, sNotes, sfwhm, temp)
 
       eq := true
       if len(fitAntiStokes) != len(fitStokes) {
@@ -268,7 +268,7 @@ func main() {
 
 //--------------------------------------------------------//
 
-func readMeta() ([]string, []string, []float64, []float64) {
+func readMeta(temp bool) ([]string, []string, []float64, []float64) {
 
   // Read
   metaFile, err := os.Open("Data/meta.csv")
@@ -285,20 +285,24 @@ func readMeta() ([]string, []string, []float64, []float64) {
   var label, data []string
   var asNotes, sNotes []float64
 
-  for _, value := range meta {
+  for row, value := range meta {
+
     label = append(label, value[1])
     data = append(data, value[3])
-    if strings.Contains(value[1], "ras") {
-      if asNote, err := strconv.ParseFloat(value[4], 64); err == nil {
-        asNotes = append(asNotes, asNote)
+
+    if temp && row > 0 {
+      if strings.Contains(value[1], "as") {
+        if asNote, err := strconv.ParseFloat(value[4], 64); err == nil {
+          asNotes = append(asNotes, asNote)
+        } else {
+          panic(err)
+        }
       } else {
-        panic(err)
-      }
-    } else if strings.Contains(value[1], "rs") {
-      if sNote, err := strconv.ParseFloat(value[4], 64); err == nil {
-        sNotes = append(sNotes, sNote)
-      } else {
-        panic(err)
+        if sNote, err := strconv.ParseFloat(value[4], 64); err == nil {
+          sNotes = append(sNotes, sNote)
+        } else {
+          panic(err)
+        }
       }
     }
   }
@@ -815,8 +819,12 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
   }
 }
 
-func goPlotasFits(sets []int, as [][][]float64, labels []string,
-  fits [][][]float64, widthLines [][][]float64, widths []float64) {
+func goPlotasFits(
+  sets []int,
+  as, fits, widthLines [][][]float64,
+  labels []string,
+  widths, notes []float64,
+  ) {
 
     p := plot.New()
     p.BackgroundColor = color.RGBA{A:0}
@@ -967,7 +975,9 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
       l.GlyphStyle.Color = setFitColors[set]
       l.GlyphStyle.Radius = vg.Points(6)
       l.Shape = draw.CircleGlyph{}
-      p.Legend.Add(strings.Trim(labels[set], " pras"), l)
+      power := strings.Trim(labels[set], " pras")
+      temp := strconv.FormatFloat(notes[set], 'f', -1, 64)
+      p.Legend.Add(power + " @" + temp + "K", l)
     }
 
     // Save plot
@@ -999,7 +1009,12 @@ func goPlotasFits(sets []int, as [][][]float64, labels []string,
     }
 }
 
-func goPlotasPowerVsWid(sets []int, labels []string, powers, widths []float64) {
+func goPlotasPowerVsWid(
+  sets []int,
+  labels []string,
+  notes, widths []float64,
+  temp bool,
+  ) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1086,7 +1101,12 @@ func goPlotasPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
     pts := make(plotter.XYs, 1)
 
-    pts[0].X = powers[key]
+    power := strings.Trim(labels[set], " mW pras")
+    if pwr, err := strconv.ParseFloat(power, 64); err == nil {
+      pts[0].X = pwr
+    } else {
+      panic(err)
+    }
     pts[0].Y = widths[key]
 
     // Plot points
@@ -1135,7 +1155,12 @@ func goPlotasPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
     // Add set plots to p
     p.Add(plotPts, vDash, hDash)
-    p.Legend.Add(strings.Trim(labels[set], " pras"), plotPts)
+    if temp {
+      temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
+      p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
+    } else {
+      p.Legend.Add(power + " mW")
+    }
   }
 
   // Save plot
@@ -1167,8 +1192,13 @@ func goPlotasPowerVsWid(sets []int, labels []string, powers, widths []float64) {
   }
 }
 
-func goPlotsFits(sets []int, s [][][]float64, labels []string,
-  fits [][][]float64, widthLines [][][]float64, widths []float64) {
+func goPlotsFits(
+  sets []int,
+  s, fits, widthLines [][][]float64,
+  labels []string,
+  widths, notes []float64,
+  temp bool,
+  ) {
 
     p := plot.New()
     p.BackgroundColor = color.RGBA{A:0}
@@ -1317,7 +1347,13 @@ func goPlotsFits(sets []int, s [][][]float64, labels []string,
       l.GlyphStyle.Color = setFitColors[set]
       l.GlyphStyle.Radius = vg.Points(6)
       l.Shape = draw.CircleGlyph{}
-      p.Legend.Add(strings.Trim(labels[set], " prs"), l)
+      power := strings.Trim(labels[set], " prs")
+      if temp {
+        temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
+        p.Legend.Add(power + " @" + temperature + "K", l)
+      } else {
+        p.Legend.Add(power)
+      }
     }
 
     // Save plot
@@ -1349,7 +1385,12 @@ func goPlotsFits(sets []int, s [][][]float64, labels []string,
     }
 }
 
-func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
+func goPlotsPowerVsWid(
+  sets []int,
+  labels []string,
+  notes, widths []float64,
+  temp bool,
+  ) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1438,7 +1479,12 @@ func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
     pts := make(plotter.XYs, 1)
 
-    pts[0].X = powers[key]
+    power := strings.Trim(labels[set], " mW prs")
+    if pwr, err := strconv.ParseFloat(power, 64); err == nil {
+      pts[0].X = pwr
+    } else {
+      panic(err)
+    }
     pts[0].Y = widths[key]
 
     // Plot points
@@ -1487,7 +1533,12 @@ func goPlotsPowerVsWid(sets []int, labels []string, powers, widths []float64) {
 
     // Add set plots to p
     p.Add(plotPts, vDash, hDash)
-    p.Legend.Add(strings.Trim(labels[set], " prs"), plotPts)
+    if temp {
+      temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
+      p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
+    } else {
+      p.Legend.Add(power + " mW")
+    }
   }
 
   // Save plot
