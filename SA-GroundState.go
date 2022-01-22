@@ -38,7 +38,9 @@ func main() {
     fmt.Println("*liquid-core optical fiber sample*")
   }
 
-  label, file, asNotes, sNotes := readMeta(temp)
+  date, run, label, file, asNotes, sNotes := readMeta(temp)
+
+  fmt.Printf("\n" + date + " run " + run + "\n")
 
   ras, bas, rs, bs := getAllData(file, label)
   rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
@@ -273,7 +275,7 @@ func main() {
 
 //--------------------------------------------------------//
 
-func readMeta(temp bool) ([]string, []string, []float64, []float64) {
+func readMeta(temp bool) (string, string, []string, []string, []float64, []float64) {
 
   // Read
   metaFile, err := os.Open("Data/meta.csv")
@@ -287,32 +289,56 @@ func readMeta(temp bool) ([]string, []string, []float64, []float64) {
     fmt.Println(err)
   }
 
-  var label, data []string
+  var date, run string
+  var label, filepath []string
   var asNotes, sNotes []float64
+  var dateCol, runCol, labelCol, filepathCol, notesCol int
+
+  for col, heading := range meta[0] {
+    switch heading {
+    case "Date":
+      dateCol = col
+    case "Run":
+      runCol = col
+    case "Label":
+      labelCol = col
+    case "Filepath":
+      filepathCol = col
+    case "Notes":
+      notesCol = col
+    }
+  }
 
   for row, value := range meta {
 
-    label = append(label, value[1])
-    data = append(data, value[3])
+    if row > 0 {
 
-    if temp && row > 0 {
-      if strings.Contains(value[1], "as") {
-        if asNote, err := strconv.ParseFloat(value[4], 64); err == nil {
-          asNotes = append(asNotes, asNote)
+      if row < 2 {
+        date = value[dateCol]
+        run = value[runCol]
+      }
+      label = append(label, value[labelCol])
+      filepath = append(filepath, value[filepathCol])
+
+      if temp {
+        if strings.Contains(value[1], "as") {
+          if asNote, err := strconv.ParseFloat(value[notesCol], 64); err == nil {
+            asNotes = append(asNotes, asNote)
+          } else {
+            panic(err)
+          }
         } else {
-          panic(err)
-        }
-      } else {
-        if sNote, err := strconv.ParseFloat(value[4], 64); err == nil {
-          sNotes = append(sNotes, sNote)
-        } else {
-          panic(err)
+          if sNote, err := strconv.ParseFloat(value[notesCol], 64); err == nil {
+            sNotes = append(sNotes, sNote)
+          } else {
+            panic(err)
+          }
         }
       }
     }
   }
 
-  return label, data, asNotes, sNotes
+  return date, run, label, filepath, asNotes, sNotes
 }
 
 func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
