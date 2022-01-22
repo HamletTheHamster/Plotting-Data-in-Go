@@ -40,35 +40,37 @@ func main() {
 
   date, run, label, file, asNotes, sNotes := readMeta(temp)
 
-  fmt.Printf("\n" + date + " run " + run + "\n")
+  fmt.Printf("\n" + date + " Run " + run + "\n")
 
   ras, bas, rs, bs := getAllData(file, label)
-  rasLabel, basLabel, rsLabel, bsLabel := getAllLabels(label)
+  asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
   setsToPlotRaw := []int{}
   plotRaw(
     setsToPlotRaw,
-    ras, rasLabel,
-    bas, basLabel,
-    rs, rsLabel,
-    bs, bsLabel,
+    bas, ras, bs, rs,
+    basLabel, asLabel, bsLabel, sLabel,
   )
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{}
-  plotSubtracted(setsToPlotSubtracted, s, as, rsLabel, rasLabel)
+  setsToPlotSubtracted := []int{0,1,2}
+  plotSubtracted(
+    setsToPlotSubtracted,
+    s, as,
+    sLabel, asLabel,
+  )
 
   setsToPlotSubtractedTogether := []int{}
   plotSubtractedTogether(
-  setsToPlotSubtractedTogether,
-  s, rsLabel,
-  as, rasLabel,
+    setsToPlotSubtractedTogether,
+    as, s,
+    asLabel, sLabel,
   )
 
   subtractedGrouped := []int{}
   if len(subtractedGrouped) > 0 {
-    goPlotSubGrpd(subtractedGrouped, s, as, rsLabel, rasLabel)
+    goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
   }
 
   // Lorentz fit
@@ -163,10 +165,10 @@ func main() {
       }
 
       // goPlot as fits
-      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, rasLabel, asfwhm, asNotes)
+      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes)
 
       // goPlot power vs width
-      goPlotasPowerVsWid(fitAntiStokes, rasLabel, asNotes, asfwhm, temp)
+      goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp)
     }
 
     fitStokes := []int{0,1,2}
@@ -247,9 +249,9 @@ func main() {
       }
       fmt.Printf("\n")
 
-      goPlotsFits(fitStokes, s, sFits, sWidthLines, rsLabel, sfwhm, sNotes, temp)
+      goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp)
 
-      goPlotsPowerVsWid(fitStokes, rsLabel, sNotes, sfwhm, temp)
+      goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp)
 
       eq := true
       if len(fitAntiStokes) != len(fitStokes) {
@@ -263,8 +265,8 @@ func main() {
         }
       }
       if eq {
-        goPlotHeightRatios(fitStokes, ampRatios, asNotes, rsLabel)
-        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asNotes, sNotes, rsLabel)
+        goPlotHeightRatios(fitStokes, ampRatios, asNotes, sLabel)
+        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asNotes, sNotes, sLabel)
       } else {
         fmt.Println("Stokes & AntiStokes sets not equal")
         fmt.Println("(Height ratio and linewidth plots not produced)\n")
@@ -273,9 +275,13 @@ func main() {
   }
 }
 
-//--------------------------------------------------------//
+//----------------------------------------------------------------------------//
 
-func readMeta(temp bool) (string, string, []string, []string, []float64, []float64) {
+func readMeta(
+  temp bool,
+  ) (
+  string, string, []string, []string, []float64, []float64,
+  ) {
 
   // Read
   metaFile, err := os.Open("Data/meta.csv")
@@ -341,7 +347,11 @@ func readMeta(temp bool) (string, string, []string, []string, []float64, []float
   return date, run, label, filepath, asNotes, sNotes
 }
 
-func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float64, [][][]float64, [][][]float64) {
+func getAllData(
+  fileNames, labels []string,
+  ) (
+  [][][]float64, [][][]float64, [][][]float64, [][][]float64,
+  ) {
 
   var bas, bs, ras, rs [][][]float64
 
@@ -361,7 +371,11 @@ func getAllData(fileNames []string, labels []string) ([][][]float64, [][][]float
   return ras, bas, rs, bs
 }
 
-func getData(csvName string) ([][]float64) {
+func getData(
+  csvName string,
+  ) (
+  [][]float64,
+  ) {
 
   // Read
   f, err := os.Open("Data/" + csvName)
@@ -431,7 +445,11 @@ func getData(csvName string) ([][]float64) {
   return [][]float64{frequency, signal}
 }
 
-func readCSV(rs io.ReadSeeker) ([][]string, error) {
+func readCSV(
+  rs io.ReadSeeker,
+  ) (
+  [][]string, error,
+  ) {
   // Skip first row (line)
   row1, err := bufio.NewReader(rs).ReadSlice('\n')
   if err != nil {
@@ -451,7 +469,11 @@ func readCSV(rs io.ReadSeeker) ([][]string, error) {
   return rows, nil
 }
 
-func getAllLabels(label []string) ([]string, []string, []string, []string) {
+func getAllLabels(
+  label []string,
+  ) (
+  []string, []string, []string, []string,
+  ) {
 
   var rasLabel, basLabel, rsLabel, bsLabel []string
 
@@ -471,7 +493,11 @@ func getAllLabels(label []string) ([]string, []string, []string, []string) {
   return rasLabel, basLabel, rsLabel, bsLabel
 }
 
-func buildData(data [][]float64) (plotter.XYs) {
+func buildData(
+  data [][]float64,
+  ) (
+  plotter.XYs,
+  ) {
 
   xy := make(plotter.XYs, len(data[0]))
 
@@ -485,10 +511,8 @@ func buildData(data [][]float64) (plotter.XYs) {
 
 func plotRaw(
   sets []int,
-  ras [][][]float64, rasLabel []string,
-  bas [][][]float64, basLabel []string,
-  rs [][][]float64, rsLabel []string,
-  bs [][][]float64, bsLabel []string,
+  bas, ras, bs, rs [][][]float64,
+  basLabel, rasLabel, bsLabel, rsLabel []string,
   ) {
 
   for i := 0; i < len(sets); i++ {
@@ -509,13 +533,9 @@ func plotRaw(
 }
 
 func subtractBackground(
-  ras [][][]float64,
-  bas [][][]float64,
-  rs [][][]float64,
-  bs [][][]float64,
+  ras, bas, rs, bs [][][]float64,
   ) (
-  [][][]float64,
-  [][][]float64,
+  [][][]float64, [][][]float64,
   ) {
 
   var s, as [][][]float64
@@ -531,7 +551,11 @@ func subtractBackground(
   return s, as
 }
 
-func subtract(b [][]float64, s [][]float64) ([][]float64) {
+func subtract(
+  b, s [][]float64,
+  ) (
+  [][]float64,
+  ) {
 
   /*var shiftUp float64 = 0
 
@@ -565,14 +589,14 @@ func plotSubtracted(
     plot.SetYLabel("Signal (uV)")
 
     plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " rs") + " s", "points", s[sets[i]])
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " ras") + " as", "points", as[sets[i]])
   }
 }
 
 func plotSubtractedTogether(
   sets []int,
-  s [][][]float64, sLabel []string,
-  as [][][]float64, asLabel []string,
+  as, s [][][]float64,
+  asLabel, sLabel []string,
   ) {
 
   dimensions := 2
@@ -590,7 +614,11 @@ func plotSubtractedTogether(
   }
 }
 
-func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
+func goPlotSubGrpd(
+  sets []int,
+  s, as [][][]float64,
+  sLabel, asLabel []string,
+  ) {
 
   // as
   p := plot.New()
@@ -1601,7 +1629,11 @@ func goPlotsPowerVsWid(
   }
 }
 
-func goPlotHeightRatios(sets []int, heightRatios, powers []float64, labels []string) {
+func goPlotHeightRatios(
+  sets []int,
+  heightRatios, powers []float64,
+  labels []string,
+  ) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1799,7 +1831,11 @@ func goPlotHeightRatios(sets []int, heightRatios, powers []float64, labels []str
   }
 }
 
-func goPlotLinewidths(sets []int, asLinewidths, sLinewidths, asPowers, sPowers []float64, labels []string) {
+func goPlotLinewidths(
+  sets []int,
+  asLinewidths, sLinewidths, asPowers, sPowers []float64,
+  labels []string,
+  ) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -2077,7 +2113,11 @@ func goPlotLinewidths(sets []int, asLinewidths, sLinewidths, asPowers, sPowers [
   }
 }
 
-func normalizeFit(fit []float64) ([]float64) {
+func normalizeFit(
+  fit []float64,
+  ) (
+  []float64,
+  ) {
 
   var shift float64 = (fit[0] + fit[599])/2
 
