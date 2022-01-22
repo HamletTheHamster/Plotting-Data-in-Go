@@ -69,8 +69,7 @@ func main() {
     goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
   }
 
-  // Lorentz fit
-  fitSets := []int{}
+  fitSets := []int{0,1,2}
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
@@ -78,8 +77,7 @@ func main() {
     wid := 0.1
     cen := 1.18
 
-    var asAmps []float64
-    var asLinewidths []float64
+    var asAmps, asLinewidths []float64
 
     fitAntiStokes := []int{}
     if len(fitAntiStokes) > 0 {
