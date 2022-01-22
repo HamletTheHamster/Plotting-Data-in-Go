@@ -23,11 +23,7 @@ import (
 
 func main() {
 
-  // Flags
-  var temp, lcof bool
-  flag.BoolVar(&temp, "t", false, "parse sample temps")
-  flag.BoolVar(&lcof, "l", false, "liquid-core optical fiber sample")
-  flag.Parse()
+  temp, lcof := flags()
 
   if temp {
     fmt.Printf("\n")
@@ -54,7 +50,7 @@ func main() {
 
   s, as := subtractBackground(ras, bas, rs, bs)
 
-  setsToPlotSubtracted := []int{0,1,2}
+  setsToPlotSubtracted := []int{}
   plotSubtracted(
     setsToPlotSubtracted,
     s, as,
@@ -74,7 +70,7 @@ func main() {
   }
 
   // Lorentz fit
-  fitSets := []int{0,1,2}
+  fitSets := []int{}
   if len(fitSets) > 0 {
 
     // Fit parameter guesses
@@ -276,6 +272,19 @@ func main() {
 }
 
 //----------------------------------------------------------------------------//
+
+func flags() (
+  bool, bool,
+) {
+
+  var temp, lcof bool
+
+  flag.BoolVar(&temp, "t", false, "parse sample temps")
+  flag.BoolVar(&lcof, "l", false, "liquid-core optical fiber sample")
+  flag.Parse()
+
+  return temp, lcof
+}
 
 func readMeta(
   temp bool,
@@ -578,7 +587,7 @@ func plotSubtracted(
   sLabel, asLabel []string,
   ) {
 
-  for i := 0; i < len(sets); i++ {
+  for _, set := range sets {
     dimensions := 2
     persist := true
     debug := false
@@ -588,8 +597,8 @@ func plotSubtracted(
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " rs") + " s", "points", s[sets[i]])
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " ras") + " as", "points", as[sets[i]])
+    plot.AddPointGroup(strings.Trim(sLabel[sets[set]], " rs") + " s", "points", s[sets[set]])
+    plot.AddPointGroup(strings.Trim(asLabel[sets[set]], " ras") + " as", "points", as[sets[set]])
   }
 }
 
@@ -608,9 +617,9 @@ func plotSubtractedTogether(
   plot.SetXLabel("Frequency (GHz)")
   plot.SetYLabel("Signal (uV)")
 
-  for i := 0; i < len(sets); i++ {
-    plot.AddPointGroup(strings.Trim(sLabel[sets[i]], " prs") + " s", "points", s[sets[i]])
-    plot.AddPointGroup(strings.Trim(asLabel[sets[i]], " pras") + " as", "points", as[sets[i]])
+  for _, set := range sets {
+    plot.AddPointGroup(strings.Trim(sLabel[sets[set]], " rs") + " s", "points", s[sets[set]])
+    //plot.AddPointGroup(strings.Trim(asLabel[sets[set]], " ras") + " as", "points", as[sets[set]])
   }
 }
 
