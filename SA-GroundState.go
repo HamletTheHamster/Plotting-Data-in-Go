@@ -25,18 +25,9 @@ func main() {
 
   temp, lcof := flags()
 
-  if temp {
-    fmt.Printf("\n")
-    fmt.Println("*Temperature-dependent data*")
-  }
-  if lcof {
-    fmt.Printf("\n")
-    fmt.Println("*liquid-core optical fiber sample*")
-  }
-
   date, run, label, file, asNotes, sNotes := readMeta(temp)
 
-  fmt.Printf("\n" + date + " Run " + run + "\n")
+  header(temp, lcof, date, run)
 
   ras, bas, rs, bs := getAllData(file, label)
   asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
@@ -352,6 +343,23 @@ func readMeta(
   }
 
   return date, run, label, filepath, asNotes, sNotes
+}
+
+func header(
+  temp, lcof bool,
+  date, run string,
+  ) {
+
+  fmt.Printf("\n" + date + " Run " + run + "\n")
+
+  if temp {
+    fmt.Printf("\n")
+    fmt.Println("*Temperature-dependent data*")
+  }
+  if lcof {
+    fmt.Printf("\n")
+    fmt.Println("*liquid-core optical fiber sample*")
+  }
 }
 
 func getAllData(
