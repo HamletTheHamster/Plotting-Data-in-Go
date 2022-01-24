@@ -25,9 +25,13 @@ func main() {
 
   lock, temp, lcof := flags()
 
-  date, run, label, file, asNotes, sNotes := readMeta(temp)
+  /*if lock {
+    date, run, label, sigFile, freqFile, asNotes, sNotes := readMetaL(temp)
+  } else {*/
+    date, run, label, file, asNotes, sNotes := readMeta(temp)
+  //}
 
-  header(temp, lcof, date, run)
+  header(lock, temp, lcof, date, run)
 
   ras, bas, rs, bs := getAllData(file, label)
   asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
@@ -257,7 +261,7 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool,
+  bool, bool, bool,
 ) {
 
   var lock, temp, lcof bool
@@ -267,14 +271,32 @@ func flags() (
   flag.BoolVar(&lcof, "lc", false, "liquid-core optical fiber sample")
   flag.Parse()
 
-  return temp, lcof
+  return lock, temp, lcof
 }
+
+/*func readMetaL(
+  temp bool,
+) (
+  string, string, []string, []string, []sring, []float64, []float64,
+) {
+  // Read
+  metaFile, err := os.Open("Data/meta.csv")
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  reader := csv.NewReader(metaFile)
+  meta, err := reader.ReadAll()
+  if err != nil {
+    fmt.Println(err)
+  }
+}*/
 
 func readMeta(
   temp bool,
-  ) (
+) (
   string, string, []string, []string, []float64, []float64,
-  ) {
+) {
 
   // Read
   metaFile, err := os.Open("Data/meta.csv")
@@ -341,9 +363,9 @@ func readMeta(
 }
 
 func header(
-  temp, lcof bool,
+  lock, temp, lcof bool,
   date, run string,
-  ) {
+) {
 
   fmt.Printf("\n" + date + " Run " + run + "\n")
 
@@ -353,15 +375,19 @@ func header(
   }
   if lcof {
     fmt.Printf("\n")
-    fmt.Println("*liquid-core optical fiber sample*")
+    fmt.Println("*Liquid-core optical fiber sample*")
+  }
+  if lock {
+    fmt.Printf("\n")
+    fmt.Println("*Data gathered from Lock-in*")
   }
 }
 
 func getAllData(
   fileNames, labels []string,
-  ) (
+) (
   [][][]float64, [][][]float64, [][][]float64, [][][]float64,
-  ) {
+) {
 
   var bas, bs, ras, rs [][][]float64
 
@@ -383,9 +409,9 @@ func getAllData(
 
 func getData(
   csvName string,
-  ) (
+) (
   [][]float64,
-  ) {
+) {
 
   // Read
   f, err := os.Open("Data/" + csvName)
@@ -401,7 +427,7 @@ func getData(
   // Separate, Strip, & Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := range dataStr {
+  for i := 1; i < len(dataStr); i++ {
     frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
     signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
   }
@@ -457,9 +483,9 @@ func getData(
 
 func readCSV(
   rs io.ReadSeeker,
-  ) (
+) (
   [][]string, error,
-  ) {
+) {
   // Skip first row (line)
   row1, err := bufio.NewReader(rs).ReadSlice('\n')
   if err != nil {
@@ -481,9 +507,9 @@ func readCSV(
 
 func getAllLabels(
   label []string,
-  ) (
+) (
   []string, []string, []string, []string,
-  ) {
+) {
 
   var rasLabel, basLabel, rsLabel, bsLabel []string
 
@@ -505,9 +531,9 @@ func getAllLabels(
 
 func buildData(
   data [][]float64,
-  ) (
+) (
   plotter.XYs,
-  ) {
+) {
 
   xy := make(plotter.XYs, len(data[0]))
 
@@ -523,7 +549,7 @@ func plotRaw(
   sets []int,
   bas, ras, bs, rs [][][]float64,
   basLabel, rasLabel, bsLabel, rsLabel []string,
-  ) {
+) {
 
   for i := range sets {
     dimensions := 2
@@ -544,9 +570,9 @@ func plotRaw(
 
 func subtractBackground(
   ras, bas, rs, bs [][][]float64,
-  ) (
+) (
   [][][]float64, [][][]float64,
-  ) {
+) {
 
   var s, as [][][]float64
 
@@ -563,9 +589,9 @@ func subtractBackground(
 
 func subtract(
   b, s [][]float64,
-  ) (
+) (
   [][]float64,
-  ) {
+) {
 
   /*var shiftUp float64 = 0
 
@@ -586,7 +612,7 @@ func plotSubtracted(
   sets []int,
   s, as [][][]float64,
   sLabel, asLabel []string,
-  ) {
+) {
 
   for _, set := range sets {
     dimensions := 2
@@ -607,7 +633,7 @@ func plotSubtractedTogether(
   sets []int,
   as, s [][][]float64,
   asLabel, sLabel []string,
-  ) {
+) {
 
   dimensions := 2
   persist := true
@@ -628,7 +654,7 @@ func goPlotSubGrpd(
   sets []int,
   s, as [][][]float64,
   sLabel, asLabel []string,
-  ) {
+) {
 
   // as
   p := plot.New()
@@ -893,7 +919,7 @@ func goPlotasFits(
   as, fits, widthLines [][][]float64,
   labels []string,
   widths, notes []float64,
-  ) {
+) {
 
     p := plot.New()
     p.BackgroundColor = color.RGBA{A:0}
@@ -1083,7 +1109,7 @@ func goPlotasPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
-  ) {
+) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1267,7 +1293,7 @@ func goPlotsFits(
   labels []string,
   widths, notes []float64,
   temp bool,
-  ) {
+) {
 
     p := plot.New()
     p.BackgroundColor = color.RGBA{A:0}
@@ -1459,7 +1485,7 @@ func goPlotsPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
-  ) {
+) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1643,7 +1669,7 @@ func goPlotHeightRatios(
   sets []int,
   heightRatios, powers []float64,
   labels []string,
-  ) {
+) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -1845,7 +1871,7 @@ func goPlotLinewidths(
   sets []int,
   asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
-  ) {
+) {
 
   p := plot.New()
   p.BackgroundColor = color.RGBA{A:0}
@@ -2125,9 +2151,9 @@ func goPlotLinewidths(
 
 func normalizeFit(
   fit []float64,
-  ) (
+) (
   []float64,
-  ) {
+) {
 
   var shift float64 = (fit[0] + fit[599])/2
 
