@@ -322,6 +322,7 @@ func readMeta(
       }
 
       label = append(label, v[labelCol])
+
       if lock {
         filepath = append(filepath, v[sigFileCol])
         filepath = append(filepath, v[freqFileCol])
@@ -360,23 +361,47 @@ func getAllData(
   var bas, bs, ras, rs [][][]float64
   var sig bool
 
-  // Assign data by name
-  for i, fileName := range fileNames {
+  if lock {
 
-    if i == 0 || i%2 != 0 {
-      sig = true
-    } else {
-      sig = false
+    // Assign data by name
+    for i := 0; i < len(fileNames)/2; i++ {
+
+      if i == 0 || i%2 != 0 {
+        sig = true
+      } else {
+        sig = false
+      }
+
+      if strings.Contains(labels[i], "bas") {
+        bas = append(bas, getData(lock, sig, fileNames[i]))
+      } else if strings.Contains(labels[i], "bs") {
+        bs = append(bs, getData(lock, sig, fileNames[i]))
+      } else if strings.Contains(labels[i], "ras") {
+        ras = append(ras, getData(lock, sig, fileNames[i]))
+      } else if strings.Contains(labels[i], "rs") {
+        rs = append(rs, getData(lock, sig, fileNames[i]))
+      }
     }
+  } else {
 
-    if strings.Contains(labels[i], "bas") {
-      bas = append(bas, getData(lock, sig, fileName))
-    } else if strings.Contains(labels[i], "bs") {
-      bs = append(bs, getData(lock, sig, fileName))
-    } else if strings.Contains(labels[i], "ras") {
-      ras = append(ras, getData(lock, sig, fileName))
-    } else if strings.Contains(labels[i], "rs") {
-      rs = append(rs, getData(lock, sig, fileName))
+    // Assign data by name
+    for i, fileName := range fileNames {
+
+      if i == 0 || i%2 != 0 {
+        sig = true
+      } else {
+        sig = false
+      }
+
+      if strings.Contains(labels[i], "bas") {
+        bas = append(bas, getData(lock, sig, fileName))
+      } else if strings.Contains(labels[i], "bs") {
+        bs = append(bs, getData(lock, sig, fileName))
+      } else if strings.Contains(labels[i], "ras") {
+        ras = append(ras, getData(lock, sig, fileName))
+      } else if strings.Contains(labels[i], "rs") {
+        rs = append(rs, getData(lock, sig, fileName))
+      }
     }
   }
 
@@ -441,33 +466,37 @@ func getData(
     }
   }
 
-  // Convert to Linear if dBm
-  if dataStr[1][3] == " dBm" {
-    var nV []float64
+  if !lock {
+    // Convert to Linear if dBm
+    if dataStr[1][3] == " dBm" {
+      var nV []float64
 
-    for _, dBm := range signal {
-      nV = append(nV, 1000*math.Pow(10, 6)*math.Pow(10, dBm/10.))
-    }
+      for _, dBm := range signal {
+        nV = append(nV, 1000*math.Pow(10, 6)*math.Pow(10, dBm/10.))
+      }
 
-    return [][]float64{frequency, nV}
-  } else if dataStr[1][3] == "  uV" {
-    var nV []float64
+      return [][]float64{frequency, nV}
+    } else if dataStr[1][3] == "  uV" {
+      var nV []float64
 
-    for _, uV := range signal {
-      nV = append(nV, 1000*uV)
-    }
+      for _, uV := range signal {
+        nV = append(nV, 1000*uV)
+      }
 
-    /* Conver to picovolts
-    var pV []float64
-    for _, uV := range signal {
-      pV = append(pV, 1000*uV)
-    }*/
+      /* Conver to picovolts
+      var pV []float64
+      for _, uV := range signal {
+        pV = append(pV, 1000*uV)
+      }*/
 
-    return [][]float64{frequency, nV}
-    }
+      return [][]float64{frequency, nV}
+      }
 
-  fmt.Println("Warning: check units - not uV or dBm")
-  return [][]float64{frequency, signal}
+    fmt.Println("Warning: check units - not uV or dBm")
+    return [][]float64{frequency, signal}
+  } else {
+    return [][]float64{frequency, signal}
+  }
 }
 
 func readCSV(
