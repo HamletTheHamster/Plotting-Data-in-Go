@@ -1,7 +1,0 @@
-Date,Run,Label,Pump Power @ Sample mW,Filepath,Notes
-21-1-18,1,185 mW bs,0,185/bs.csv,1.56
-21-1-18,1,185 mW rs,185,185/rs.csv,1.56
-21-1-18,1,80 mW bs,0,80/bs.csv,1.47
-21-1-18,1,80 mW rs,80,80/rs.csv,1.47
-21-1-18,1,40 mW bs,0,40/bs.csv,1.46
-21-1-18,1,40 mW rs,40,40/rs.csv,1.46

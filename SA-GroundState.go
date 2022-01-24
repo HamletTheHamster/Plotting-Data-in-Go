@@ -263,8 +263,8 @@ func flags() (
   var lock, temp, lcof bool
 
   flag.BoolVar(&lock, "l", false, "lock-in data")
-  flag.BoolVar(&temp, "t", false, "parse sample temps")
-  flag.BoolVar(&lcof, "lc", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&temp, "t", false, "contains temperature data")
+  flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
   flag.Parse()
 
   return lock, temp, lcof
@@ -541,6 +541,9 @@ func header(
   if lock {
     fmt.Printf("\n")
     fmt.Println("*Data gathered from Lock-in*")
+  } else {
+    fmt.Printf("\n")
+    fmt.Println("*Data gathered from Spectrum Analyzer*")
   }
 }
 
