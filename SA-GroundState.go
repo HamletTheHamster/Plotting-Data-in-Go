@@ -23,7 +23,7 @@ import (
 
 func main() {
 
-  temp, lcof := flags()
+  lock, temp, lcof := flags()
 
   date, run, label, file, asNotes, sNotes := readMeta(temp)
 
@@ -87,17 +87,11 @@ func main() {
 
       for key, set := range fitAntiStokes {
 
-        // Test //
-        // Feed previous width into next set guess -- no change
-        /*if key > 0 {
-          wid = asLinewidths[key - 1]/1000
-          }*/
-
         f := func(dst, guess []float64) {
 
           amp, wid, cen := guess[0], guess[1], guess[2]
 
-          for i := 0; i < len(as[set][0]); i++ {
+          for i := range as[set][0] {
             x := as[set][0][i]
             y := as[set][1][i]
             dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
@@ -129,7 +123,7 @@ func main() {
         var asyFits []float64
 
         // Create function according to solved fit parameters
-        for i := 0; i < len(as[set][0]); i++ {
+        for i := range as[set][0] {
           // (amp*wid^2/((x-cen)^2+wid^2))
           x := as[set][0][i]
           asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
@@ -179,7 +173,7 @@ func main() {
 
           amp, wid, cen := guess[0], guess[1], guess[2]
 
-          for i := 0; i < len(s[set][0]); i++ {
+          for i := range s[set][0] {
             x := s[set][0][i]
             y := s[set][1][i]
             dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
@@ -211,7 +205,7 @@ func main() {
         var syFits []float64
 
         // Create function according to solved fit parameters
-        for i := 0; i < len(s[set][0]); i++ {
+        for i := range s[set][0] {
           // (amp*wid^2/((x-cen)^2+wid^2))
           x := s[set][0][i]
           syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
@@ -266,10 +260,11 @@ func flags() (
   bool, bool,
 ) {
 
-  var temp, lcof bool
+  var lock, temp, lcof bool
 
+  flag.BoolVar(&lock, "l", false, "lock-in data")
   flag.BoolVar(&temp, "t", false, "parse sample temps")
-  flag.BoolVar(&lcof, "l", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&lcof, "lc", false, "liquid-core optical fiber sample")
   flag.Parse()
 
   return temp, lcof
@@ -406,7 +401,7 @@ func getData(
   // Separate, Strip, & Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := 1; i < len(dataStr); i++ {
+  for i := range dataStr {
     frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
     signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
   }
@@ -530,7 +525,7 @@ func plotRaw(
   basLabel, rasLabel, bsLabel, rsLabel []string,
   ) {
 
-  for i := 0; i < len(sets); i++ {
+  for i := range sets {
     dimensions := 2
     persist := true
     debug := false
@@ -580,7 +575,7 @@ func subtract(
     shiftUp = s[1][600] - b[1][600]
   }*/
 
-  for i := 0; i < len(b[0]); i++ {
+  for i := range b[0] {
     s[1][i] = s[1][i] - b[1][i] //+ shiftUp
   }
 
@@ -1742,7 +1737,7 @@ func goPlotHeightRatios(
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, _ := range sets {
+    for key := range sets {
 
       x = powers[key]
       y := heightRatios[key]
@@ -1773,7 +1768,7 @@ func goPlotHeightRatios(
   var xFit []float64
 
   // Create function according to solved fit parameters
-  for key, _ := range sets {
+  for key := range sets {
     var x float64
 
     x = powers[key]
@@ -1795,7 +1790,7 @@ func goPlotHeightRatios(
   plotFit.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
   plotFit.LineStyle.Width = vg.Points(3)
 
-  for key, _ := range sets {
+  for key := range sets {
 
     pts := make(plotter.XYs, 1)
 
@@ -1942,7 +1937,7 @@ func goPlotLinewidths(
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, _ := range sets {
+    for key := range sets {
 
       x = asPowers[key]
       y := asLinewidths[key]
@@ -1973,7 +1968,7 @@ func goPlotLinewidths(
   var asxFit []float64
 
   // Create function according to solved fit parameters
-  for key, _ := range sets {
+  for key := range sets {
     var x float64
 
     x = asPowers[key]
@@ -2000,7 +1995,7 @@ func goPlotLinewidths(
     var x float64
     m, b := guess[0], guess[1]
 
-    for key, _ := range sets {
+    for key := range sets {
 
       x = sPowers[key]
       y := sLinewidths[key]
@@ -2031,7 +2026,7 @@ func goPlotLinewidths(
   var sxFit []float64
 
   // Create function according to solved fit parameters
-  for key, _ := range sets {
+  for key := range sets {
     var x float64
 
     x = sPowers[key]
@@ -2056,7 +2051,7 @@ func goPlotLinewidths(
   p.Legend.Add("Stokes", sPlotFit)
 
   // as points
-  for key, _ := range sets {
+  for key := range sets {
 
     pts := make(plotter.XYs, 1)
 
@@ -2078,7 +2073,7 @@ func goPlotLinewidths(
   }
 
   // s points
-  for key, _ := range sets {
+  for key := range sets {
 
     pts := make(plotter.XYs, 1)
 
@@ -2136,7 +2131,7 @@ func normalizeFit(
 
   var shift float64 = (fit[0] + fit[599])/2
 
-  for i := 0; i < 600; i++ {
+  for i := range fit {
     fit[i] = fit[i] - shift
   }
   return fit
