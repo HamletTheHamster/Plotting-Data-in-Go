@@ -25,15 +25,11 @@ func main() {
 
   lock, temp, lcof := flags()
 
-  /*if lock {
-    date, run, label, sigFile, freqFile, asNotes, sNotes := readMetaL(temp)
-  } else {*/
-    date, run, label, file, asNotes, sNotes := readMeta(temp)
-  //}
+  date, run, label, file, asNotes, sNotes := readMeta(lock, temp)
+  ras, bas, rs, bs := getAllData(lock, file, label)
 
   header(lock, temp, lcof, date, run)
 
-  ras, bas, rs, bs := getAllData(file, label)
   asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
   setsToPlotRaw := []int{}
@@ -274,26 +270,8 @@ func flags() (
   return lock, temp, lcof
 }
 
-/*func readMetaL(
-  temp bool,
-) (
-  string, string, []string, []string, []sring, []float64, []float64,
-) {
-  // Read
-  metaFile, err := os.Open("Data/meta.csv")
-  if err != nil {
-    fmt.Println(err)
-  }
-
-  reader := csv.NewReader(metaFile)
-  meta, err := reader.ReadAll()
-  if err != nil {
-    fmt.Println(err)
-  }
-}*/
-
 func readMeta(
-  temp bool,
+  lock, temp bool,
 ) (
   string, string, []string, []string, []float64, []float64,
 ) {
@@ -313,7 +291,7 @@ func readMeta(
   var date, run string
   var label, filepath []string
   var asNotes, sNotes []float64
-  var dateCol, runCol, labelCol, filepathCol, notesCol int
+  var dateCol, runCol, labelCol, filepathCol, sigFileCol, freqFileCol, notesCol int
 
   for col, heading := range meta[0] {
     switch heading {
@@ -325,31 +303,41 @@ func readMeta(
       labelCol = col
     case "Filepath":
       filepathCol = col
+    case "Signal":
+      sigFileCol = col
+    case "Frequency":
+      freqFileCol = col
     case "Notes":
       notesCol = col
     }
   }
 
-  for row, value := range meta {
+  for row, v := range meta {
 
     if row > 0 {
 
       if row < 2 {
-        date = value[dateCol]
-        run = value[runCol]
+        date = v[dateCol]
+        run = v[runCol]
       }
-      label = append(label, value[labelCol])
-      filepath = append(filepath, value[filepathCol])
+
+      label = append(label, v[labelCol])
+      if lock {
+        filepath = append(filepath, v[sigFileCol])
+        filepath = append(filepath, v[freqFileCol])
+      } else {
+        filepath = append(filepath, v[filepathCol])
+      }
 
       if temp {
-        if strings.Contains(value[1], "as") {
-          if asNote, err := strconv.ParseFloat(value[notesCol], 64); err == nil {
+        if strings.Contains(v[labelCol], "as") {
+          if asNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
             asNotes = append(asNotes, asNote)
           } else {
             panic(err)
           }
         } else {
-          if sNote, err := strconv.ParseFloat(value[notesCol], 64); err == nil {
+          if sNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
             sNotes = append(sNotes, sNote)
           } else {
             panic(err)
@@ -362,45 +350,33 @@ func readMeta(
   return date, run, label, filepath, asNotes, sNotes
 }
 
-func header(
-  lock, temp, lcof bool,
-  date, run string,
-) {
-
-  fmt.Printf("\n" + date + " Run " + run + "\n")
-
-  if temp {
-    fmt.Printf("\n")
-    fmt.Println("*Temperature-dependent data*")
-  }
-  if lcof {
-    fmt.Printf("\n")
-    fmt.Println("*Liquid-core optical fiber sample*")
-  }
-  if lock {
-    fmt.Printf("\n")
-    fmt.Println("*Data gathered from Lock-in*")
-  }
-}
-
 func getAllData(
+  lock bool,
   fileNames, labels []string,
 ) (
   [][][]float64, [][][]float64, [][][]float64, [][][]float64,
 ) {
 
   var bas, bs, ras, rs [][][]float64
+  var sig bool
 
   // Assign data by name
   for i, fileName := range fileNames {
+
+    if i == 0 || i%2 != 0 {
+      sig = true
+    } else {
+      sig = false
+    }
+
     if strings.Contains(labels[i], "bas") {
-      bas = append(bas, getData(fileName))
+      bas = append(bas, getData(lock, sig, fileName))
     } else if strings.Contains(labels[i], "bs") {
-      bs = append(bs, getData(fileName))
+      bs = append(bs, getData(lock, sig, fileName))
     } else if strings.Contains(labels[i], "ras") {
-      ras = append(ras, getData(fileName))
+      ras = append(ras, getData(lock, sig, fileName))
     } else if strings.Contains(labels[i], "rs") {
-      rs = append(rs, getData(fileName))
+      rs = append(rs, getData(lock, sig, fileName))
     }
   }
 
@@ -408,6 +384,7 @@ func getAllData(
 }
 
 func getData(
+  lock, sig bool,
   csvName string,
 ) (
   [][]float64,
@@ -427,9 +404,21 @@ func getData(
   // Separate, Strip, & Transpose
   var frequencyStrT, signalStrT []string
 
-  for i := 1; i < len(dataStr); i++ {
-    frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
-    signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
+  if lock {
+    if sig {
+      for i := range dataStr {
+        signalStrT = append(signalStrT, dataStr[i][0])
+      }
+    } else {
+      for i := range dataStr {
+        frequencyStrT = append(frequencyStrT, dataStr[i][0])
+      }
+    }
+  } else {
+    for i := 1; i < len(dataStr); i++ {
+      frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
+      signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
+    }
   }
 
   // Convert to float
@@ -503,6 +492,27 @@ func readCSV(
     return nil, err
   }
   return rows, nil
+}
+
+func header(
+  lock, temp, lcof bool,
+  date, run string,
+) {
+
+  fmt.Printf("\n" + date + " Run " + run + "\n")
+
+  if temp {
+    fmt.Printf("\n")
+    fmt.Println("*Temperature-dependent data*")
+  }
+  if lcof {
+    fmt.Printf("\n")
+    fmt.Println("*Liquid-core optical fiber sample*")
+  }
+  if lock {
+    fmt.Printf("\n")
+    fmt.Println("*Data gathered from Lock-in*")
+  }
 }
 
 func getAllLabels(
