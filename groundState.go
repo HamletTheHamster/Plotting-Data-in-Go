@@ -698,6 +698,7 @@ func goPlotSubGrpd(
   sLabel, asLabel []string,
 ) {
 
+  // Anti-Stokes
   title := "Anti-Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
@@ -763,7 +764,7 @@ func goPlotSubGrpd(
 
   savePlot(p, "Anti-Stokes Background Subtracted")
 
-
+  // Stokes
   title = "Stokes"
   xlabel = "Frequency (GHz)"
   ylabel = "Spectral Density (nV)"
