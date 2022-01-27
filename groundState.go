@@ -716,24 +716,6 @@ func goPlotSubGrpd(
     xtickLabels, ytickLabels,
   )
 
-  setColors := make([]color.RGBA, 16)
-  setColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  setColors[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-  setColors[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
-  setColors[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
-  setColors[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
-  setColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
   for _, set := range sets {
 
     asPts := buildData(as[set])
@@ -744,7 +726,7 @@ func goPlotSubGrpd(
       panic(err)
     }
 
-    plotSet.GlyphStyle.Color = setColors[set]
+    plotSet.GlyphStyle.Color = palette(set, false)
     plotSet.GlyphStyle.Radius = vg.Points(3)
     plotSet.Shape = draw.CircleGlyph{}
 
@@ -756,7 +738,7 @@ func goPlotSubGrpd(
       panic(err)
     }
 
-    l.GlyphStyle.Color = setColors[set]
+    l.GlyphStyle.Color = palette(set, false)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
@@ -776,7 +758,7 @@ func goPlotSubGrpd(
   xtickLabels = []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
   ytickLabels = []string{"0", "", "5", "", "10", "", "15", ""}
 
-  p := prepPlot(
+  p = prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
@@ -792,7 +774,7 @@ func goPlotSubGrpd(
       panic(err)
     }
 
-    plotSet.GlyphStyle.Color = setColors[set]
+    plotSet.GlyphStyle.Color = palette(set, false)
     plotSet.GlyphStyle.Radius = vg.Points(3)
     plotSet.Shape = draw.CircleGlyph{}
 
@@ -804,7 +786,7 @@ func goPlotSubGrpd(
       panic(err)
     }
 
-    l.GlyphStyle.Color = setColors[set]
+    l.GlyphStyle.Color = palette(set, false)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
 
@@ -838,43 +820,6 @@ func goPlotasFits(
     xtickLabels, ytickLabels,
   )
 
-  setPtColors := make([]color.RGBA, 16)
-  setPtColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  setPtColors[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-  setPtColors[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
-  setPtColors[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
-  setPtColors[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
-  setPtColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setPtColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setPtColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setPtColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setPtColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setPtColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setPtColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setPtColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setPtColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setPtColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setPtColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
-
   for key, set := range sets {
 
     pts := buildData(as[set])
@@ -887,7 +832,7 @@ func goPlotasFits(
       panic(err)
     }
 
-    plotPts.GlyphStyle.Color = setPtColors[set]
+    plotPts.GlyphStyle.Color = palette(set, false)
     plotPts.GlyphStyle.Radius = vg.Points(3)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -897,7 +842,7 @@ func goPlotasFits(
       panic(err)
     }
 
-    plotFit.LineStyle.Color = setFitColors[set]
+    plotFit.LineStyle.Color = palette(set, true)
     plotFit.LineStyle.Width = vg.Points(3)
 
     // Width lines
@@ -906,7 +851,7 @@ func goPlotasFits(
       panic(err)
     }
 
-    plotWid.LineStyle.Color = setFitColors[set]
+    plotWid.LineStyle.Color = palette(set, true)
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -919,7 +864,7 @@ func goPlotasFits(
       panic(err)
     }
 
-    l.GlyphStyle.Color = setFitColors[set]
+    l.GlyphStyle.Color = palette(set, true)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     power := strings.Trim(labels[set], " pras")
@@ -954,24 +899,6 @@ func goPlotasPowerVsWid(
     xtickLabels, ytickLabels,
   )
 
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
   for key, set := range sets {
 
     pts := make(plotter.XYs, 1)
@@ -990,7 +917,7 @@ func goPlotasPowerVsWid(
       panic(err)
     }
 
-    plotPts.GlyphStyle.Color = setFitColors[set]
+    plotPts.GlyphStyle.Color = palette(set, true)
     plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1009,7 +936,7 @@ func goPlotasPowerVsWid(
       panic(err)
     }
 
-    vDash.LineStyle.Color = setFitColors[set]
+    vDash.LineStyle.Color = palette(set, true)
     vDash.LineStyle.Width = vg.Points(4)
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1066,43 +993,6 @@ func goPlotsFits(
     xtickLabels, ytickLabels,
   )
 
-  setPtColors := make([]color.RGBA, 16)
-  setPtColors[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  setPtColors[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-  setPtColors[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
-  setPtColors[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
-  setPtColors[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
-  setPtColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setPtColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setPtColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setPtColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setPtColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setPtColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setPtColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setPtColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setPtColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setPtColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setPtColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
-
   for key, set := range sets {
 
     pts := buildData(s[set])
@@ -1115,7 +1005,7 @@ func goPlotsFits(
       panic(err)
     }
 
-    plotPts.GlyphStyle.Color = setPtColors[set]
+    plotPts.GlyphStyle.Color = palette(set, false)
     plotPts.GlyphStyle.Radius = vg.Points(3)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1125,7 +1015,7 @@ func goPlotsFits(
       panic(err)
     }
 
-    plotFit.LineStyle.Color = setFitColors[set]
+    plotFit.LineStyle.Color = palette(set, true)
     plotFit.LineStyle.Width = vg.Points(3)
 
     // Width lines
@@ -1134,7 +1024,7 @@ func goPlotsFits(
       panic(err)
     }
 
-    plotWid.LineStyle.Color = setFitColors[set]
+    plotWid.LineStyle.Color = palette(set, true)
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1147,7 +1037,7 @@ func goPlotsFits(
       panic(err)
     }
 
-    l.GlyphStyle.Color = setFitColors[set]
+    l.GlyphStyle.Color = palette(set, true)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     power := strings.Trim(labels[set], " prs")
@@ -1186,24 +1076,6 @@ func goPlotsPowerVsWid(
     xtickLabels, ytickLabels,
   )
 
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
-
   for key, set := range sets {
 
     pts := make(plotter.XYs, 1)
@@ -1222,7 +1094,7 @@ func goPlotsPowerVsWid(
       panic(err)
     }
 
-    plotPts.GlyphStyle.Color = setFitColors[set]
+    plotPts.GlyphStyle.Color = palette(set, true)
     plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1241,7 +1113,7 @@ func goPlotsPowerVsWid(
       panic(err)
     }
 
-    vDash.LineStyle.Color = setFitColors[set]
+    vDash.LineStyle.Color = palette(set, true)
     vDash.LineStyle.Width = vg.Points(4)
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1295,24 +1167,6 @@ func goPlotHeightRatios(
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
   )
-
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
 
   // Linear fit line
 
@@ -1425,24 +1279,6 @@ func goPlotLinewidths(
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
   )
-
-  setFitColors := make([]color.RGBA, 16)
-  setFitColors[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-  setFitColors[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-  setFitColors[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  setFitColors[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
-  setFitColors[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-  setFitColors[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
-  setFitColors[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
-  setFitColors[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
-  setFitColors[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  setFitColors[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
-  setFitColors[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
-  setFitColors[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
-  setFitColors[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
-  setFitColors[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
-  setFitColors[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
-  setFitColors[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
 
   // as linear fit
 
@@ -1679,6 +1515,56 @@ func prepPlot(
   p.Legend.Add(legend)
 
   return p
+}
+
+func palette(
+  brush int,
+  dark bool,
+) (
+  color.RGBA,
+) {
+
+  if dark {
+    darkColor := make([]color.RGBA, 16)
+    darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+    darkColor[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+    darkColor[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+    darkColor[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
+    darkColor[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
+    darkColor[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+    darkColor[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+    darkColor[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+    darkColor[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+    darkColor[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+    darkColor[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+    darkColor[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+    darkColor[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+    darkColor[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+    darkColor[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+    darkColor[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+
+    return darkColor[brush]
+  }
+
+  col := make([]color.RGBA, 16)
+  col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+  col[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+  col[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+  col[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
+  col[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
+  col[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+  col[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+  col[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+  col[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+  col[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+  col[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+  col[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+  col[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+  col[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+  col[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+  col[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+
+  return col[brush]
 }
 
 func savePlot(
