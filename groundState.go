@@ -810,31 +810,7 @@ func goPlotSubGrpd(
     p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
   }
 
-  date := time.Now()
-
-  // Make current date folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  savePlotAs := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/Anti-Stokes No Probe Background Subtracted"
-  // Save the plot to a PNG file.
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".png"); err != nil {
-    panic(err)
-  }
-
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".svg"); err != nil {
-    panic(err)
-  }
+  savePlot(p, "Anti-Stokes Background Subtracted")
 
   // s
   p = plot.New()
@@ -931,29 +907,7 @@ func goPlotSubGrpd(
     p.Legend.Add(strings.Trim(sLabel[set], " rs"), l)
   }
 
-  // Make current date folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  savePlotAs = "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/Stokes No Probe Background Subtracted"
-  // Save the plot to a PNG file.
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".png"); err != nil {
-    panic(err)
-  }
-
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, savePlotAs+".svg"); err != nil {
-    panic(err)
-  }
+  savePlot(p, "Stokes Background Subtracted")
 }
 
 func goPlotasFits(
@@ -1117,33 +1071,7 @@ func goPlotasFits(
       p.Legend.Add(power + " @" + temp + "K", l)
     }
 
-    // Save plot
-    name := "Anti-Stokes w Fits"
-    date := time.Now()
-
-    // Make current date folder if it doesn't already exist
-    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-        panic(err)
-      }
-    }
-
-    // Make current time folder if it doesn't already exist
-    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-        panic(err)
-      }
-    }
-
-    path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-    // Save the plot to a PNG file.
-    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
-    	panic(err)
-    }
-
-    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
-      panic(err)
-    }
+    savePlot(p, "Anti-Stokes w Fits")
 }
 
 func goPlotasPowerVsWid(
@@ -1300,33 +1228,7 @@ func goPlotasPowerVsWid(
     }
   }
 
-  // Save plot
-  name := "as Pow vs Wid"
-  date := time.Now()
-
-  // Make current date folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-  // Save the plot to a PNG file.
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
-    panic(err)
-  }
-
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
-    panic(err)
-  }
+  savePlot(p, "as Pow vs Wid")
 }
 
 func goPlotsFits(
@@ -1493,33 +1395,7 @@ func goPlotsFits(
       }
     }
 
-    // Save plot
-    name := "Stokes w Fits"
-    date := time.Now()
-
-    // Make current date folder if it doesn't already exist
-    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-        panic(err)
-      }
-    }
-
-    // Make current time folder if it doesn't already exist
-    if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-      if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-        panic(err)
-      }
-    }
-
-    path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-    // Save the plot to a PNG file.
-    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
-    	panic(err)
-    }
-
-    if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
-      panic(err)
-    }
+    savePlot(p, "Stokes w Fits")
 }
 
 func goPlotsPowerVsWid(
@@ -1678,33 +1554,7 @@ func goPlotsPowerVsWid(
     }
   }
 
-  // Save plot
-  name := "s Pow vs Wid"
-  date := time.Now()
-
-  // Make current date folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-  // Save the plot to a PNG file.
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
-    panic(err)
-  }
-
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
-    panic(err)
-  }
+  savePlot(p, "s Pow vs Wid")
 }
 
 func goPlotHeightRatios(
@@ -1880,33 +1730,7 @@ func goPlotHeightRatios(
     //p.Legend.Add(strings.Trim(labels[set], " prs"), plotPts)
   }
 
-  // Save plot
-  name := "height ratios"
-  date := time.Now()
-
-  // Make current date folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
-      panic(err)
-    }
-  }
-
-  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-  // Save the plot to a PNG file.
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
-    panic(err)
-  }
-
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
-    panic(err)
-  }
+  savePlot(p, "height ratios")
 }
 
 func goPlotLinewidths(
@@ -2162,8 +1986,13 @@ func goPlotLinewidths(
     p.Add(sPlotPts)
   }
 
-  // Save plot
-  name := "linewidths"
+  savePlot(p, "linewidths")
+}
+
+func savePlot(
+  p *plot.Plot, name string,
+) {
+
   date := time.Now()
 
   // Make current date folder if it doesn't already exist
