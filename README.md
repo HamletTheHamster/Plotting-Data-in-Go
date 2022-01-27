@@ -5,3 +5,4 @@ Using gonum, with github.com/maorshutman/lm to generate fits
 ![image](https://raw.githubusercontent.com/HamletTheHamster/Plotting-Data-in-Go/master/plots/2021-Nov-30/17%3A17%3A28/Anti-Stokes%20w%20Fits.png)
 ![image](https://raw.githubusercontent.com/HamletTheHamster/Plotting-Data-in-Go/master/plots/2021-Nov-30/17%3A17%3A28/Pow%20vs%20Wid.png)
 ![image](https://raw.githubusercontent.com/HamletTheHamster/Plotting-Data-in-Go/master/plots/2021-Dec-02/11%3A24%3A12/height%20ratios.png)
+![image](https://raw.githubusercontent.com/HamletTheHamster/Plotting-Data-in-Go/master/plots/2022-Jan-27/13%3A56%3A49/log.png)
