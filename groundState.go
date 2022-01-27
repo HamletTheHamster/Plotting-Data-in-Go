@@ -28,7 +28,7 @@ func main() {
   date, run, label, file, asNotes, sNotes := readMeta(lock, temp)
   ras, bas, rs, bs := getAllData(lock, file, label)
 
-  header(lock, temp, lcof, date, run)
+  log := header(lock, temp, lcof, date, run)
 
   asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
@@ -79,6 +79,8 @@ func main() {
 
       // as
       fmt.Println("\nAnti-Stokes\n")
+      log = append(log, "\nAnti-Stokes\n")
+
       var asFit [][]float64
       var asFits [][][]float64
       var asWidthLine [][]float64
@@ -118,7 +120,9 @@ func main() {
 
         asfwhm = append(asfwhm, wid*2000)
 
-        fmt.Printf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        str := fmt.Sprintf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        fmt.Printf(str)
+        log = append(log, str)
 
         var asyFits []float64
 
@@ -158,6 +162,7 @@ func main() {
       }
 
       fmt.Println("\nStokes\n")
+      log = append(log, "\nStokes\n")
 
       var sFit [][]float64
       var sFits [][][]float64
@@ -200,7 +205,9 @@ func main() {
 
         sfwhm = append(sfwhm, wid*2000)
 
-        fmt.Printf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        str := fmt.Sprintf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        fmt.Printf(str)
+        log = append(log, str)
 
         var syFits []float64
 
@@ -227,6 +234,7 @@ func main() {
         sFits = append(sFits, sFit)
       }
       fmt.Printf("\n")
+      log = append(log, "\n")
 
       goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp)
 
@@ -247,11 +255,15 @@ func main() {
         goPlotHeightRatios(fitStokes, ampRatios, asNotes, sLabel)
         goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asNotes, sNotes, sLabel)
       } else {
-        fmt.Println("Stokes & AntiStokes sets not equal")
-        fmt.Println("(Height ratio and linewidth plots not produced)\n")
+        str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
+          "(Height ratio and linewidth plots not produced)\n")
+        fmt.Printf(str)
+        log = append(log, str)
       }
     }
   }
+
+  writeLog(log)
 }
 
 //----------------------------------------------------------------------------//
@@ -526,25 +538,32 @@ func readCSV(
 func header(
   lock, temp, lcof bool,
   date, run string,
+) (
+  []string,
 ) {
 
-  fmt.Printf("\n" + date + " Run " + run + "\n")
+  log := []string{}
+  log = append(log, date + " Run " + run + "\n")
+
+  fmt.Printf(log[0])
 
   if temp {
-    fmt.Printf("\n")
-    fmt.Println("*Temperature-dependent data*")
+    log = append(log, "\n*Temperature-dependent data*\n")
+    fmt.Printf("\n*Temperature-dependent data*\n")
   }
   if lcof {
-    fmt.Printf("\n")
-    fmt.Println("*Liquid-core optical fiber sample*")
+    log = append(log, "\n*Liquid-core optical fiber sample*\n")
+    fmt.Printf("\n*Liquid-core optical fiber sample*\n")
   }
   if lock {
-    fmt.Printf("\n")
-    fmt.Println("*Data gathered from Lock-in*")
+    log = append(log, "\n*Data gathered from Lock-in*\n")
+    fmt.Printf("\n*Data gathered from Lock-in*\n")
   } else {
-    fmt.Printf("\n")
-    fmt.Println("*Data gathered from Spectrum Analyzer*")
+    log = append(log, "\n*Data gathered from Spectrum Analyzer*\n")
+    fmt.Printf("\n*Data gathered from Spectrum Analyzer*\n")
   }
+
+  return log
 }
 
 func getAllLabels(
@@ -1610,4 +1629,41 @@ func normalizeFit(
     fit[i] = fit[i] - shift
   }
   return fit
+}
+
+func writeLog(
+  log []string,
+) {
+
+  date := time.Now()
+
+  // Make current date folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  // Make current time folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+      panic(err)
+    }
+  }
+
+  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")
+
+  txt, err := os.Create(path + "/log.txt")
+  if err != nil {
+    panic(err)
+  }
+
+  w := bufio.NewWriter(txt)
+  for _, line := range log {
+    if _, err := w.WriteString(line); err != nil {
+      panic(err)
+    }
+  }
+
+  w.Flush()
 }
