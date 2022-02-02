@@ -1,0 +1,13 @@
+21-1-18 Run 1
+
+*Temperature-dependent data*
+
+*Data gathered from Spectrum Analyzer*
+
+Stokes
+set 0 | width: 86.13 MHz | peak: 8.812490 nV | center: 1.1628 GHz
+set 1 | width: 348.40 MHz | peak: 6.736383 nV | center: 1.1766 GHz
+set 2 | width: 436.72 MHz | peak: 4.465209 nV | center: 1.1882 GHz
+
+Stokes & AntiStokes sets not equal
+(Height ratio and linewidth plots not produced)

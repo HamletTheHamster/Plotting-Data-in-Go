@@ -1615,6 +1615,10 @@ func savePlot(
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
     panic(err)
   }
+
+  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
+    panic(err)
+  }
 }
 
 func normalizeFit(
