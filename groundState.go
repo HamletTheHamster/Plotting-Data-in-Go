@@ -17,6 +17,7 @@ import (
   "gonum.org/v1/plot/vg"
   "gonum.org/v1/plot/font"
   "gonum.org/v1/plot/vg/draw"
+  //"gonum.org/v1/plot/vg/vgeps"
   "time"
   "flag"
 )
@@ -1607,7 +1608,7 @@ func savePlot(
   }
 
   path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
-  // Save the plot to a PNG file.
+
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
     panic(err)
   }
@@ -1619,6 +1620,10 @@ func savePlot(
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
     panic(err)
   }
+
+  /*if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".eps"); err != nil {
+    panic(err)
+  }*/
 }
 
 func normalizeFit(
