@@ -61,7 +61,7 @@ func main() {
     goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
   }
 
-  fitSets := []int{0,1,2}
+  fitSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
   if len(fitSets) > 0 {
 
     var amp, wid, cen float64
@@ -86,7 +86,7 @@ func main() {
 
     var asAmps, asLinewidths []float64
 
-    fitAntiStokes := []int{0,1,2}
+    fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(fitAntiStokes) > 0 {
 
       if len(fitAntiStokes) > len(fitSets) {
@@ -170,7 +170,7 @@ func main() {
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
-    fitStokes := []int{0,1,2}
+    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(fitStokes) > 0 {
 
       if len(fitStokes) > len(fitSets) {
@@ -272,8 +272,8 @@ func main() {
         for i, v := range asPowers {
           powers = append(powers, (v + sPowers[i])/2)
         }
-        goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel)
-        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel)
+        goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
+        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
       } else {
         str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
           "(Height ratio and linewidth plots not produced)\n")
@@ -728,6 +728,66 @@ func axes(
       ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
       ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
+  case "height ratios":
+    switch sample {
+    case "Liquid-Core":
+      xrange := []float64{50, 200}
+      yrange := []float64{1, 3.5}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{1, 1.5, 2, 2.5, 3, 3.5}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"", "", "2", "", "3", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "UHNA3":
+      xrange := []float64{0, 200}
+      yrange := []float64{90, 130}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "[Unspecified Sample]":
+      xrange := []float64{0, 200}
+      yrange := []float64{90, 130}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
+  case "linewidths":
+    switch sample {
+    case "Liquid-Core":
+      xrange := []float64{25, 200}
+      yrange := []float64{50, 125}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{50, 62.5, 75, 87.5, 100, 112.5, 125}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"50", "", "75", "", "100", "", "125"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "UHNA3":
+      xrange := []float64{25, 200}
+      yrange := []float64{50, 125}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{50, 62.5, 75, 87.5, 100, 112.5, 125}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"50", "", "75", "", "100", "", "125"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "[Unspecified Sample]":
+      xrange := []float64{25, 200}
+      yrange := []float64{50, 125}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{50, 62.5, 75, 87.5, 100, 112.5, 125}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"50", "", "75", "", "100", "", "125"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }
@@ -1282,23 +1342,23 @@ func goPlotHeightRatios(
   sets []int,
   heightRatios, powers []float64,
   labels []string,
+  sample string,
 ) {
 
   title := "Height Ratios vs Power"
   xlabel := "Pump Power (mW)"
   ylabel := "Stokes/Anti-Stokes Heights"
   legend := ""
-  xrange := []float64{25, 200}
-  yrange := []float64{1, 1.3}
-  xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-  ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125}
-  xtickLabels := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-  ytickLabels := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("height ratios", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   // Linear fit line
@@ -1394,23 +1454,23 @@ func goPlotLinewidths(
   sets []int,
   asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
+  sample string,
 ) {
 
   title := "Linewidths vs Power"
   xlabel := "Pump Power (mW)"
   ylabel := "Full Width Half Max (MHz)"
   legend := ""
-  xrange := []float64{25, 200}
-  yrange := []float64{50, 125}
-  xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-  ytick := []float64{50, 62.5, 75, 87.5, 100, 112.5, 125}
-  xtickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-  ytickLabels := []string{"50", "", "75", "", "100", "", "125"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("linewidths", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   // as linear fit
