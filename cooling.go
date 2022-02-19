@@ -17,16 +17,15 @@ import (
   "gonum.org/v1/plot/vg"
   "gonum.org/v1/plot/font"
   "gonum.org/v1/plot/vg/draw"
-  //"gonum.org/v1/plot/vg/vgeps"
   "time"
   "flag"
 )
 
 func main() {
 
-  lock, temp, lcof := flags()
+  lock, temp, lcof, uhna3 := flags()
 
-  date, run, label, file, asNotes, sNotes := readMeta(lock, temp)
+  date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(lock, temp)
   ras, bas, rs, bs := getAllData(lock, file, label)
 
   log := header(lock, temp, lcof, date, run)
@@ -64,14 +63,29 @@ func main() {
   fitSets := []int{0,1,2}
   if len(fitSets) > 0 {
 
+    var amp, wid, cen float64
+    var sample string
     // Fit parameter guesses
-    amp := 12.
-    wid := 0.1
-    cen := 1.18
+    if lcof {
+      sample = "Liquid-Core"
+      amp = 5.
+      wid = 0.1
+      cen = 2.25
+    } else if uhna3 {
+      sample = "UHNA3"
+      amp = 12.
+      wid = 0.1
+      cen = 1.18
+    } else {
+      sample = "[Unspecified] Sample"
+      amp = 5.
+      wid = 0.1
+      cen = 2.25
+    }
 
     var asAmps, asLinewidths []float64
 
-    fitAntiStokes := []int{}
+    fitAntiStokes := []int{0,1,2}
     if len(fitAntiStokes) > 0 {
 
       if len(fitAntiStokes) > len(fitSets) {
@@ -149,7 +163,7 @@ func main() {
       }
 
       // goPlot as fits
-      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes)
+      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample)
 
       // goPlot power vs width
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp)
@@ -253,8 +267,12 @@ func main() {
         }
       }
       if eq {
-        goPlotHeightRatios(fitStokes, ampRatios, asNotes, sLabel)
-        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asNotes, sNotes, sLabel)
+        var powers []float64
+        for i, v := range asPowers {
+          powers = append(powers, (v + sPowers[i])/2)
+        }
+        goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel)
+        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel)
       } else {
         str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
           "(Height ratio and linewidth plots not produced)\n")
@@ -270,23 +288,24 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool,
+  bool, bool, bool, bool,
 ) {
 
-  var lock, temp, lcof bool
+  var lock, temp, lcof, uhna3 bool
 
   flag.BoolVar(&lock, "l", false, "lock-in data")
   flag.BoolVar(&temp, "t", false, "contains temperature data")
   flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&uhna3, "3", false, "UHNA3 fiber sample")
   flag.Parse()
 
-  return lock, temp, lcof
+  return lock, temp, lcof, uhna3
 }
 
 func readMeta(
   lock, temp bool,
 ) (
-  string, string, []string, []string, []float64, []float64,
+  string, string, []string, []float64, []float64, []string, []float64, []float64,
 ) {
 
   // Read
@@ -303,7 +322,7 @@ func readMeta(
 
   var date, run string
   var label, filepath []string
-  var asNotes, sNotes []float64
+  var asPowers, sPowers, asNotes, sNotes []float64
   var dateCol, runCol, labelCol, filepathCol, sigFileCol, freqFileCol, notesCol int
 
   for col, heading := range meta[0] {
@@ -336,6 +355,20 @@ func readMeta(
 
       label = append(label, v[labelCol])
 
+      if strings.Contains(v[labelCol], "ras") {
+        if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
+          asPowers = append(asPowers, v)
+        } else {
+          panic(err)
+        }
+      } else {
+        if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
+          sPowers = append(sPowers, v)
+        } else {
+          panic(err)
+        }
+      }
+
       if lock {
         filepath = append(filepath, v[sigFileCol])
         filepath = append(filepath, v[freqFileCol])
@@ -361,7 +394,7 @@ func readMeta(
     }
   }
 
-  return date, run, label, filepath, asNotes, sNotes
+  return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
 func getAllData(
@@ -630,6 +663,15 @@ func plotRaw(
   }
 }
 
+func axes(
+  xrange, yrange, xtick, ytick []float64,
+  xticklabel, yticklabel []string,
+) (
+  []float64, []float64, []float64, []float64, []string, []string,
+) {
+  return xrange, yrange, xtick, ytick, xticklabel, yticklabel
+}
+
 func subtractBackground(
   ras, bas, rs, bs [][][]float64,
 ) (
@@ -821,23 +863,53 @@ func goPlotasFits(
   as, fits, widthLines [][][]float64,
   labels []string,
   widths, notes []float64,
+  temp bool,
+  sample string,
 ) {
 
-  title := "Anti-Stokes"
+  var xrange, yrange, xtick, ytick []float64
+  var xtickLabel, ytickLabel []string
+
+  switch sample {
+  case "Liquid-Core":
+    xranges := []float64{2, 2.5}
+    yranges := []float64{0, 17.5}
+    xticks := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+    yticks := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+    xtickLabels := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+    ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
+
+    xrange, yrange, xtick, ytick, xtickLabel, ytickLabel = axes(
+      xranges, yranges, xticks, yticks,
+      xtickLabels, ytickLabels,
+    )
+  case "UHNA3":
+    xranges := []float64{1, 1.36}
+    yranges := []float64{0, 17.5}
+    xticks := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
+    yticks := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+    xtickLabels := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
+    ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
+
+    xrange, yrange, xtick, ytick, xtickLabel, ytickLabel = axes(
+      xranges, yranges, xticks, yticks,
+      xtickLabels, ytickLabels,
+    )
+  case "[Unspecified Sample]":
+
+  }
+
+  title := sample + "Anti-Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
-  legend := "Pump"
-  xrange := []float64{1, 1.36}
-  yrange := []float64{0, 17.5}
-  xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-  ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-  xtickLabels := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-  ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
+  legend := "Power"
+
+
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   for key, set := range sets {
@@ -888,8 +960,13 @@ func goPlotasFits(
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     power := strings.Trim(labels[set], " pras")
-    temp := strconv.FormatFloat(notes[set], 'f', -1, 64)
-    p.Legend.Add(power + " @" + temp + "K", l)
+    if temp {
+      temp := strconv.FormatFloat(notes[set], 'f', -1, 64)
+      p.Legend.Add(power + " @" + temp + "K", l)
+    } else {
+      p.Legend.Add(power, l)
+    }
+
   }
 
   savePlot(p, "Anti-Stokes w Fits")
@@ -1620,10 +1697,6 @@ func savePlot(
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
     panic(err)
   }
-
-  /*if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".eps"); err != nil {
-    panic(err)
-  }*/
 }
 
 func normalizeFit(

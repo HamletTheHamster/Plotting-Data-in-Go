@@ -1,0 +1,16 @@
+20-12-9 Run 20-12-9
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+set 0 | width: 118.35 MHz | peak: 4.308432 nV | center: 2.2350 GHz
+set 1 | width: 110.33 MHz | peak: 4.060424 nV | center: 2.2339 GHz
+set 2 | width: 132.61 MHz | peak: 4.228823 nV | center: 2.2359 GHz
+
+Stokes
+set 0 | width: 3360.40 MHz | peak: 32.844928 nV | center: 7.7535 GHz
+set 1 | width: 1640.75 MHz | peak: 28.718856 nV | center: 5.0228 GHz
+set 2 | width: 4463.44 MHz | peak: 26.375788 nV | center: 9.8887 GHz
+
