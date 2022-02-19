@@ -19,6 +19,7 @@ import (
   "gonum.org/v1/plot/vg/draw"
   "time"
   "flag"
+  "errors"
 )
 
 func main() {
@@ -65,7 +66,7 @@ func main() {
 
     var amp, wid, cen float64
     var sample string
-    // Fit parameter guesses
+
     if lcof {
       sample = "Liquid-Core"
       amp = 5.
@@ -166,7 +167,7 @@ func main() {
       goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample)
 
       // goPlot power vs width
-      goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp)
+      goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
     fitStokes := []int{0,1,2}
@@ -251,9 +252,9 @@ func main() {
       fmt.Printf("\n")
       log = append(log, "\n")
 
-      goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp)
+      goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample)
 
-      goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp)
+      goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample)
 
       eq := true
       if len(fitAntiStokes) != len(fitStokes) {
@@ -664,12 +665,76 @@ func plotRaw(
 }
 
 func axes(
-  xrange, yrange, xtick, ytick []float64,
-  xticklabel, yticklabel []string,
+  plot, sample string,
 ) (
-  []float64, []float64, []float64, []float64, []string, []string,
+  []float64, []float64, []float64, []float64, []string, []string, error,
 ) {
-  return xrange, yrange, xtick, ytick, xticklabel, yticklabel
+
+  switch plot {
+  case "fits":
+    switch sample {
+    case "Liquid-Core":
+      xrange := []float64{2, 2.5}
+      yrange := []float64{0, 17.5}
+      xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+      xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "UHNA3":
+      xrange := []float64{1, 1.36}
+      yrange := []float64{0, 17.5}
+      xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+      xtickLabel := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "[Unspecified Sample]":
+      xrange := []float64{2, 2.5}
+      yrange := []float64{0, 17.5}
+      xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+      xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
+  case "pow vs wid":
+    switch sample {
+    case "Liquid-Core":
+      xrange := []float64{0, 200}
+      yrange := []float64{90, 130}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "UHNA3":
+      xrange := []float64{0, 200}
+      yrange := []float64{90, 130}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "[Unspecified Sample]":
+      xrange := []float64{0, 200}
+      yrange := []float64{90, 130}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
+  }
+
+  return []float64{}, []float64{}, []float64{}, []float64{}, []string{},
+    []string{}, errors.New("func axes(): no plot matches")
 }
 
 func subtractBackground(
@@ -867,44 +932,15 @@ func goPlotasFits(
   sample string,
 ) {
 
-  var xrange, yrange, xtick, ytick []float64
-  var xtickLabel, ytickLabel []string
-
-  switch sample {
-  case "Liquid-Core":
-    xranges := []float64{2, 2.5}
-    yranges := []float64{0, 17.5}
-    xticks := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-    yticks := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-    xtickLabels := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-    ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
-
-    xrange, yrange, xtick, ytick, xtickLabel, ytickLabel = axes(
-      xranges, yranges, xticks, yticks,
-      xtickLabels, ytickLabels,
-    )
-  case "UHNA3":
-    xranges := []float64{1, 1.36}
-    yranges := []float64{0, 17.5}
-    xticks := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-    yticks := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-    xtickLabels := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-    ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
-
-    xrange, yrange, xtick, ytick, xtickLabel, ytickLabel = axes(
-      xranges, yranges, xticks, yticks,
-      xtickLabels, ytickLabels,
-    )
-  case "[Unspecified Sample]":
-
-  }
-
   title := sample + "Anti-Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
   legend := "Power"
 
-
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("fits", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
@@ -977,23 +1013,23 @@ func goPlotasPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
+  sample string,
 ) {
 
   title := "Anti-Stokes Pump Power vs Widths of Fits"
   xlabel := "Pump Power (mW)"
   ylabel := "Full Width Half Max (MHz)"
   legend := ""
-  xrange := []float64{0, 200}
-  yrange := []float64{90, 130}
-  xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-  ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
-  xtickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-  ytickLabels := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("pow vs wid", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   for key, set := range sets {
@@ -1071,23 +1107,23 @@ func goPlotsFits(
   labels []string,
   widths, notes []float64,
   temp bool,
+  sample string,
 ) {
 
   title := "Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
-  legend := "Pump"
-  xrange := []float64{1, 1.36}
-  yrange := []float64{0, 17.5}
-  xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-  ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-  xtickLabels := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-  ytickLabels := []string{"0", "", "5", "", "10", "", "15", ""}
+  legend := "Power"
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("fits", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   for key, set := range sets {
@@ -1154,23 +1190,23 @@ func goPlotsPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
+  sample string,
 ) {
 
   title := "Stokes Pump Power vs Widths of Fits"
   xlabel := "Pump Power (mW)"
   ylabel := "Full Width Half Max (MHz)"
   legend := ""
-  xrange := []float64{0, 200}
-  yrange := []float64{0, 500}
-  xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-  ytick := []float64{0, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500}
-  xtickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-  ytickLabels := []string{"0", "", "100", "", "200", "", "300", "", "400", "", "500"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("pow vs wid", sample)
+  if err != nil {
+    panic(err)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
   )
 
   for key, set := range sets {
