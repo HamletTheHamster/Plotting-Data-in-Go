@@ -85,7 +85,8 @@ func main() {
 
     var asAmps, asLinewidths []float64
 
-    // 0,4,8,12,15
+    // 0,4,8,12,15: presentation
+    // 2,3,4,5,6,7,8,9: <
     fitAntiStokes := []int{2,3,4,5,6,7,8,9}
     if len(fitAntiStokes) > 0 {
 
@@ -769,11 +770,11 @@ func axes(
   case "linewidths":
     switch sample {
     case "Liquid-Core":
-      xrange := []float64{100, 200}
+      xrange := []float64{75, 175}
       yrange := []float64{62.5, 150}
-      xtick := []float64{100, 125, 150, 175, 200}
+      xtick := []float64{75, 100, 125, 150, 175}
       ytick := []float64{62.5, 75, 87.5, 100, 112.5, 125, 137.5, 150}
-      xtickLabel := []string{"100", "", "150", "", "200"}
+      xtickLabel := []string{"75", "", "100", "", "150", ""}
       ytickLabel := []string{"", "75", "", "100", "", "125", "", "150"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
@@ -1555,10 +1556,10 @@ func goPlotLinewidths(
   var asxFit []float64
 
   // Create function according to solved fit parameters
-  for i := range sets {
+  for _, set := range sets {
     var x float64
 
-    x = asPowers[i]
+    x = asPowers[set]
 
     asxFit = append(asxFit, x)
     asyFit = append(asyFit, m * x + b)
@@ -1618,10 +1619,10 @@ func goPlotLinewidths(
   var sxFit []float64
 
   // Create function according to solved fit parameters
-  for i := range sets {
+  for _, set := range sets {
     var x float64
 
-    x = sPowers[i]
+    x = sPowers[set]
 
     sxFit = append(sxFit, x)
     syFit = append(syFit, m * x + b)
@@ -1644,12 +1645,16 @@ func goPlotLinewidths(
   p.Legend.Add("Stokes", sPlotFit)
 
   // as points
-  for i := range sets {
+  fmt.Println("-as-")
+  fmt.Println("Power\tLinewidth")
+  for i, set := range sets {
 
     pts := make(plotter.XYs, 1)
 
-    pts[0].X = asPowers[i]
+    pts[0].X = asPowers[set]
     pts[0].Y = asLinewidths[i]
+
+    fmt.Printf("%.0f\t%.2f\n", asPowers[set], asLinewidths[i])
 
     // Plot points
     asPlotPts, err := plotter.NewScatter(pts)
@@ -1667,11 +1672,11 @@ func goPlotLinewidths(
   }
 
   // s points
-  for i := range sets {
+  for i, set := range sets {
 
     pts := make(plotter.XYs, 1)
 
-    pts[0].X = sPowers[i]
+    pts[0].X = sPowers[set]
     pts[0].Y = sLinewidths[i]
 
     // Plot points
