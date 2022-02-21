@@ -85,7 +85,8 @@ func main() {
 
     var asAmps, asLinewidths []float64
 
-    fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+    // 0,4,8,12,15
+    fitAntiStokes := []int{2,3,4,5,6,7,8,9}
     if len(fitAntiStokes) > 0 {
 
       // as
@@ -165,7 +166,7 @@ func main() {
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
-    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+    fitStokes := []int{2,3,4,5,6,7,8,9}
     if len(fitStokes) > 0 {
 
       fmt.Println("\nStokes\n")
@@ -361,7 +362,7 @@ func readMeta(
           fmt.Println(err)
           os.Exit(1)
         }
-      } else {
+      } else if strings.Contains(v[labelCol], "rs"){
         if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
           sPowers = append(sPowers, v)
         } else {
@@ -738,12 +739,12 @@ func axes(
   case "height ratios":
     switch sample {
     case "Liquid-Core":
-      xrange := []float64{50, 200}
+      xrange := []float64{0, 200}
       yrange := []float64{1, 3.5}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
       ytick := []float64{1, 1.5, 2, 2.5, 3, 3.5}
-      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"", "", "2", "", "3", ""}
+      xtickLabel := []string{"", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"1", "", "2", "", "3", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -768,12 +769,12 @@ func axes(
   case "linewidths":
     switch sample {
     case "Liquid-Core":
-      xrange := []float64{25, 200}
-      yrange := []float64{50, 125}
-      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{50, 62.5, 75, 87.5, 100, 112.5, 125}
-      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"50", "", "75", "", "100", "", "125"}
+      xrange := []float64{100, 200}
+      yrange := []float64{62.5, 150}
+      xtick := []float64{100, 125, 150, 175, 200}
+      ytick := []float64{62.5, 75, 87.5, 100, 112.5, 125, 137.5, 150}
+      xtickLabel := []string{"100", "", "150", "", "200"}
+      ytickLabel := []string{"", "75", "", "100", "", "125", "", "150"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1172,7 +1173,7 @@ func goPlotasPowerVsWid(
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
     } else {
-      p.Legend.Add(power + " mW")
+      p.Legend.Add(power + " mW", plotPts)
     }
   }
 
@@ -1261,7 +1262,7 @@ func goPlotsFits(
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " @" + temperature + "K", l)
     } else {
-      p.Legend.Add(power)
+      p.Legend.Add(power, l)
     }
   }
 
@@ -1400,9 +1401,9 @@ func goPlotHeightRatios(
     var x float64
     m, b := guess[0], guess[1]
 
-    for i := range sets {
+    for i, set := range sets {
 
-      x = powers[i]
+      x = powers[set]
       y := heightRatios[i]
 
       dst[i] = m * x + b - y
@@ -1435,10 +1436,10 @@ func goPlotHeightRatios(
   var xFit []float64
 
   // Create function according to solved fit parameters
-  for i := range sets {
+  for _, set := range sets {
     var x float64
 
-    x = powers[i]
+    x = powers[set]
 
     xFit = append(xFit, x)
     yFit = append(yFit, m * x + b)
@@ -1462,7 +1463,7 @@ func goPlotHeightRatios(
 
     pts := make(plotter.XYs, 1)
 
-    pts[0].X = powers[i]
+    pts[0].X = powers[set]
     pts[0].Y = heightRatios[i]
 
     // Plot points
@@ -1478,7 +1479,7 @@ func goPlotHeightRatios(
 
     // Add set plots to p
     p.Add(plotPts)
-    p.Legend.Add(strings.Trim(labels[set], " prs"), plotPts)
+    //p.Legend.Add(strings.Trim(labels[set], " prs"), plotPts)
   }
 
   savePlot(p, "height ratios")
@@ -1519,9 +1520,9 @@ func goPlotLinewidths(
     var x float64
     m, b := guess[0], guess[1]
 
-    for i := range sets {
+    for i, set := range sets {
 
-      x = asPowers[i]
+      x = asPowers[set]
       y := asLinewidths[i]
 
       dst[i] = m * x + b - y
@@ -1582,9 +1583,9 @@ func goPlotLinewidths(
     var x float64
     m, b := guess[0], guess[1]
 
-    for i := range sets {
+    for i, set := range sets {
 
-      x = sPowers[i]
+      x = sPowers[set]
       y := sLinewidths[i]
 
       dst[i] = m * x + b - y
