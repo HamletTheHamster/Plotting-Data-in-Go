@@ -1,0 +1,42 @@
+20-12-920-12-9 Run 20-12-9
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+set 0 | power : 189.00 mW | width: 118.35 MHz | peak: 4.308432 nV | center: 2.2350 GHz
+set 1 | power : 178.00 mW | width: 110.33 MHz | peak: 4.060424 nV | center: 2.2339 GHz
+set 2 | power : 166.00 mW | width: 132.61 MHz | peak: 4.228823 nV | center: 2.2359 GHz
+set 3 | power : 154.00 mW | width: 131.62 MHz | peak: 4.024650 nV | center: 2.2349 GHz
+set 4 | power : 143.00 mW | width: 130.81 MHz | peak: 3.832646 nV | center: 2.2354 GHz
+set 5 | power : 134.00 mW | width: 134.17 MHz | peak: 3.631620 nV | center: 2.2354 GHz
+set 6 | power : 123.00 mW | width: 131.25 MHz | peak: 3.435700 nV | center: 2.2346 GHz
+set 7 | power : 106.00 mW | width: 126.80 MHz | peak: 3.128567 nV | center: 2.2355 GHz
+set 8 | power : 94.00 mW | width: 127.71 MHz | peak: 2.862579 nV | center: 2.2353 GHz
+set 9 | power : 84.00 mW | width: 125.68 MHz | peak: 2.660754 nV | center: 2.2344 GHz
+set 10 | power : 73.00 mW | width: 127.54 MHz | peak: 2.367610 nV | center: 2.2344 GHz
+set 11 | power : 61.00 mW | width: 130.98 MHz | peak: 2.073403 nV | center: 2.2348 GHz
+set 12 | power : 43.00 mW | width: 135.90 MHz | peak: 1.497483 nV | center: 2.2347 GHz
+set 13 | power : 32.00 mW | width: 70.94 MHz | peak: 1.051243 nV | center: 2.2292 GHz
+set 14 | power : 24.00 mW | width: 64.78 MHz | peak: 0.867168 nV | center: 2.2296 GHz
+set 15 | power : 14.00 mW | width: 38.43 MHz | peak: 0.422628 nV | center: 2.2281 GHz
+
+Stokes
+set 0 | width: 68.75 MHz | peak: 14.736603 nV | center: 2.3090 GHz
+set 1 | width: 68.56 MHz | peak: 12.591294 nV | center: 2.3086 GHz
+set 2 | width: 68.02 MHz | peak: 11.511743 nV | center: 2.3087 GHz
+set 3 | width: 77.61 MHz | peak: 10.981926 nV | center: 2.3089 GHz
+set 4 | width: 77.22 MHz | peak: 10.345355 nV | center: 2.3091 GHz
+set 5 | width: 78.74 MHz | peak: 9.321179 nV | center: 2.3096 GHz
+set 6 | width: 80.01 MHz | peak: 8.283982 nV | center: 2.3090 GHz
+set 7 | width: 82.07 MHz | peak: 6.933428 nV | center: 2.3090 GHz
+set 8 | width: 85.62 MHz | peak: 5.932553 nV | center: 2.3096 GHz
+set 9 | width: 86.77 MHz | peak: 5.248420 nV | center: 2.3100 GHz
+set 10 | width: 87.05 MHz | peak: 4.627547 nV | center: 2.3088 GHz
+set 11 | width: 91.00 MHz | peak: 3.742615 nV | center: 2.3093 GHz
+set 12 | width: 98.24 MHz | peak: 2.526873 nV | center: 2.3108 GHz
+set 13 | width: 69.05 MHz | peak: 1.586092 nV | center: 2.3080 GHz
+set 14 | width: 64.67 MHz | peak: 1.237679 nV | center: 2.3075 GHz
+set 15 | width: 42.38 MHz | peak: 0.497531 nV | center: 2.3091 GHz
+

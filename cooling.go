@@ -60,8 +60,8 @@ func main() {
     goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
   }
 
-  fitSets := []int{1}
-  if len(fitSets) > 0 {
+  fitSets := true
+  if fitSets {
 
     var amp, wid, cen float64
     var sample string
@@ -87,12 +87,13 @@ func main() {
 
     // 0,4,8,12,15: presentation
     // 2,3,4,5,6,7,8,9: <
-    fitAntiStokes := []int{2,3,4,5,6,7,8,9}
+    fitAntiStokes := []int{0,2,7,11,15}
     if len(fitAntiStokes) > 0 {
 
       // as
-      fmt.Println("\nAnti-Stokes\n")
-      log = append(log, "\nAnti-Stokes\n")
+      header := fmt.Sprintf("\nAnti-Stokes\nSet  \t Power \t\t Width \t\t Peak \t\t Center\n")
+      fmt.Printf(header)
+      log = append(log, header)
 
       var asFit [][]float64
       var asFits [][][]float64
@@ -133,7 +134,7 @@ func main() {
 
         asfwhm = append(asfwhm, wid*2000)
 
-        str := fmt.Sprintf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*2000, amp, cen)
         fmt.Printf(str)
         log = append(log, str)
 
@@ -167,11 +168,12 @@ func main() {
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
-    fitStokes := []int{2,3,4,5,6,7,8,9}
+    fitStokes := []int{0,2,7,11,15}
     if len(fitStokes) > 0 {
 
-      fmt.Println("\nStokes\n")
-      log = append(log, "\nStokes\n")
+      header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
+      fmt.Printf(header)
+      log = append(log, header)
 
       var sFit [][]float64
       var sFits [][][]float64
@@ -214,7 +216,7 @@ func main() {
 
         sfwhm = append(sfwhm, wid*2000)
 
-        str := fmt.Sprintf("set %d | width: %.2f MHz | peak: %.6f nV | center: %.4f GHz\n", set, wid*2000, amp, cen)
+        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*2000, amp, cen)
         fmt.Printf(str)
         log = append(log, str)
 
@@ -274,6 +276,9 @@ func main() {
         log = append(log, str)
       }
     }
+
+    // binMHz := 50.
+    // as, s = bin(as,s, binMHz)
   }
 
   writeLog(log)
@@ -1083,6 +1088,56 @@ func goPlotasFits(
   savePlot(p, "Anti-Stokes w Fits")
 }
 
+func bin(
+  as, s [][][]float64,
+  binMHz float64,
+) (
+  [][][]float64, [][][]float64,
+) {
+
+  var asBinned, sBinned [][][]float64
+  // copy as, s first [] to asBinned, sBinned w/append
+
+  binGHz := binMHz/1000
+  nBins := (as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz
+  bins := []float64{}
+  bound := as[0][0][0]
+
+  for i := 0; i < int(nBins) + 1; i++ {
+    bound += binGHz
+    bins = append(bins, bound)
+
+    var binFreqs []float64
+    for _, f := range as[0][0] {
+      if f < bound {
+        binFreqs = append(binFreqs, f)
+      }
+    }
+    // Want to average *signal* not frequencies
+    // Frequency for each bin should be center of the bin
+    // Create asSlice[0 = f, 1 = sig][vals], sSlice[0 = f, 1 = sig][vals]
+    // append asBinned[set], sBinned[set] with asSlice, sSlice respectively  
+    asBinned[0][0][i] = avg(binFreqs)
+  }
+
+  fmt.Printf("%.2f", asBinned[0][0])
+
+  return asBinned, sBinned
+}
+
+func avg(
+  toAvg []float64,
+) (
+  float64,
+) {
+
+  sum := 0.
+  for _, v := range toAvg {
+    sum += v
+  }
+  return sum/float64(len(toAvg))
+}
+
 func goPlotasPowerVsWid(
   sets []int,
   labels []string,
@@ -1645,16 +1700,12 @@ func goPlotLinewidths(
   p.Legend.Add("Stokes", sPlotFit)
 
   // as points
-  fmt.Println("-as-")
-  fmt.Println("Power\tLinewidth")
   for i, set := range sets {
 
     pts := make(plotter.XYs, 1)
 
     pts[0].X = asPowers[set]
     pts[0].Y = asLinewidths[i]
-
-    fmt.Printf("%.0f\t%.2f\n", asPowers[set], asLinewidths[i])
 
     // Plot points
     asPlotPts, err := plotter.NewScatter(pts)
