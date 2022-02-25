@@ -85,9 +85,15 @@ func main() {
 
     var asAmps, asLinewidths []float64
 
+    binSets := []int{0,1,2}
+    if len(binSets) > 0 {
+      binMHz := 10.
+      as, s = bin(binSets, as, s, binMHz)
+    }
+
     // 0,4,8,12,15: presentation
     // 2,3,4,5,6,7,8,9: <
-    fitAntiStokes := []int{0,2,7,11,15}
+    fitAntiStokes := []int{0,1,2}
     if len(fitAntiStokes) > 0 {
 
       // as
@@ -168,7 +174,7 @@ func main() {
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
-    fitStokes := []int{0,2,7,11,15}
+    fitStokes := []int{0,1,2}
     if len(fitStokes) > 0 {
 
       header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -276,9 +282,6 @@ func main() {
         log = append(log, str)
       }
     }
-
-    // binMHz := 50.
-    // as, s = bin(as,s, binMHz)
   }
 
   writeLog(log)
@@ -1089,39 +1092,65 @@ func goPlotasFits(
 }
 
 func bin(
+  sets []int,
   as, s [][][]float64,
   binMHz float64,
 ) (
   [][][]float64, [][][]float64,
 ) {
 
-  var asBinned, sBinned [][][]float64
-  // copy as, s first [] to asBinned, sBinned w/append
-
   binGHz := binMHz/1000
-  nBins := (as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz
-  bins := []float64{}
-  bound := as[0][0][0]
+  nBins := int((as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz + 1)
+  asBound := as[0][0][0]
+  sBound := s[0][0][0]
 
-  for i := 0; i < int(nBins) + 1; i++ {
-    bound += binGHz
-    bins = append(bins, bound)
-
-    var binFreqs []float64
-    for _, f := range as[0][0] {
-      if f < bound {
-        binFreqs = append(binFreqs, f)
-      }
+  asBinned :=  make([][][]float64, len(sets))
+  for i := range asBinned {
+    asBinned[i] = make([][]float64, 2)
+    for j := range asBinned[i] {
+      asBinned[i][j] = make([]float64, nBins)
     }
-    // Want to average *signal* not frequencies
-    // Frequency for each bin should be center of the bin
-    // Create asSlice[0 = f, 1 = sig][vals], sSlice[0 = f, 1 = sig][vals]
-    // append asBinned[set], sBinned[set] with asSlice, sSlice respectively  
-    asBinned[0][0][i] = avg(binFreqs)
+  }
+  sBinned :=  make([][][]float64, len(sets))
+  for i := range sBinned {
+    sBinned[i] = make([][]float64, nBins)
+    for j := range sBinned[i] {
+      sBinned[i][j] = make([]float64, nBins)
+    }
   }
 
-  fmt.Printf("%.2f", asBinned[0][0])
 
+
+  for _, set := range sets {
+    for i := 0; i < nBins; i++ {
+      asBound += binGHz
+      sBound += binGHz
+
+      var asSigsInBin, sSigsInBin []float64
+
+      for j, f := range as[set][0] {
+        if f < asBound && f > asBound - binGHz {
+          if set == 0 && j < 20 {
+            fmt.Printf("%f ", as[set][0][j])
+          }
+          asSigsInBin = append(asSigsInBin, as[set][1][j])
+        }
+      }
+      asBinned[set][0][i] = asBound - (binGHz/2)
+      if i == 0 {
+        fmt.Printf("\n%.2f avg: %.4f\n", asSigsInBin, avg(asSigsInBin))
+      }
+      asBinned[set][1][i] = avg(asSigsInBin)
+
+      for j, f := range s[set][0] {
+        if f < sBound && f > sBound - binGHz {
+          sSigsInBin = append(sSigsInBin, s[set][1][j])
+        }
+      }
+      sBinned[set][0][i] = sBound - (binGHz/2)
+      sBinned[set][1][i] = avg(sSigsInBin)
+    }
+  }
   return asBinned, sBinned
 }
 
