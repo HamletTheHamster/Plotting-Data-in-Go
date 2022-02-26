@@ -23,12 +23,12 @@ import (
 
 func main() {
 
-  lock, temp, lcof, uhna3 := flags()
+  lock, temp, lcof, uhna3, length := flags()
 
   date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(lock, temp)
   ras, bas, rs, bs := getAllData(lock, file, label)
 
-  log := header(lock, temp, lcof, date, run)
+  log := header(lock, temp, lcof, date, run, length)
 
   asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
@@ -70,22 +70,25 @@ func main() {
       sample = "Liquid-Core"
       amp = 5.
       wid = 0.1
-      cen = 2.25
+      cen = 2.275
+      //gb = 10 // W^{-1}m^{-1}
     } else if uhna3 {
       sample = "UHNA3"
       amp = 12.
       wid = 0.1
       cen = 1.18
+      //gb = 0.
     } else {
       sample = "[Unspecified] Sample"
       amp = 5.
       wid = 0.1
       cen = 2.25
+      //gb = 0.
     }
 
     var asAmps, asLinewidths []float64
 
-    binSets := []int{0,1,2}
+    binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(binSets) > 0 {
       binMHz := 10.
       as, s = bin(binSets, as, s, binMHz)
@@ -93,7 +96,7 @@ func main() {
 
     // 0,4,8,12,15: presentation
     // 2,3,4,5,6,7,8,9: <
-    fitAntiStokes := []int{0,1,2}
+    fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(fitAntiStokes) > 0 {
 
       // as
@@ -101,7 +104,6 @@ func main() {
       fmt.Printf(header)
       log = append(log, header)
 
-      var asFit [][]float64
       var asFits [][][]float64
       var asWidthLine [][]float64
       var asWidthLines [][][]float64
@@ -116,7 +118,7 @@ func main() {
           for i := range as[set][0] {
             x := as[set][0][i]
             y := as[set][1][i]
-            dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
+            dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
           }
         }
 
@@ -138,23 +140,20 @@ func main() {
 
         amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
 
-        asfwhm = append(asfwhm, wid*2000)
+        asfwhm = append(asfwhm, wid*1000)
 
-        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*2000, amp, cen)
+        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
         fmt.Printf(str)
         log = append(log, str)
 
-        var asyFits []float64
-
-        // Create function according to solved fit parameters
-        for i := range as[set][0] {
-          // (amp*wid^2/((x-cen)^2+wid^2))
-          x := as[set][0][i]
-          asyFits = append(asyFits, amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)))
-        }
+        // Create Lorentzian fit data according to solved fit parameters
+        df := .001
+        f0 := as[set][0][0]
+        fitPts := int((as[set][0][len(as[set][0]) - 1] - f0)/df) + 1
+        asFits = append(asFits, generateFitData(amp, wid, cen, f0, df, fitPts))
 
         // Width lines
-        asWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
+        asWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
         asWidthLines = append(asWidthLines, asWidthLine)
 
         // For height ratios
@@ -162,9 +161,6 @@ func main() {
 
         // For linewidths
         asLinewidths = append(asLinewidths, asfwhm[i])
-
-        asFit = [][]float64{as[set][0], asyFits}
-        asFits = append(asFits, asFit)
       }
 
       // goPlot as fits
@@ -174,14 +170,13 @@ func main() {
       goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
     }
 
-    fitStokes := []int{0,1,2}
+    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(fitStokes) > 0 {
 
       header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
       fmt.Printf(header)
       log = append(log, header)
 
-      var sFit [][]float64
       var sFits [][][]float64
       var sWidthLine [][]float64
       var sWidthLines [][][]float64
@@ -198,7 +193,7 @@ func main() {
           for i := range s[set][0] {
             x := s[set][0][i]
             y := s[set][1][i]
-            dst[i] = amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + math.Pow(wid, 2)) - y
+            dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
           }
         }
 
@@ -220,23 +215,20 @@ func main() {
 
         amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
 
-        sfwhm = append(sfwhm, wid*2000)
+        sfwhm = append(sfwhm, wid*1000)
 
-        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*2000, amp, cen)
+        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
         fmt.Printf(str)
         log = append(log, str)
 
-        var syFits []float64
-
-        // Create function according to solved fit parameters
-        for i := range s[set][0] {
-          // (amp*wid^2/((x-cen)^2+wid^2))
-          x := s[set][0][i]
-          syFits = append(syFits, results.X[0] * math.Pow(results.X[1], 2) / (math.Pow(x - results.X[2], 2) + math.Pow(results.X[1], 2)))
-        }
+        // Create Lorentzian fit data according to solved fit parameters
+        df := .001
+        f0 := s[set][0][0]
+        fitPts := int((s[set][0][len(s[set][0]) - 1] - f0)/df) + 1
+        sFits = append(sFits, generateFitData(amp, wid, cen, f0, df, fitPts))
 
         // Width lines
-        sWidthLine = [][]float64{{cen - wid, cen + wid},{amp/2, amp/2}}
+        sWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
         sWidthLines = append(sWidthLines, sWidthLine)
 
         if len(fitStokes) == len(fitAntiStokes) {
@@ -246,9 +238,6 @@ func main() {
 
         // For linewidth
         sLinewidths = append(sLinewidths, sfwhm[i])
-
-        sFit = [][]float64{s[set][0], syFits}
-        sFits = append(sFits, sFit)
       }
       fmt.Printf("\n")
       log = append(log, "\n")
@@ -274,7 +263,10 @@ func main() {
           powers = append(powers, (v + sPowers[i])/2)
         }
         goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
-        goPlotLinewidths(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
+
+        //ΓasEff, ΓsEff := Γeff(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, length, gb)
+        goPlotΓeff(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
+
       } else {
         str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
           "(Height ratio and linewidth plots not produced)\n")
@@ -290,23 +282,29 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool,
+  bool, bool, bool, bool, float64,
 ) {
 
   var lock, temp, lcof, uhna3 bool
+  var length float64
 
   flag.BoolVar(&lock, "l", false, "lock-in data")
   flag.BoolVar(&temp, "t", false, "contains temperature data")
   flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
   flag.BoolVar(&uhna3, "3", false, "UHNA3 fiber sample")
+  flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
 
   if lcof && uhna3 {
     fmt.Println("flag.Parse(): sample flagged as both UHNA3 and liquid-core.")
     os.Exit(1)
   }
+  if (lcof || uhna3) && length == 0 {
+    fmt.Println("Specify length of sample in meters with -len=")
+    os.Exit(1)
+  }
 
-  return lock, temp, lcof, uhna3
+  return lock, temp, lcof, uhna3, length
 }
 
 func readMeta(
@@ -584,6 +582,7 @@ func readCSV(
 func header(
   lock, temp, lcof bool,
   date, run string,
+  length float64,
 ) (
   []string,
 ) {
@@ -601,15 +600,18 @@ func header(
     fmt.Printf("\n*Temperature-dependent data*\n")
   }
   if lcof {
-    log = append(log, "\n*Liquid-core optical fiber sample*\n")
-    fmt.Printf("\n*Liquid-core optical fiber sample*\n")
+    str := fmt.Sprintf("\n*Liquid-core optical fiber sample*\n")
+    log = append(log, str)
+    fmt.Printf(str)
   }
   if lock {
-    log = append(log, "\n*Data gathered from Lock-in*\n")
-    fmt.Printf("\n*Data gathered from Lock-in*\n")
+    str := fmt.Sprintf("\n*Data gathered from Lock-in*\n")
+    log = append(log, str)
+    fmt.Printf(str)
   } else {
-    log = append(log, "\n*Data gathered from Spectrum Analyzer*\n")
-    fmt.Printf("\n*Data gathered from Spectrum Analyzer*\n")
+    str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n")
+    log = append(log, str)
+    fmt.Printf(str)
   }
 
   return log
@@ -778,12 +780,12 @@ func axes(
   case "linewidths":
     switch sample {
     case "Liquid-Core":
-      xrange := []float64{75, 175}
-      yrange := []float64{62.5, 150}
-      xtick := []float64{75, 100, 125, 150, 175}
-      ytick := []float64{62.5, 75, 87.5, 100, 112.5, 125, 137.5, 150}
-      xtickLabel := []string{"75", "", "100", "", "150", ""}
-      ytickLabel := []string{"", "75", "", "100", "", "125", "", "150"}
+      xrange := []float64{0, 200}
+      yrange := []float64{60, 120}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{60, 70, 80, 90, 100, 110, 120}
+      xtickLabel := []string{"", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"", "", "80", "", "100", "", "110", "", "120"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -820,11 +822,16 @@ func subtractBackground(
   var s, as [][][]float64
 
   for i := range rs {
-    s = append(s, subtract(bs[0], rs[i]))
+    if i == 15 {
+      sOutlier := true
+      s = append(s, subtract(bs[0], rs[i], sOutlier))
+    } else {
+      s = append(s, subtract(bs[0], rs[i], false))
+    }
   }
 
   for i := range ras {
-    as = append(as, subtract(bas[0], ras[i]))
+    as = append(as, subtract(bas[0], ras[i], false))
   }
 
   return s, as
@@ -832,20 +839,30 @@ func subtractBackground(
 
 func subtract(
   b, s [][]float64,
+  sOutlier bool,
 ) (
   [][]float64,
 ) {
 
-  /*var shiftUp float64 = 0
+  var shift float64
 
-  if (s[1][0] - b[1][0] > 0) {
-    shiftUp = b[1][0] - s[1][0]
+  if sOutlier {
+    shift = -(avg(s[1][:250]) - avg(b[1][:250]))
   } else {
-    shiftUp = s[1][600] - b[1][600]
-  }*/
+    shift = -(avg(s[1][:100]) - avg(b[1][:100]))
+  }
+
+
+  // lastTenSigPts := s[1][len(s[1]) - 10:len(s[1])]
+  // lastTenBgPts := b[1][len(b[1]) - 10:len(b[1])]
+  // if below := lastTenSigPts - lastTenBgPts; below < 0 {
+  //   shift = below
+  // } else {
+  //   shift = -below
+  // }
 
   for i := range b[0] {
-    s[1][i] = s[1][i] - b[1][i] //+ shiftUp
+    s[1][i] = s[1][i] - b[1][i] + shift
   }
 
   return s
@@ -1001,6 +1018,27 @@ func goPlotSubGrpd(
   savePlot(p, "Stokes Background Subtracted")
 }
 
+func generateFitData(
+  amp, wid, cen, f0, df float64,
+  fitPts int,
+) (
+  [][]float64,
+) {
+
+  x := make([]float64, fitPts)
+  for i := range x {
+    x[i] = f0 + df*float64(i)
+  }
+
+  y := make([]float64, fitPts)
+  for i := range x {
+    // (amp*wid^2/((x-cen)^2+wid^2))
+    y[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x[i] - cen, 2) + (.25 * math.Pow(wid, 2)))
+  }
+
+  return [][]float64{x, y}
+}
+
 func goPlotasFits(
   sets []int,
   as, fits, widthLines [][][]float64,
@@ -1101,8 +1139,6 @@ func bin(
 
   binGHz := binMHz/1000
   nBins := int((as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz + 1)
-  asBound := as[0][0][0]
-  sBound := s[0][0][0]
 
   asBinned :=  make([][][]float64, len(sets))
   for i := range asBinned {
@@ -1119,9 +1155,11 @@ func bin(
     }
   }
 
-
-
   for _, set := range sets {
+
+    asBound := as[set][0][0]
+    sBound := s[set][0][0]
+
     for i := 0; i < nBins; i++ {
       asBound += binGHz
       sBound += binGHz
@@ -1130,16 +1168,10 @@ func bin(
 
       for j, f := range as[set][0] {
         if f < asBound && f > asBound - binGHz {
-          if set == 0 && j < 20 {
-            fmt.Printf("%f ", as[set][0][j])
-          }
           asSigsInBin = append(asSigsInBin, as[set][1][j])
         }
       }
       asBinned[set][0][i] = asBound - (binGHz/2)
-      if i == 0 {
-        fmt.Printf("\n%.2f avg: %.4f\n", asSigsInBin, avg(asSigsInBin))
-      }
       asBinned[set][1][i] = avg(asSigsInBin)
 
       for j, f := range s[set][0] {
@@ -1570,16 +1602,36 @@ func goPlotHeightRatios(
   savePlot(p, "height ratios")
 }
 
-func goPlotLinewidths(
+func Γeff(
   sets []int,
-  asLinewidths, sLinewidths, asPowers, sPowers []float64,
+  Γas, Γs, asPowers, sPowers []float64,
+  length, gb float64,
+) (
+  []float64, []float64,
+) {
+  // Γ_as,eff = Γ*(1 + GPL/4)
+  // Γ_s,eff = Γ*(1 - GPL/4)
+
+  ΓasEff, ΓsEff := make([]float64, len(sets)), make([]float64, len(sets))
+
+  for set := range sets {
+    ΓasEff[set] = 2*math.Pi*Γas[set]*(1 + gb*asPowers[set]*.001*gb*length/4)
+    ΓsEff[set] = 2*math.Pi*Γs[set]*(1 - gb*sPowers[set]*.001*gb*length/4)
+  }
+
+  return ΓasEff, ΓsEff
+}
+
+func goPlotΓeff(
+  sets []int,
+  Γas, Γs, asPowers, sPowers []float64,
   labels []string,
   sample string,
 ) {
 
   title := "Linewidths vs Power"
-  xlabel := "Pump Power (mW)"
-  ylabel := "Full Width Half Max (MHz)"
+  xlabel := "Power (mW)"
+  ylabel := "Dissipation Rate (MHz)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("linewidths", sample)
@@ -1608,7 +1660,7 @@ func goPlotLinewidths(
     for i, set := range sets {
 
       x = asPowers[set]
-      y := asLinewidths[i]
+      y := Γas[i]
 
       dst[i] = m * x + b - y
     }
@@ -1671,7 +1723,7 @@ func goPlotLinewidths(
     for i, set := range sets {
 
       x = sPowers[set]
-      y := sLinewidths[i]
+      y := Γs[i]
 
       dst[i] = m * x + b - y
     }
@@ -1734,7 +1786,7 @@ func goPlotLinewidths(
     pts := make(plotter.XYs, 1)
 
     pts[0].X = asPowers[set]
-    pts[0].Y = asLinewidths[i]
+    pts[0].Y = Γas[i]
 
     // Plot points
     asPlotPts, err := plotter.NewScatter(pts)
@@ -1757,7 +1809,7 @@ func goPlotLinewidths(
     pts := make(plotter.XYs, 1)
 
     pts[0].X = sPowers[set]
-    pts[0].Y = sLinewidths[i]
+    pts[0].Y = Γs[i]
 
     // Plot points
     sPlotPts, err := plotter.NewScatter(pts)
