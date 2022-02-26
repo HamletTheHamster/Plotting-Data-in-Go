@@ -1,0 +1,42 @@
+20-12-920-12-9 Run 20-12-9
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 189.00 mW 	 109.92 MHz 	 4.212040 nV 	 2.2344 GHz
+1 	 178.00 mW 	 109.43 MHz 	 4.046053 nV 	 2.2335 GHz
+2 	 166.00 mW 	 113.65 MHz 	 4.082501 nV 	 2.2348 GHz
+3 	 154.00 mW 	 106.69 MHz 	 3.853309 nV 	 2.2337 GHz
+4 	 143.00 mW 	 105.63 MHz 	 3.656720 nV 	 2.2342 GHz
+5 	 134.00 mW 	 112.57 MHz 	 3.488690 nV 	 2.2343 GHz
+6 	 123.00 mW 	 96.18 MHz 	 3.216549 nV 	 2.2331 GHz
+7 	 106.00 mW 	 105.41 MHz 	 3.023033 nV 	 2.2343 GHz
+8 	 94.00 mW 	 101.70 MHz 	 2.727596 nV 	 2.2341 GHz
+9 	 84.00 mW 	 107.35 MHz 	 2.587303 nV 	 2.2336 GHz
+10 	 73.00 mW 	 111.82 MHz 	 2.313162 nV 	 2.2334 GHz
+11 	 61.00 mW 	 107.78 MHz 	 2.006725 nV 	 2.2335 GHz
+12 	 43.00 mW 	 121.87 MHz 	 1.468702 nV 	 2.2337 GHz
+13 	 32.00 mW 	 111.45 MHz 	 1.145053 nV 	 2.2298 GHz
+14 	 24.00 mW 	 118.33 MHz 	 0.977040 nV 	 2.2311 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 189.00 mW 	 69.30 MHz 	 14.658922 nV 	 2.3086 GHz
+1 	 178.00 mW 	 70.03 MHz 	 12.558480 nV 	 2.3082 GHz
+2 	 166.00 mW 	 69.69 MHz 	 11.490630 nV 	 2.3083 GHz
+3 	 154.00 mW 	 74.08 MHz 	 10.866138 nV 	 2.3084 GHz
+4 	 143.00 mW 	 71.21 MHz 	 10.172779 nV 	 2.3086 GHz
+5 	 134.00 mW 	 73.31 MHz 	 9.159848 nV 	 2.3091 GHz
+6 	 123.00 mW 	 73.59 MHz 	 8.142501 nV 	 2.3085 GHz
+7 	 106.00 mW 	 76.98 MHz 	 6.835431 nV 	 2.3086 GHz
+8 	 94.00 mW 	 76.49 MHz 	 5.802975 nV 	 2.3091 GHz
+9 	 84.00 mW 	 79.91 MHz 	 5.167581 nV 	 2.3094 GHz
+10 	 73.00 mW 	 75.07 MHz 	 4.496384 nV 	 2.3083 GHz
+11 	 61.00 mW 	 92.96 MHz 	 3.734066 nV 	 2.3089 GHz
+12 	 43.00 mW 	 82.33 MHz 	 2.449639 nV 	 2.3103 GHz
+13 	 32.00 mW 	 93.83 MHz 	 1.677761 nV 	 2.3075 GHz
+14 	 24.00 mW 	 96.19 MHz 	 1.324659 nV 	 2.3065 GHz
+
