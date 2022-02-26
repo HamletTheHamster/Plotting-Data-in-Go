@@ -63,27 +63,30 @@ func main() {
   fitSets := true
   if fitSets {
 
-    var amp, wid, cen float64
+    var amp, wid, cen, gb, Γ float64
     var sample string
 
     if lcof {
       sample = "Liquid-Core"
-      amp = 5.
+      amp = 5
       wid = 0.1
       cen = 2.275
-      //gb = 10 // W^{-1}m^{-1}
+      gb = 4.75 // W^{-1}m^{-1}
+      Γ = 89.5//*2*math.Pi // MHz
     } else if uhna3 {
       sample = "UHNA3"
-      amp = 12.
+      amp = 12
       wid = 0.1
       cen = 1.18
-      //gb = 0.
+      gb = 0
+      Γ = 0
     } else {
       sample = "[Unspecified] Sample"
-      amp = 5.
+      amp = 5
       wid = 0.1
       cen = 2.25
-      //gb = 0.
+      gb = 0
+      Γ = 0
     }
 
     var asAmps, asLinewidths []float64
@@ -94,8 +97,6 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    // 0,4,8,12,15: presentation
-    // 2,3,4,5,6,7,8,9: <
     fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(fitAntiStokes) > 0 {
 
@@ -264,8 +265,8 @@ func main() {
         }
         goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
 
-        //ΓasEff, ΓsEff := Γeff(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, length, gb)
-        goPlotΓeff(fitStokes, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
+        ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
+        goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
 
       } else {
         str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
@@ -1048,7 +1049,7 @@ func goPlotasFits(
   sample string,
 ) {
 
-  title := sample + "Anti-Stokes"
+  title := sample + " Anti-Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
   legend := "Power"
@@ -1140,14 +1141,14 @@ func bin(
   binGHz := binMHz/1000
   nBins := int((as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz + 1)
 
-  asBinned :=  make([][][]float64, len(sets))
+  asBinned :=  make([][][]float64, len(as))
   for i := range asBinned {
     asBinned[i] = make([][]float64, 2)
     for j := range asBinned[i] {
       asBinned[i][j] = make([]float64, nBins)
     }
   }
-  sBinned :=  make([][][]float64, len(sets))
+  sBinned :=  make([][][]float64, len(s))
   for i := range sBinned {
     sBinned[i] = make([][]float64, nBins)
     for j := range sBinned[i] {
@@ -1306,7 +1307,7 @@ func goPlotsFits(
   sample string,
 ) {
 
-  title := "Stokes"
+  title := sample + " Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
   legend := "Power"
@@ -1603,28 +1604,28 @@ func goPlotHeightRatios(
 }
 
 func Γeff(
-  sets []int,
-  Γas, Γs, asPowers, sPowers []float64,
-  length, gb float64,
+  maxPow float64,
+  Γ, length, gb float64,
 ) (
-  []float64, []float64,
+  [][]float64, [][]float64,
 ) {
-  // Γ_as,eff = Γ*(1 + GPL/4)
-  // Γ_s,eff = Γ*(1 - GPL/4)
+  // Γ_as,eff = 2*pi*Γ*(1 + GPL/4)
+  // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
-  ΓasEff, ΓsEff := make([]float64, len(sets)), make([]float64, len(sets))
+  pow := []float64{0, maxPow}
+  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/4)}
+  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/4)}
 
-  for set := range sets {
-    ΓasEff[set] = 2*math.Pi*Γas[set]*(1 + gb*asPowers[set]*.001*gb*length/4)
-    ΓsEff[set] = 2*math.Pi*Γs[set]*(1 - gb*sPowers[set]*.001*gb*length/4)
-  }
+  fmt.Printf("\nΓasEff: %.4f\n", ΓasEff[1])
+  fmt.Printf("ΓsEff: %.4f\n", ΓsEff[1])
 
-  return ΓasEff, ΓsEff
+  return [][]float64{pow, ΓasEff}, [][]float64{pow, ΓsEff}
 }
 
-func goPlotΓeff(
+func goPlotLinewidths(
   sets []int,
-  Γas, Γs, asPowers, sPowers []float64,
+  ΓasEff, ΓsEff [][]float64,
+  asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
   sample string,
 ) {
@@ -1647,8 +1648,7 @@ func goPlotΓeff(
   )
 
   // as linear fit
-
-  // Fit parameter guesses
+  // linewidth fit parameter guesses
   m := 1.
   b := 100.
 
@@ -1660,7 +1660,7 @@ func goPlotΓeff(
     for i, set := range sets {
 
       x = asPowers[set]
-      y := Γas[i]
+      y := asLinewidths[i]
 
       dst[i] = m * x + b - y
     }
@@ -1710,9 +1710,6 @@ func goPlotΓeff(
     os.Exit(1)
   }
 
-  asPlotFit.LineStyle.Color = color.RGBA{R: 99, G: 124, B: 198, A: 255}
-  asPlotFit.LineStyle.Width = vg.Points(3)
-
   // s linear fit
 
   f = func(dst, guess []float64) {
@@ -1723,7 +1720,7 @@ func goPlotΓeff(
     for i, set := range sets {
 
       x = sPowers[set]
-      y := Γs[i]
+      y := sLinewidths[i]
 
       dst[i] = m * x + b - y
     }
@@ -1766,7 +1763,7 @@ func goPlotΓeff(
 
   sfit := buildData([][]float64{sxFit, syFit})
 
-  // Plot as fit
+  // Plot s fit
   sPlotFit, err := plotter.NewLine(sfit)
   if err != nil {
     fmt.Println(err)
@@ -1776,9 +1773,34 @@ func goPlotΓeff(
   sPlotFit.LineStyle.Color = color.RGBA{R: 201, G: 104, B: 146, A: 255}
   sPlotFit.LineStyle.Width = vg.Points(3)
 
-  p.Add(asPlotFit, sPlotFit)
+  asPlotFit.LineStyle.Color = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+  asPlotFit.LineStyle.Width = vg.Points(3)
+
+  // Plot Γeff
+  ΓasEffPlot, err := plotter.NewLine(buildData(ΓasEff))
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  ΓasEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
+  ΓasEffPlot.LineStyle.Width = vg.Points(3)
+
+  ΓsEffPlot, err := plotter.NewLine(buildData(ΓsEff))
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  ΓsEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
+  ΓsEffPlot.LineStyle.Width = vg.Points(3)
+
+
+  p.Add(asPlotFit, sPlotFit, ΓasEffPlot, ΓsEffPlot)
   p.Legend.Add("Anti-Stokes", asPlotFit)
+  p.Legend.Add("Γas,eff", ΓasEffPlot)
   p.Legend.Add("Stokes", sPlotFit)
+  p.Legend.Add("Γs,eff", ΓsEffPlot)
 
   // as points
   for i, set := range sets {
@@ -1786,7 +1808,7 @@ func goPlotΓeff(
     pts := make(plotter.XYs, 1)
 
     pts[0].X = asPowers[set]
-    pts[0].Y = Γas[i]
+    pts[0].Y = asLinewidths[i]
 
     // Plot points
     asPlotPts, err := plotter.NewScatter(pts)
@@ -1809,7 +1831,7 @@ func goPlotΓeff(
     pts := make(plotter.XYs, 1)
 
     pts[0].X = sPowers[set]
-    pts[0].Y = Γs[i]
+    pts[0].Y = sLinewidths[i]
 
     // Plot points
     sPlotPts, err := plotter.NewScatter(pts)
