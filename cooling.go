@@ -23,258 +23,273 @@ import (
 
 func main() {
 
-  lock, temp, lcof, uhna3, length := flags()
+  cooling, cabs, lock, temp, lcof, uhna3, length := flags()
 
-  date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(lock, temp)
-  ras, bas, rs, bs := getAllData(lock, file, label)
-
-  log := header(lock, temp, lcof, date, run, length)
-
-  asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
-
-  setsToPlotRaw := []int{}
-  plotRaw(
-    setsToPlotRaw,
-    bas, ras, bs, rs,
-    basLabel, asLabel, bsLabel, sLabel,
+  date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
+    cooling, cabs, lock, temp,
   )
 
-  s, as := subtractBackground(ras, bas, rs, bs)
+  log := header(cooling, cabs, lock, temp, lcof, date, run, length)
 
-  setsToPlotSubtracted := []int{}
-  plotSubtracted(
-    setsToPlotSubtracted,
-    s, as,
-    sLabel, asLabel,
-  )
+  if cooling {
 
-  setsToPlotSubtractedTogether := []int{}
-  plotSubtractedTogether(
-    setsToPlotSubtractedTogether,
-    as, s,
-    asLabel, sLabel,
-  )
+    ras, bas, rs, bs := getCoolingData(lock, file, label)
 
-  subtractedGrouped := []int{}
-  if len(subtractedGrouped) > 0 {
-    goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
-  }
+    asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
-  fitSets := true
-  if fitSets {
+    setsToPlotRaw := []int{}
+    plotRaw(
+      setsToPlotRaw,
+      bas, ras, bs, rs,
+      basLabel, asLabel, bsLabel, sLabel,
+    )
 
-    var amp, wid, cen, gb, Γ float64
-    var sample string
+    s, as := subtractBackground(ras, bas, rs, bs)
 
-    if lcof {
-      sample = "Liquid-Core"
-      amp = 5
-      wid = 0.1
-      cen = 2.275
-      gb = 4.75 // W^{-1}m^{-1}
-      Γ = 89.5//*2*math.Pi // MHz
-    } else if uhna3 {
-      sample = "UHNA3"
-      amp = 12
-      wid = 0.1
-      cen = 1.18
-      gb = 0
-      Γ = 0
-    } else {
-      sample = "[Unspecified] Sample"
-      amp = 5
-      wid = 0.1
-      cen = 2.25
-      gb = 0
-      Γ = 0
+    setsToPlotSubtracted := []int{}
+    plotSubtracted(
+      setsToPlotSubtracted,
+      s, as,
+      sLabel, asLabel,
+    )
+
+    setsToPlotSubtractedTogether := []int{}
+    plotSubtractedTogether(
+      setsToPlotSubtractedTogether,
+      as, s,
+      asLabel, sLabel,
+    )
+
+    subtractedGrouped := []int{}
+    if len(subtractedGrouped) > 0 {
+      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
     }
 
-    var asAmps, asLinewidths []float64
+    fitSets := true
+    if fitSets {
 
-    binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
-    if len(binSets) > 0 {
-      binMHz := 10.
-      as, s = bin(binSets, as, s, binMHz)
-    }
+      var amp, wid, cen, gb, Γ float64
+      var sample string
 
-    fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
-    if len(fitAntiStokes) > 0 {
-
-      // as
-      header := fmt.Sprintf("\nAnti-Stokes\nSet  \t Power \t\t Width \t\t Peak \t\t Center\n")
-      fmt.Printf(header)
-      log = append(log, header)
-
-      var asFits [][][]float64
-      var asWidthLine [][]float64
-      var asWidthLines [][][]float64
-      var asfwhm []float64
-
-      for i, set := range fitAntiStokes {
-
-        f := func(dst, guess []float64) {
-
-          amp, wid, cen := guess[0], guess[1], guess[2]
-
-          for i := range as[set][0] {
-            x := as[set][0][i]
-            y := as[set][1][i]
-            dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
-          }
-        }
-
-        jacobian := lm.NumJac{Func: f}
-
-        // Solve for fit
-        toBeSolved := lm.LMProblem{
-          Dim:        3,
-          Size:       len(as[set][0]),
-          Func:       f,
-          Jac:        jacobian.Jac,
-          InitParams: []float64{amp, wid, cen},
-          Tau:        1e-6,
-          Eps1:       1e-8,
-          Eps2:       1e-8,
-        }
-
-        results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
-
-        amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
-
-        asfwhm = append(asfwhm, wid*1000)
-
-        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
-        fmt.Printf(str)
-        log = append(log, str)
-
-        // Create Lorentzian fit data according to solved fit parameters
-        df := .001
-        f0 := as[set][0][0]
-        fitPts := int((as[set][0][len(as[set][0]) - 1] - f0)/df) + 1
-        asFits = append(asFits, generateFitData(amp, wid, cen, f0, df, fitPts))
-
-        // Width lines
-        asWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
-        asWidthLines = append(asWidthLines, asWidthLine)
-
-        // For height ratios
-        asAmps = append(asAmps, amp)
-
-        // For linewidths
-        asLinewidths = append(asLinewidths, asfwhm[i])
-      }
-
-      // goPlot as fits
-      goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample)
-
-      // goPlot power vs width
-      goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
-    }
-
-    fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
-    if len(fitStokes) > 0 {
-
-      header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
-      fmt.Printf(header)
-      log = append(log, header)
-
-      var sFits [][][]float64
-      var sWidthLine [][]float64
-      var sWidthLines [][][]float64
-      var ampRatios []float64
-      var sLinewidths []float64
-      var sfwhm []float64
-
-      for i, set := range fitStokes {
-
-        f := func(dst, guess []float64) {
-
-          amp, wid, cen := guess[0], guess[1], guess[2]
-
-          for i := range s[set][0] {
-            x := s[set][0][i]
-            y := s[set][1][i]
-            dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
-          }
-        }
-
-        jacobian := lm.NumJac{Func: f}
-
-        // Solve for fit
-        toBeSolved := lm.LMProblem{
-      	  Dim:        3,
-       	  Size:       len(s[set][0]),
-       	  Func:       f,
-       	  Jac:        jacobian.Jac,
-       	  InitParams: []float64{amp, wid, cen},
-       	  Tau:        1e-6,
-       	  Eps1:       1e-8,
-       	  Eps2:       1e-8,
-        }
-
-        results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
-
-        amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
-
-        sfwhm = append(sfwhm, wid*1000)
-
-        str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
-        fmt.Printf(str)
-        log = append(log, str)
-
-        // Create Lorentzian fit data according to solved fit parameters
-        df := .001
-        f0 := s[set][0][0]
-        fitPts := int((s[set][0][len(s[set][0]) - 1] - f0)/df) + 1
-        sFits = append(sFits, generateFitData(amp, wid, cen, f0, df, fitPts))
-
-        // Width lines
-        sWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
-        sWidthLines = append(sWidthLines, sWidthLine)
-
-        if len(fitStokes) == len(fitAntiStokes) {
-          // For height ratio
-          ampRatios = append(ampRatios, amp/asAmps[i])
-        }
-
-        // For linewidth
-        sLinewidths = append(sLinewidths, sfwhm[i])
-      }
-      fmt.Printf("\n")
-      log = append(log, "\n")
-
-      goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample)
-
-      goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample)
-
-      eq := true
-      if len(fitAntiStokes) != len(fitStokes) {
-        eq = false
+      if lcof {
+        sample = "Liquid-Core"
+        amp = 5
+        wid = 0.1
+        cen = 2.275
+        gb = 4.75 // W^{-1}m^{-1}
+        Γ = 89.5//*2*math.Pi // MHz
+      } else if uhna3 {
+        sample = "UHNA3"
+        amp = 12
+        wid = 0.1
+        cen = 9.18
+        gb = 0.6
+        Γ = 100
       } else {
-        for i, v := range fitAntiStokes {
-          if v != fitStokes[i] {
-            eq = false
-            break
+        sample = "[Unspecified] Sample"
+        amp = 5
+        wid = 0.1
+        cen = 2.25
+        gb = 0
+        Γ = 0
+      }
+
+      var asAmps, asLinewidths []float64
+
+      binSets := []int{}
+      if len(binSets) > 0 {
+        binMHz := 10.
+        as, s = bin(binSets, as, s, binMHz)
+      }
+
+      fitAntiStokes := []int{}
+      if len(fitAntiStokes) > 0 {
+
+        // as
+        header := fmt.Sprintf("\nAnti-Stokes\nSet  \t Power \t\t Width \t\t Peak \t\t Center\n")
+        fmt.Printf(header)
+        log = append(log, header)
+
+        var asFits [][][]float64
+        var asWidthLine [][]float64
+        var asWidthLines [][][]float64
+        var asfwhm []float64
+
+        for i, set := range fitAntiStokes {
+
+          f := func(dst, guess []float64) {
+
+            amp, wid, cen := guess[0], guess[1], guess[2]
+
+            for i := range as[set][0] {
+              x := as[set][0][i]
+              y := as[set][1][i]
+              dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
+            }
+          }
+
+          jacobian := lm.NumJac{Func: f}
+
+          // Solve for fit
+          toBeSolved := lm.LMProblem{
+            Dim:        3,
+            Size:       len(as[set][0]),
+            Func:       f,
+            Jac:        jacobian.Jac,
+            InitParams: []float64{amp, wid, cen},
+            Tau:        1e-6,
+            Eps1:       1e-8,
+            Eps2:       1e-8,
+          }
+
+          results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+          amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
+
+          asfwhm = append(asfwhm, wid*1000)
+
+          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
+          fmt.Printf(str)
+          log = append(log, str)
+
+          // Create Lorentzian fit data according to solved fit parameters
+          df := .001
+          f0 := as[set][0][0]
+          fitPts := int((as[set][0][len(as[set][0]) - 1] - f0)/df) + 1
+          asFits = append(asFits, generateFitData(amp, wid, cen, f0, df, fitPts))
+
+          // Width lines
+          asWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
+          asWidthLines = append(asWidthLines, asWidthLine)
+
+          // For height ratios
+          asAmps = append(asAmps, amp)
+
+          // For linewidths
+          asLinewidths = append(asLinewidths, asfwhm[i])
+        }
+
+        // goPlot as fits
+        goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample)
+
+        // goPlot power vs width
+        goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
+      }
+
+      fitStokes := []int{}
+      if len(fitStokes) > 0 {
+
+        header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
+        fmt.Printf(header)
+        log = append(log, header)
+
+        var sFits [][][]float64
+        var sWidthLine [][]float64
+        var sWidthLines [][][]float64
+        var ampRatios []float64
+        var sLinewidths []float64
+        var sfwhm []float64
+
+        for i, set := range fitStokes {
+
+          f := func(dst, guess []float64) {
+
+            amp, wid, cen := guess[0], guess[1], guess[2]
+
+            for i := range s[set][0] {
+              x := s[set][0][i]
+              y := s[set][1][i]
+              dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
+            }
+          }
+
+          jacobian := lm.NumJac{Func: f}
+
+          // Solve for fit
+          toBeSolved := lm.LMProblem{
+        	  Dim:        3,
+         	  Size:       len(s[set][0]),
+         	  Func:       f,
+         	  Jac:        jacobian.Jac,
+         	  InitParams: []float64{amp, wid, cen},
+         	  Tau:        1e-6,
+         	  Eps1:       1e-8,
+         	  Eps2:       1e-8,
+          }
+
+          results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
+
+          amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
+
+          sfwhm = append(sfwhm, wid*1000)
+
+          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
+          fmt.Printf(str)
+          log = append(log, str)
+
+          // Create Lorentzian fit data according to solved fit parameters
+          df := .001
+          f0 := s[set][0][0]
+          fitPts := int((s[set][0][len(s[set][0]) - 1] - f0)/df) + 1
+          sFits = append(sFits, generateFitData(amp, wid, cen, f0, df, fitPts))
+
+          // Width lines
+          sWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
+          sWidthLines = append(sWidthLines, sWidthLine)
+
+          if len(fitStokes) == len(fitAntiStokes) {
+            // For height ratio
+            ampRatios = append(ampRatios, amp/asAmps[i])
+          }
+
+          // For linewidth
+          sLinewidths = append(sLinewidths, sfwhm[i])
+        }
+        fmt.Printf("\n")
+        log = append(log, "\n")
+
+        goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample)
+
+        goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample)
+
+        eq := true
+        if len(fitAntiStokes) != len(fitStokes) {
+          eq = false
+        } else {
+          for i, v := range fitAntiStokes {
+            if v != fitStokes[i] {
+              eq = false
+              break
+            }
           }
         }
-      }
-      if eq {
-        var powers []float64
-        for i, v := range asPowers {
-          powers = append(powers, (v + sPowers[i])/2)
+        if eq {
+          var powers []float64
+          for i, v := range asPowers {
+            powers = append(powers, (v + sPowers[i])/2)
+          }
+          goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
+
+          ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
+          goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
+
+        } else {
+          str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
+            "(Height ratio and linewidth plots not produced)\n")
+          fmt.Printf(str)
+          log = append(log, str)
         }
-        goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
-
-        ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
-        goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
-
-      } else {
-        str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
-          "(Height ratio and linewidth plots not produced)\n")
-        fmt.Printf(str)
-        log = append(log, str)
       }
     }
+
+  } else if cabs {
+
+    cabsData := getCABSData(lock, file)
+
+    setsToPlotCABS := []int{1}
+    plotCABS(setsToPlotCABS, cabsData, label)
+
+
   }
 
   writeLog(log)
@@ -283,18 +298,25 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, float64,
+  bool, bool, bool, bool, bool, bool, float64,
 ) {
 
-  var lock, temp, lcof, uhna3 bool
+  var cooling, cabs, lock, temp, lcof, uhna3 bool
   var length float64
 
+  flag.BoolVar(&cooling, "cool", false, "cooling data")
+  flag.BoolVar(&cabs, "cabs", false, "CABS data")
   flag.BoolVar(&lock, "l", false, "lock-in data")
-  flag.BoolVar(&temp, "t", false, "contains temperature data")
+  flag.BoolVar(&temp, "t", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
   flag.BoolVar(&uhna3, "3", false, "UHNA3 fiber sample")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
+
+  if cooling && cabs {
+    fmt.Println("flag.Parse(): data flagged as both cooling and CABS.")
+    os.Exit(1)
+  }
 
   if lcof && uhna3 {
     fmt.Println("flag.Parse(): sample flagged as both UHNA3 and liquid-core.")
@@ -305,11 +327,11 @@ func flags() (
     os.Exit(1)
   }
 
-  return lock, temp, lcof, uhna3, length
+  return cooling, cabs, lock, temp, lcof, uhna3, length
 }
 
 func readMeta(
-  lock, temp bool,
+  cooling, cabs, lock, temp bool,
 ) (
   string, string, []string, []float64, []float64, []string, []float64, []float64,
 ) {
@@ -331,7 +353,9 @@ func readMeta(
   var date, run string
   var label, filepath []string
   var asPowers, sPowers, asNotes, sNotes []float64
+  var pumpPowers, stokesPowers, probePowers []float64
   var dateCol, runCol, labelCol, filepathCol, sigFileCol, freqFileCol, notesCol int
+  var pumpCol, stokesCol, probeCol int
 
   for col, heading := range meta[0] {
     switch heading {
@@ -341,6 +365,12 @@ func readMeta(
       runCol = col
     case "Label":
       labelCol = col
+    case "Pump":
+      pumpCol = col
+    case "Stokes":
+      stokesCol = col
+    case "Probe":
+      probeCol = col
     case "Filepath":
       filepathCol = col
     case "Signal":
@@ -363,43 +393,89 @@ func readMeta(
 
       label = append(label, v[labelCol])
 
-      if strings.Contains(v[labelCol], "ras") {
-        if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
-          asPowers = append(asPowers, v)
-        } else {
-          fmt.Println(err)
-          os.Exit(1)
-        }
-      } else if strings.Contains(v[labelCol], "rs"){
-        if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
-          sPowers = append(sPowers, v)
-        } else {
-          fmt.Println(err)
-          os.Exit(1)
-        }
-      }
-
-      if lock {
-        filepath = append(filepath, v[sigFileCol])
-        filepath = append(filepath, v[freqFileCol])
-      } else {
-        filepath = append(filepath, v[filepathCol])
-      }
-
-      if temp {
-        if strings.Contains(v[labelCol], "as") {
-          if asNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
-            asNotes = append(asNotes, asNote)
+      if cooling {
+        if strings.Contains(v[labelCol], "ras") {
+          if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
+            asPowers = append(asPowers, v)
           } else {
             fmt.Println(err)
             os.Exit(1)
           }
-        } else {
-          if sNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
-            sNotes = append(sNotes, sNote)
+        } else if strings.Contains(v[labelCol], "rs"){
+          if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
+            sPowers = append(sPowers, v)
           } else {
             fmt.Println(err)
             os.Exit(1)
+          }
+        }
+
+        if lock {
+          filepath = append(filepath, v[sigFileCol])
+          filepath = append(filepath, v[freqFileCol])
+        } else {
+          filepath = append(filepath, v[filepathCol])
+        }
+
+        if temp {
+          if strings.Contains(v[labelCol], "as") {
+            if asNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
+              asNotes = append(asNotes, asNote)
+            } else {
+              fmt.Println(err)
+              os.Exit(1)
+            }
+          } else {
+            if sNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
+              sNotes = append(sNotes, sNote)
+            } else {
+              fmt.Println(err)
+              os.Exit(1)
+            }
+          }
+        }
+      } else if cabs {
+        if v, err := strconv.ParseFloat(v[pumpCol], 64); err == nil {
+          pumpPowers = append(pumpPowers, v)
+        } else {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+        if v, err := strconv.ParseFloat(v[stokesCol], 64); err == nil {
+          stokesPowers = append(stokesPowers, v)
+        } else {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+        if v, err := strconv.ParseFloat(v[probeCol], 64); err == nil {
+          probePowers = append(probePowers, v)
+        } else {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+
+        if lock {
+          filepath = append(filepath, v[sigFileCol])
+          filepath = append(filepath, v[freqFileCol])
+        } else {
+          filepath = append(filepath, v[filepathCol])
+        }
+
+        if temp {
+          if strings.Contains(v[labelCol], "as") {
+            if asNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
+              asNotes = append(asNotes, asNote)
+            } else {
+              fmt.Println(err)
+              os.Exit(1)
+            }
+          } else {
+            if sNote, err := strconv.ParseFloat(v[notesCol], 64); err == nil {
+              sNotes = append(sNotes, sNote)
+            } else {
+              fmt.Println(err)
+              os.Exit(1)
+            }
           }
         }
       }
@@ -409,7 +485,7 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
-func getAllData(
+func getCoolingData(
   lock bool,
   fileNames, labels []string,
 ) (
@@ -460,6 +536,34 @@ func getAllData(
   }
 
   return ras, bas, rs, bs
+}
+
+func getCABSData(
+  lock bool,
+  fileNames []string,
+) (
+  [][][]float64,
+) {
+
+  var cabsData [][][]float64
+  var cabsSigFileNames, cabsFreqFileNames []string
+
+  if lock {
+    for _, v := range fileNames {
+
+      if strings.Contains(v, "signal.csv") {
+        cabsSigFileNames = append(cabsSigFileNames, v)
+      } else if strings.Contains(v, "frequency.csv") {
+        cabsFreqFileNames = append(cabsFreqFileNames, v)
+      }
+    }
+
+    for i, v := range cabsSigFileNames {
+      cabsData = append(cabsData, getLockData(v, cabsFreqFileNames[i]))
+    }
+  }
+
+  return cabsData
 }
 
 func getData(
@@ -540,7 +644,7 @@ func getData(
         nV = append(nV, 1000*uV)
       }
 
-      /* Conver to picovolts
+      /* Convert to picovolts
       var pV []float64
       for _, uV := range signal {
         pV = append(pV, 1000*uV)
@@ -554,6 +658,77 @@ func getData(
   } else {
     return [][]float64{frequency, signal}
   }
+}
+
+func getLockData(
+  sigCSVName, freqCSVName string,
+) (
+  [][]float64,
+) {
+
+  // Read signal data
+  sigf, err := os.Open("Data/" + sigCSVName)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+  defer sigf.Close()
+  sigDataStr, err := readCSV(sigf)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  // Read frequency data
+  freqf, err := os.Open("Data/" + freqCSVName)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+  defer freqf.Close()
+  freqDataStr, err := readCSV(freqf)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  // Transpose
+  var freqStrT, sigStrT []string
+
+  for i := range sigDataStr {
+    sigStrT = append(sigStrT, sigDataStr[i][0])
+  }
+  for i := range freqDataStr {
+    freqStrT = append(freqStrT, freqDataStr[i][0])
+  }
+
+  // Convert to float
+  var frequency, signal []float64
+
+  for _, freqElem := range freqStrT {
+    if freqValue, err := strconv.ParseFloat(freqElem, 64); err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    } else {
+      frequency = append(frequency, freqValue/1e9)
+    }
+  }
+
+  for _, sigElem := range sigStrT {
+    if sigValue, err := strconv.ParseFloat(sigElem, 64); err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    } else {
+      signal = append(signal, sigValue)
+    }
+  }
+
+  // Convert to uV
+  for i, v := range signal {
+    signal[i] = v*1e6
+  }
+
+  return [][]float64{frequency, signal}
 }
 
 func readCSV(
@@ -581,7 +756,7 @@ func readCSV(
 }
 
 func header(
-  lock, temp, lcof bool,
+  cooling, cabs, lock, temp, lcof bool,
   date, run string,
   length float64,
 ) (
@@ -596,6 +771,13 @@ func header(
 
   fmt.Printf(log[0])
 
+  if cooling {
+    log = append(log, "\n*Cooling Data*\n")
+    fmt.Printf("\n*Cooling Data*\n")
+  } else if cabs {
+    log = append(log, "\n*CABS Data*\n")
+    fmt.Printf("\n*CABS Data*\n")
+  }
   if temp {
     log = append(log, "\n*Temperature-dependent data*\n")
     fmt.Printf("\n*Temperature-dependent data*\n")
@@ -679,6 +861,61 @@ func plotRaw(
     plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
     plot.AddPointGroup(bsLabel[0], "points", bs[0])
   }
+}
+
+func plotCABS(
+  sets []int,
+  cabsData [][][]float64,
+  label []string,
+) {
+
+  title := "CABS"
+  xlabel := "Frequency (GHz)"
+  ylabel := "Spectral Density (uV)"
+  legend := ""
+  xrange := []float64{9, 9.36}
+  yrange := []float64{0, 100}
+  xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
+  ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+  xtickLabels := []string{"9", "", "9.1", "", "9.2", "", "9.3", "", "9.4"}
+  ytickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+
+  p := prepPlot(
+    title, xlabel, ylabel, legend,
+    xrange, yrange, xtick, ytick,
+    xtickLabels, ytickLabels,
+  )
+
+  for _, set := range sets {
+
+    pts := buildData(cabsData[set])
+
+    plotSet, err := plotter.NewScatter(pts)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+    plotSet.GlyphStyle.Color = palette(set, false)
+    plotSet.GlyphStyle.Radius = vg.Points(3)
+    plotSet.Shape = draw.CircleGlyph{}
+
+    p.Add(plotSet)
+
+    // Legend
+    l, err := plotter.NewScatter(pts)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+    l.GlyphStyle.Color = palette(set, false)
+    l.GlyphStyle.Radius = vg.Points(6)
+    l.Shape = draw.CircleGlyph{}
+    p.Legend.Add(label[set], l)
+  }
+
+  savePlot(p, "CABS")
 }
 
 func axes(

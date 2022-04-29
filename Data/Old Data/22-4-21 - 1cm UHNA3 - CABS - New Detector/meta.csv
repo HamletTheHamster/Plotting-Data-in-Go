@@ -1,0 +1,4 @@
+date,label,pump mW,stokes mW,probe mW,bandpass,range,sample rate,notes,
+4-21-22,10 fw powers @ tap,.35,.35,9.00,10kHz,20.0m,921.1k,powers@tap - after pbs and circulator,
+,approx actual 10 fw,.198,.188,8.02,10kHz,20.0m,921.1k,powers@tap - after pbs and circulator,
+,little higher,.257,.256,8.00,10kHz,20.0m,921.1k,pr 5GHz from P - exiting sample: P=333 S=332 Pr=8.7 = 8.66 fW,
