@@ -23,13 +23,13 @@ import (
 
 func main() {
 
-  cooling, cabs, lock, temp, lcof, uhna3, length := flags()
+  cooling, cabs, lock, temp, lcof, sample, length := flags()
 
   date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
     cooling, cabs, lock, temp,
   )
 
-  log := header(cooling, cabs, lock, temp, lcof, date, run, length)
+  log := header(cooling, cabs, lock, temp, lcof, date, run, sample, length)
 
   if cooling {
 
@@ -78,8 +78,7 @@ func main() {
         cen = 2.275
         gb = 4.75 // W^{-1}m^{-1}
         Γ = 89.5//*2*math.Pi // MHz
-      } else if uhna3 {
-        sample = "UHNA3"
+      } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
         cen = 9.18
@@ -286,10 +285,8 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{1}
-    plotCABS(setsToPlotCABS, cabsData, label)
-
-
+    setsToPlotCABS := []int{1, 2}
+    plotCABS(setsToPlotCABS, cabsData, label, sample, length)
   }
 
   writeLog(log)
@@ -298,10 +295,11 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, float64,
+  bool, bool, bool, bool, bool, string, float64,
 ) {
 
-  var cooling, cabs, lock, temp, lcof, uhna3 bool
+  var cooling, cabs, lock, temp, lcof bool
+  var sample string
   var length float64
 
   flag.BoolVar(&cooling, "cool", false, "cooling data")
@@ -309,7 +307,7 @@ func flags() (
   flag.BoolVar(&lock, "l", false, "lock-in data")
   flag.BoolVar(&temp, "t", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
-  flag.BoolVar(&uhna3, "3", false, "UHNA3 fiber sample")
+  flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, ")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
 
@@ -318,16 +316,12 @@ func flags() (
     os.Exit(1)
   }
 
-  if lcof && uhna3 {
-    fmt.Println("flag.Parse(): sample flagged as both UHNA3 and liquid-core.")
-    os.Exit(1)
-  }
-  if (lcof || uhna3) && length == 0 {
+  if (lcof) && length == 0 {
     fmt.Println("Specify length of sample in meters with -len=")
     os.Exit(1)
   }
 
-  return cooling, cabs, lock, temp, lcof, uhna3, length
+  return cooling, cabs, lock, temp, lcof, sample, length
 }
 
 func readMeta(
@@ -757,16 +751,19 @@ func readCSV(
 
 func header(
   cooling, cabs, lock, temp, lcof bool,
-  date, run string,
+  date, run, sample string,
   length float64,
 ) (
   []string,
 ) {
 
   log := []string{}
-  log = append(log, date)
+  log = append(log, "Data taken: " + date + "\n")
   if run != "" {
-    log = append(log, date + " Run " + run + "\n")
+    log = append(log, "Run: " + run + "\n")
+  }
+  if sample != "" {
+    log = append(log, "Sample: " + sample + "\n")
   }
 
   fmt.Printf(log[0])
@@ -867,18 +864,29 @@ func plotCABS(
   sets []int,
   cabsData [][][]float64,
   label []string,
+  sample string,
+  length float64,
 ) {
 
-  title := "CABS"
+  var len string
+
+  switch length {
+  case 0.001:
+    len = "1 mm"
+  case 0.01:
+    len = "1 cm"
+  }
+
+  title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (uV)"
   legend := ""
   xrange := []float64{9, 9.36}
-  yrange := []float64{0, 100}
+  yrange := []float64{0, 250}
   xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-  ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+  ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250}
   xtickLabels := []string{"9", "", "9.1", "", "9.2", "", "9.3", "", "9.4"}
-  ytickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+  ytickLabels := []string{"0", "", "50", "", "100", "", "150", "", "200", "", "250"}
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
