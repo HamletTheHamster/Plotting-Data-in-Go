@@ -760,7 +760,7 @@ func header(
   log := []string{}
   log = append(log, "Data taken: " + date + "\n")
   if run != "" {
-    log = append(log, "Run: " + run + "\n")
+    log = append(log, "Run: " + run  + "\n")
   }
   if sample != "" {
     log = append(log, "Sample: " + sample + "\n")
