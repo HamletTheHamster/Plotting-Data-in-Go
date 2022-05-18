@@ -302,11 +302,11 @@ func flags() (
   var sample string
   var length float64
 
-  flag.BoolVar(&cooling, "cool", false, "cooling data")
+  flag.BoolVar(&cooling, "cooling", false, "cooling data")
   flag.BoolVar(&cabs, "cabs", false, "CABS data")
-  flag.BoolVar(&lock, "l", false, "lock-in data")
-  flag.BoolVar(&temp, "t", false, "contains temperature data in notes column")
-  flag.BoolVar(&lcof, "o", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&lock, "lockin", false, "lock-in data")
+  flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
+  flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
   flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, ")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
