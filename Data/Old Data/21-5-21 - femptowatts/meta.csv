@@ -1,0 +1,4 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+21-5-21,20 fW,1,.5,.5,8.91,500u-10m-frequency.csv,500u-10m-signal.csv, success! 20 fW 500 uW 10m Range 200 Hz Bandwidth
+21-5-21,10 fW,1,.4,.4,8.93,400u-10m-frequency.csv,400u-10m-signal.csv, Success! 10 fW 400 uW 10m Range 200 Hz Bandwidth
+21-5-21,9.8 fW,1,.35,.35,8.93,350u-10m-frequency.csv,350u-10m-signal.csv, Success!!! 9.8 fW 350 uW 10m Range 200 Hz Bandwidth
