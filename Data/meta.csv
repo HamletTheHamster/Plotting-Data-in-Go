@@ -1,4 +1,6 @@
-Date,Name,Pump@Sample,Pump-Stokes@Sample,Probe@Sample,Polarization Re-adjust,LO Re-adjust,Frequency Filepath,Signal Filepath,Notes
-21-5-21,500 uW 10m Range 200 Hz Bandwidth,.5,.5,8.91,t,t,Data/500u-10m-frequency.csv,Data/500u-10m-signal.csv, success! 2 fW
-21-5-21,400 uW 10m Range 200 Hz Bandwidth,.4,.4,8.93,t,t,Data/400u-10m-frequency.csv,Data/400u-10m-signal.csv, Success! 1 fW
-21-5-21,350 uW 10m Range 200 Hz Bandwidth,.35,.35,,,,Data/350u-10m-frequency.csv,Data/350u-10m-signal.csv, Success!!! 980 aW
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+22-4-22,10.94 fW,1,.307,.30765,8.688,1/frequency.csv,1/signal.csv,Success
+22-4-22,3.44 fW,2,.1962,.2241,8.692,2/frequency.csv,2/signal.csv,Success
+22-4-22,increase range,3,.154,.154,8,3/frequency.csv,3/signal.csv,powers approx and at tap - success better
+22-4-22,1.36 fW,4,.13055,.13431,8.70,4/frequency.csv,4/signal.csv,success!
+22-4-22,1.52 fW,5,.12991,.14933,8.70,5/frequency.csv,5/signal.csv,success!
