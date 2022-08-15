@@ -1,6 +1,5 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-22-4-22,10.94 fW,1,.307,.30765,8.688,1/frequency.csv,1/signal.csv,Success
-22-4-22,3.44 fW,2,.1962,.2241,8.692,2/frequency.csv,2/signal.csv,Success
-22-4-22,increase range,3,.154,.154,8,3/frequency.csv,3/signal.csv,powers approx and at tap - success better
-22-4-22,1.36 fW,4,.13055,.13431,8.70,4/frequency.csv,4/signal.csv,success!
-22-4-22,1.52 fW,5,.12991,.14933,8.70,5/frequency.csv,5/signal.csv,success!
+22-8-15,3 GHz CS2,1,99.9,39.41,35.61,1/frequency.csv,1/signal.csv,success - low res - expected shape [all notes in OneNote page 8-15-22]
+,3 GHz CS2,2,104.2,40.38,35.57,2/frequency.csv,2/signal.csv,Success - high res - inverted
+,3 GHz CS2,3,.154,.154,8,3/frequency.csv,3/signal.csv, success - low res again - inverted
+,6 GHz CS2,5,105.4,38.94,36.73,5/frequency.csv,5/signal.csv,success - high res

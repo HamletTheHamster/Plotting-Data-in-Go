@@ -285,7 +285,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{1,2}
     plotCABS(setsToPlotCABS, cabsData, label, sample, length)
   }
 
@@ -717,15 +717,15 @@ func getLockData(
     }
   }
 
-  /* Convert to uV
+  // Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }*/
+  }
 
-  // OR Convert to pV
+  /* OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }
+  }*/
 
   return [][]float64{frequency, signal}
 }
@@ -880,18 +880,20 @@ func plotCABS(
     len = "1 mm"
   case 0.01:
     len = "1 cm"
+  case 0.004:
+    len = "4 mm"
   }
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (pV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
-  xrange := []float64{9, 9.3}
-  yrange := []float64{0, 200}
-  xtick := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
-  ytick := []float64{0, 50, 100, 150, 200}
-  xtickLabels := []string{"9", "", "9.1", "", "9.2", "", "9.3"}
-  ytickLabels := []string{"0", "", "100", "", "200"}
+  xrange := []float64{2.3, 2.8}
+  yrange := []float64{0, 30}
+  xtick := []float64{2.3, 2.4, 2.5, 2.6, 2.7, 2.8}
+  ytick := []float64{0, 5, 10, 15, 20, 25, 30}
+  xtickLabels := []string{"2.3", "", "2.5", "", "2.7", ""}
+  ytickLabels := []string{"0", "", "10", "", "20", "", "30"}
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
@@ -909,7 +911,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    plotSet.GlyphStyle.Color = palette(set-1, false)
+    plotSet.GlyphStyle.Color = palette(set, false)
     plotSet.GlyphStyle.Radius = vg.Points(5) //3
     plotSet.Shape = draw.CircleGlyph{}
 
@@ -922,7 +924,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set-1, false)
+    l.GlyphStyle.Color = palette(set, false)
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
