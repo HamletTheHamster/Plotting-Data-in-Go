@@ -888,12 +888,12 @@ func plotCABS(
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (uV)"
   legend := ""
-  xrange := []float64{2.3, 2.8}
-  yrange := []float64{0, 60}
-  xtick := []float64{2.3, 2.4, 2.5, 2.6, 2.7, 2.8}
-  ytick := []float64{0, 10, 20, 30, 40, 50, 60}
-  xtickLabels := []string{"2.3", "", "2.5", "", "2.7", ""}
-  ytickLabels := []string{"0", "", "20", "", "40", "", "60"}
+
+  xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
@@ -940,6 +940,27 @@ func axes(
 ) {
 
   switch plot {
+  case "CABS":
+    switch sample {
+    case "UHNA3":
+      xrange := []float64{1, 1.36}
+      yrange := []float64{0, 17.5}
+      xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+      xtickLabel := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "CS2":
+      xrange := []float64{2.3, 2.8}
+      yrange := []float64{0, 60}
+      xtick := []float64{2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
+      ytick := []float64{0, 10, 20, 30, 40, 50, 60}
+      xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
+      ytickLabel := []string{"0", "", "20", "", "40", "", "60",}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
   case "fits":
     switch sample {
     case "Liquid-Core":
