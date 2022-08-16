@@ -1,0 +1,296 @@
+# -*- coding: utf-8 -*-
+"""
+6/14
+Cycles through range of frequencies for modulator and records data for each. Time will have to be longer to allow
+for evening out of each frequency set. 
+"""
+import csv
+import visa
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+import zhinst.ziPython, zhinst.utils
+import os
+#import datetime
+#import statistics
+import winsound
+daq = zhinst.ziPython.ziDAQServer('localhost', 8005)
+# Detect device
+device = zhinst.utils.autoDetect(daq)
+
+   #amplitude=1 
+
+dwell = 1
+F_lockin = 35.0000E6
+F_AOM = 40.00050e6
+chan = 1
+ch   = str(chan-1)
+   #amplitude=1 
+rate=1.842e9 #rate, per millisecond
+#RBW = 3*10**6/3.0
+RBW = 500
+tc=1/(2*np.pi*RBW) #time constant  This averages the noise over time. increasing tc increases integration time of demods
+
+exp_set = [
+           #no one knows what any of the first four do. Don't look. Just accept.
+       [['/', device, '/sigins/',ch,'/diff'], 0],   #diff, imp50,ac, range seem to be basic settings with 0,1,0 for the first three
+       [['/', device, '/sigins/',ch,'/imp50'], 1],   #configures channel input. imp 50 implies the 50 ohm setting, this is the on off command
+       [['/', device, '/sigins/',ch,'/ac'], 1],  
+       [['/', device, '/sigins/',ch,'/range'], .04], #want as low as possible without clipping data (red Over light on Lock-in box)
+       #congfigures demods
+       [['/', device, '/demods/',ch,'/order'], 1],  #order is set to 8. Order of what?
+       [['/', device, '/demods/',ch,'/timeconstant'], tc], #time constant is set to tc=.01
+       [['/', device, '/demods/',ch,'/rate'], rate],  #readout rate
+       [['/', device, '/demods/',ch,'/adcselect'], chan-1], #adc-analog to digital converter set to channel-1 --see c above
+       [['/', device, '/demods/',ch,'/oscselect'], chan-1], #oscillator is set to channel-1--see c above
+       [['/', device, '/demods/',ch,'/harmonic'], 1], #harmonic is set to 1. 1st harmonic?
+       [['/', device, '/oscs/',ch,'/freq'], F_lockin],  #oscillator freq is set to frequency
+       
+   ]
+   #run the settings above
+daq.set(exp_set);
+time.sleep(.001)
+
+path = '/%s/demods/%d/sample' % (device, 0) #(device, demod_index)   alternative/unfunctional>>'/' + device + '/demods/', c, 'sample
+daq.subscribe(path)
+daq.flush()
+daq.sync()
+
+def measureSynchronousFeedback(daq, device, channel, frequency): #setings. frequency=oscillatory freq
+   c=str(channel-1) #return a string of an object. =channel-1=-1 for channel 0
+   
+# Poll the subscribed data from the data server. Poll will block and record
+    # for poll_length seconds.
+   daq.sync()
+   daq.flush()
+   poll_length = dwell  # [s]
+   poll_timeout = 10  # [ms]
+   poll_flags = 0
+   poll_return_flat_dict = True
+   data = daq.poll(poll_length, poll_timeout, poll_flags, poll_return_flat_dict)
+#    # Unsubscribe from all paths.
+#    # Check the dictionary returned is non-empty
+   assert data, "poll() returned an empty data dictionary, did you subscribe to any paths?"
+
+    # The data returned is a dictionary of dictionaries that reflects the node's path.
+    # Note, the data could be empty if no data had arrived, e.g., if the demods
+    # were disabled or had demodulator rate 0.
+   #assert path in data, "The data dictionary returned by poll has no key `%s`." % path
+   
+   # Access the demodulator sample using the node's path.
+   sample = data[path] #Defines the sample as the data from defined path
+     # Calculate the demodulator's magnitude and phase and add them to the dict.
+   global sampleR
+   sampleR = np.abs(sample['x'] + 1j*sample['y']) #y axis #magnitude
+   #sample['phi'] = np.angle(sample['x'] + 1j*sample['y']) #phase
+   #print("Average measured RMS amplitude is {:.3e} V.".format(np.mean(sampleR)))
+   #startT=time.time()
+
+  # if device in data: #no if, only zuul
+   clockbase = float(daq.getInt('/%s/clockbase' % device))
+       # Convert timestamps from ticks to seconds via clockbase.
+   t = (sample['timestamp'] - sample['timestamp'][0])/clockbase
+#%%
+
+        # Create plot
+#   plt.figure()
+#   plt.grid(True) #grid on
+#   plt.plot(t, sampleR) #t-x axis, R from above- y axis
+#   plt.title('Demodulator data') #title
+#   plt.xlabel('Time (s)') #x labe
+#   plt.ylabel('R (V)') #y label
+#   mean_r = np.mean(sampleR) #center line, plt axis is for above and below/left and right
+#   plt.axis([t[0], t[-1], -1.5*mean_r, 5.01*mean_r]) #to keep the graph from looking dumb change from .99, 1.01 to .59,2.01
+#   plt.draw()
+#   plt.show()
+#display resource list
+resources = visa.ResourceManager()
+#display resource list
+resources.list_resources()
+#print(resources.list_resources())
+
+#open the signal generator
+#gen=resources.open_resource('USB0::0x03EB::0xAFFF::6C2-0A2A2000A-0374::INSTR')
+gen=resources.open_resource('USB0::0x03EB::0xAFFF::6C2-0A2B2000A-0430::INSTR')
+##return the ID string for checks
+##print(gen.query('*IDN?'))
+gen.write('FREQUENCY:MODE CW DUAL')
+time.sleep(0.01)
+gen.write('OUTPUT1 1')
+time.sleep(0.01)
+gen.write('OUTPUT2 1')
+#date=datetime.date.today()
+# TestFolder=str(date)+"Testfolder" #folder title
+#os.makedirs(TestFolder) #makes folder, don't have to run if there is already a folder
+#f=open('testFile.csv', 'w+') #a for append. alt save
+#f.write('Frequency1' + " " + 'Frequency2'+ " " + 'Power(W)'+' ' +'\n') #alt save
+#run a cycle of frequencies for each output
+Fstart = 2.3*1E9
+Fstop  = 2.8*1E9
+F_step = 0.0050456*1E9
+#Fstart = 0.26E9
+#Fstop =  0.29E9
+#F_step = 1E6
+
+N_steps = np.int((Fstop-Fstart)/F_step)
+
+NoRealizations = 5
+dataR = [0]*N_steps # demod data
+dataF = [0]*N_steps # Freq. axis
+#background = [0]*N_steps
+#f1 = Fstart + F_AOM - F_lockin
+f2 = Fstart
+F = Fstart
+
+#%%
+folderName = "22-8-16 - CS2 short length cuvet - CABS/5"
+fileCreate = 0
+signalData = 0
+controlData = 0
+takeBkrdData = 1 # set to 1 to take background data, set to 0 to display signal - background
+
+aveDataR = [0]*N_steps
+
+
+if fileCreate == 1:
+    os.makedirs(folderName)
+
+for kk in range(0,NoRealizations):
+    #sampleR = [0]*N_steps # demod data
+    F = Fstart
+    print(kk)
+    for jj in range(0,N_steps): #need to append not overwrite file for each frequency set 
+        f1 = F
+        f2 = F + F_AOM - F_lockin
+        time.sleep(0.1)
+        gen.write("SOURce1: FREQuency:CW "+ str(f1)) #must use stupid notation. units in Hz
+        time.sleep(1e-3)
+        gen.write("SOURce2:FREQuency:CW "+ str(f2))
+        time.sleep(1e-3)
+        #waits 5 sec then runs polling for 3 sec
+        #print gen.query('SOURce2:FREQuency:CW?')+ gen.query('SOURce1:FREQuency:CW?')+'\n'
+        #time.sleep(0.01)
+        measureSynchronousFeedback(daq, device, 1, F_lockin) #daq, device, channel, frequency. this line defines them      
+        #time.sleep(dwell*1.1)
+        time.sleep(1e-3)
+        F=F+F_step
+       
+        dataF[jj] = Fstart+jj*F_step
+        ff1 = f1*10**-6
+        ff2 = f2*10**-6
+        #ff  = F*10**-6
+        #print('Frequencies (MHz): ', F*1E-6) # phonon frequency, mod 1 freq. mod. 2 freq
+        avg=np.mean(sampleR)
+        
+        dataR[jj]=np.mean(sampleR)
+   
+    aveDataR = (np.array(dataR)+kk*np.array(aveDataR))/(kk+1)     
+  
+    if takeBkrdData == 1:
+        background = aveDataR
+        
+    
+#Cleanup
+           # Open connection to ziServer
+           #avg+std deviation of power, that's the data we want
+    if takeBkrdData == 1:
+        plt.figure()
+        plt.grid(True) #grid on
+        plt.plot(dataF, background) #t-x axis, R from above- y axis
+        #plt.plot(dataF, bkrd) #t-x axis, R from above- y axis
+    #    if seeProbe == 1:
+    #        plt.plot(dataF, probe) #t-x axis, R from above- y axis
+        plt.title('Background Demodulator data') #title
+        #plt.ylim(0.000003 ,0.000005)
+        plt.xlabel('F') #x labe
+        plt.ylabel('R') #y label
+        #plt.yscale('log')
+        plt.show()
+    
+    if takeBkrdData == 0:
+        plt.figure()
+        plt.grid(True) #grid on
+#        plt.plot(dataF, aveDataR)
+        plt.plot(dataF, aveDataR-background) #t-x axis, R from above- y axis
+    #plt.plot(dataF, bkrd) #t-x axis, R from above- y axis
+        plt.title('Signal - Background Demodulator data') #title
+    #plt.ylim(0.000003 ,0.000005)
+        plt.xlabel('F') #x labe
+        plt.ylabel('R') #y label
+    #plt.yscale('log')
+#        plt.plot(dataF, probe, '--')
+        plt.show()
+    
+if signalData == 1:     
+    csvfile=folderName+"/signal.csv"  #csvfile=folderName +"/file name.csv". creates path and file name. add +str() to add values. Creates a separate file for each loop.
+    with open(csvfile, "w") as output:
+        writer=csv.writer(output, lineterminator='\n')
+        for val in aveDataR-background:
+            writer.writerow([val])
+
+    csvfile=folderName+"/frequency.csv" #csvfile=folderName +"/file name.csv". creates path and file name. add +str() to add values. Creates a separate file for each loop.
+    with open(csvfile, "w") as output:
+        writer=csv.writer(output, lineterminator='\n')
+        for val in dataF:
+            writer.writerow([val]) 
+
+if controlData == 1:
+    csvfile=folderName+"/control_2.csv"  #csvfile=folderName +"/file name.csv". creates path and file name. add +str() to add values. Creates a separate file for each loop.
+    with open(csvfile, "w") as output:
+        writer=csv.writer(output, lineterminator='\n')
+        for val in aveDataR:
+            writer.writerow([val])
+
+ 
+#winsound.Beep(1000,250)      # Beep(freq,duration)
+                
+#f.close()
+"""time.sleep(.3)
+gen.write('OUTPUT1 0')
+time.sleep(0.1)
+gen.write('OUTPUT2 0')
+time.sleep(.1)"""
+
+##%%
+#no_sample = aveDataR-probe
+#
+#data = np.loadtxt("nanohelix_attempt2_01-10-20/nanoHelices_3.csv",usecols=[0])
+##%%
+#
+#plt.plot(dataF,probe, label= "BG")
+#plt.plot(dataF, aveDataR, label= "Raw Data")
+##plt.yscale('log')
+#plt.legend()
+#%%
+#import scipy.signal as signal
+##%%
+#rawdata = np.loadtxt('graph.csv',delimiter=',',usecols=[2])
+#freq = np.loadtxt('graph.csv',delimiter=',',usecols=[0])
+#data = np.loadtxt('graph.csv',delimiter=',',usecols=[3])
+##rawdata = np.loadtxt('graph.csv',delimiter=',',usecols=[1])
+##%%
+#rawdata = aveDataR
+#data = probe
+##%%
+#rawdata = aveDataR - probe
+##%%
+## First, design the Buterworth filter
+#N  = 2    # Filter order
+#Wn = 0.1 # Cutoff frequency
+#B, A = signal.butter(N, Wn, output='ba')
+#smooth_rawdata = signal.filtfilt(B,A, rawdata)
+#plt.plot(rawdata,'-')
+#plt.plot(smooth_rawdata,'k-')
+##plt.show()
+#
+##%%
+## First, design the Buterworth filter
+#N  = 2    # Filter order
+#Wn = 0.1 # Cutoff frequency
+#B, A = signal.butter(N, Wn, output='ba')
+#smooth_data = signal.filtfilt(B,A, data)
+##plt.plot(data,'-')
+#plt.plot(dataF, smooth_data,'-',label='BG')
+#plt.plot(dataF, smooth_rawdata,'-',label='Data')
+#plt.legend()
+#plt.show()
