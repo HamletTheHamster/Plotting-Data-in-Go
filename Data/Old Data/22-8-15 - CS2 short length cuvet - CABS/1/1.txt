@@ -36,7 +36,7 @@ exp_set = [
        [['/', device, '/sigins/',ch,'/diff'], 0],   #diff, imp50,ac, range seem to be basic settings with 0,1,0 for the first three
        [['/', device, '/sigins/',ch,'/imp50'], 1],   #configures channel input. imp 50 implies the 50 ohm setting, this is the on off command
        [['/', device, '/sigins/',ch,'/ac'], 1],  
-       [['/', device, '/sigins/',ch,'/range'], .04], #want as low as possible without clipping data (red Over light on Lock-in box)
+       [['/', device, '/sigins/',ch,'/range'], .03], #want as low as possible without clipping data (red Over light on Lock-in box)
        #congfigures demods
        [['/', device, '/demods/',ch,'/order'], 1],  #order is set to 8. Order of what?
        [['/', device, '/demods/',ch,'/timeconstant'], tc], #time constant is set to tc=.01
@@ -126,7 +126,7 @@ gen.write('OUTPUT2 1')
 #f.write('Frequency1' + " " + 'Frequency2'+ " " + 'Power(W)'+' ' +'\n') #alt save
 #run a cycle of frequencies for each output
 Fstart = 2.3*1E9
-Fstop  = 2.8*1E9
+Fstop  = 2.75*1E9
 F_step = 0.0050456*1E9
 #Fstart = 0.26E9
 #Fstop =  0.29E9
@@ -143,11 +143,11 @@ f2 = Fstart
 F = Fstart
 
 #%%
-folderName = "22-8-16 - CS2 short length cuvet - CABS/1"
-fileCreate = 1
-signalData = 1
+folderName = "22-8-15 - CS2 short length cuvet - CABS/1"
+fileCreate = 0
+signalData = 0
 controlData = 0
-takeBkrdData = 0 # ste to 1 to take background data, set to 0 to display signal - background
+takeBkrdData = 1 # ste to 1 to take background data, set to 0 to display signal - background
 
 aveDataR = [0]*N_steps
 

@@ -285,7 +285,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{3}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, length)
   }
 
@@ -717,15 +717,15 @@ func getLockData(
     }
   }
 
-  /* Convert to uV
+  // Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }*/
+  }
 
-  // OR Convert to pV
+  /* OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }
+  }*/
 
   return [][]float64{frequency, signal}
 }
@@ -889,11 +889,11 @@ func plotCABS(
   ylabel := "Spectral Density (uV)"
   legend := ""
   xrange := []float64{2.3, 2.8}
-  yrange := []float64{0, 800}
+  yrange := []float64{0, 30}
   xtick := []float64{2.3, 2.4, 2.5, 2.6, 2.7, 2.8}
-  ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700, 800}
+  ytick := []float64{0, 5, 10, 15, 20, 25, 30}
   xtickLabels := []string{"2.3", "", "2.5", "", "2.7", ""}
-  ytickLabels := []string{"0", "", "200", "", "400", "", "600", "", "800"}
+  ytickLabels := []string{"0", "", "10", "", "20", "", "30"}
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
