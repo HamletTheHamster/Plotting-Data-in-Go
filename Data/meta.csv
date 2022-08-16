@@ -1,2 +1,6 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-22-8-16,3 GHz CS2,1,99.9,39.41,35.61,1/frequency.csv,1/signal.csv,success - low res - expected shape
+22-8-16,3 GHz CS2,1,98.7,38.51,36.00,1/frequency.csv,1/signal.csv,probe 1549.024 filter 1549.05 - success: ~1.5x larger than yesterday (and cleaner)
+,4 GHz CS2,2,100.5,38.04,35.56,2/frequency.csv,2/signal.csv,DITHER probe 1549.032 filter 1549.06 - success: ~10x smaller than 3 GHz - flatter on either side of peak
+,4 GHz CS2,3,101.7,36.48,37.15,3/frequency.csv,3/signal.csv,probe 1549.032 filter 1549.06 - success: 5x smaller than previous run with dither (!)
+,4 GHz CS2,4,,,,4/frequency.csv,4/signal.csv,probe 1549.032 filter 1549.06 - LO polarization no obvious affect - turn off sig gen & lockin & rf amp to cool
+,5 GHz CS2,5,,,,5/frequency.csv,5/signal.csv,probe 1549.04 filter 1549.065 -
