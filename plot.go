@@ -889,11 +889,11 @@ func plotCABS(
   ylabel := "Spectral Density (uV)"
   legend := ""
   xrange := []float64{2.3, 2.8}
-  yrange := []float64{0, 30}
+  yrange := []float64{0, 60}
   xtick := []float64{2.3, 2.4, 2.5, 2.6, 2.7, 2.8}
-  ytick := []float64{0, 5, 10, 15, 20, 25, 30}
+  ytick := []float64{0, 10, 20, 30, 40, 50, 60}
   xtickLabels := []string{"2.3", "", "2.5", "", "2.7", ""}
-  ytickLabels := []string{"0", "", "10", "", "20", "", "30"}
+  ytickLabels := []string{"0", "", "20", "", "40", "", "60"}
 
   p := prepPlot(
     title, xlabel, ylabel, legend,
