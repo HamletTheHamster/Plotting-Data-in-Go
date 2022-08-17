@@ -1,8 +1,7 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-22-8-16,3 GHz CS2,1,98.7,38.51,36.00,1/frequency.csv,1/signal.csv,probe 1549.024 filter 1549.05 - success: ~1.5x larger than yesterday (and cleaner)
-,4 GHz CS2,2,100.5,38.04,35.56,2/frequency.csv,2/signal.csv,DITHER probe 1549.032 filter 1549.06 - success: ~10x smaller than 3 GHz - flatter on either side of peak
-,4 GHz CS2,3,101.7,36.48,37.15,3/frequency.csv,3/signal.csv,probe 1549.032 filter 1549.06 - success: 5x smaller than previous run with dither (!)
-,4 GHz CS2,4,99.5,38.57,35.71,4/frequency.csv,4/signal.csv,probe 1549.032 filter 1549.06 - cool sig gen 30m - success: same height as dither run 2 maybe cleaner
-,5 GHz CS2,5,101.4,37.96,36.67,5/frequency.csv,5/signal.csv,probe 1549.04 filter 1549.065 - cool sig gen 30m - success: just shy of 4GHz height (50 uV)
-,6 GHz CS2,6,99.6,38.67,36.14,6/frequency.csv,6/signal.csv,*Range 200 mV* probe 1549.048 filter 1549.072 - cool sig gen w air gun - success: 4 uV but major instrument noise defect
-,6 GHz CS2,7,99.4,36.92,36.43,7/frequency.csv,7/signal.csv,probe 1549.048 filter 1549.072 range 40 mV - cool sig gen 30m - success: 4 uV
+
+22-8-17,6 GHz CS2,1,100.3,35.64,37.24,1/frequency.csv,1/signal.csv,probe 1549.048 filter 1549.068 - success: 62 uV
+
+22-8-17,9 GHz CS2,2,101.7,35.17,34.12,2/frequency.csv,2/signal.csv,probe 1549.072 filter 1549.092 - success: 38 uV
+22-8-17,12 GHz CS2,3,101.3,36.41,36.6,3/frequency.csv,3/signal.csv,probe 1549.096 filter 1549.116 - success: 7 uV
+22-8-17,3 GHz CS2,4,98.50,37.19,36.45,4/frequency.csv,4/signal.csv,probe 1549.024 filter 1549.05 - success: 0.8 uV
