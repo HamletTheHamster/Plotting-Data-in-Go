@@ -1,7 +1,5 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-
 22-8-17,6 GHz CS2,1,100.3,35.64,37.24,1/frequency.csv,1/signal.csv,probe 1549.048 filter 1549.068 - success: 62 uV
-
 22-8-17,9 GHz CS2,2,101.7,35.17,34.12,2/frequency.csv,2/signal.csv,probe 1549.072 filter 1549.092 - success: 38 uV
 22-8-17,12 GHz CS2,3,101.3,36.41,36.6,3/frequency.csv,3/signal.csv,probe 1549.096 filter 1549.116 - success: 7 uV
 22-8-17,3 GHz CS2,4,98.50,37.19,36.45,4/frequency.csv,4/signal.csv,probe 1549.024 filter 1549.05 - success: 0.8 uV

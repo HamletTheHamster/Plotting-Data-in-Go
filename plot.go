@@ -285,7 +285,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{5}
+    setsToPlotCABS := []int{0,1,2,3}
     plotCABS(setsToPlotCABS, cabsData, label, sample, length)
   }
 
@@ -953,9 +953,9 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
       xrange := []float64{2.3, 2.8}
-      yrange := []float64{0, 6}
+      yrange := []float64{0, 60}
       xtick := []float64{2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{0, 1, 2, 3, 4, 5, 6}
+      ytick := []float64{0, 10, 20, 30, 40, 50, 60}
       xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
       ytickLabel := []string{"0", "", "20", "", "40", "", "60",}
 
