@@ -285,7 +285,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{0,1,2}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, length)
   }
 
@@ -307,7 +307,7 @@ func flags() (
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
-  flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, ")
+  flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, glass slide")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
 
@@ -958,6 +958,15 @@ func axes(
       ytick := []float64{0, 10, 20, 30, 40, 50, 60}
       xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
       ytickLabel := []string{"0", "", "20", "", "40", "", "60",}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "glass slide":
+      xrange := []float64{10.5, 11.5}
+      yrange := []float64{0, 15}
+      xtick := []float64{10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5}
+      ytick := []float64{0, 3, 6, 9, 12, 15}
+      xtickLabel := []string{"10.5", "", "10.7", "", "10.9", "", "11.1", "", "11.3", "", "11.5"}
+      ytickLabel := []string{"0", "3", "6", "9", "12", "15"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }
