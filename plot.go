@@ -101,7 +101,7 @@ func main() {
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,3,6,9,12}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -175,7 +175,7 @@ func main() {
         goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,3,6,9,12}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
