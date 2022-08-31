@@ -60,12 +60,12 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{0}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
     }
 
-    fitSets := true
+    fitSets := false
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
