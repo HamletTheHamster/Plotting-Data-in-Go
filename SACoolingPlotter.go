@@ -226,13 +226,13 @@ func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][
 
   // Assign data by checking csv name
   for _, fileName := range fileNames {
-    if strings.Contains(fileName, "pras.") {
+    if strings.Contains(fileName, "ras.") {
       pras = append(pras, getData(&fileName))
-    } else if strings.Contains(fileName, "pas.") {
+    } else if strings.Contains(fileName, "bas.") {
       pas = append(pas, getData(&fileName))
-    } else if strings.Contains(fileName, "prs.") {
+    } else if strings.Contains(fileName, "rs.") {
       prs = append(prs, getData(&fileName))
-    } else if strings.Contains(fileName, "ps.") {
+    } else if strings.Contains(fileName, "bs.") {
       ps = append(ps, getData(&fileName))
     }
   }
@@ -243,7 +243,7 @@ func getAllData(fileNames, labels []string) ([][][]float64, [][][]float64, [][][
 func getData(csvName *string) ([][]float64) {
 
   // Read
-  f, err := os.Open(*csvName)
+  f, err := os.Open("Data/" + *csvName)
   if err != nil {
     panic(err)
   }
@@ -558,7 +558,7 @@ func goPlotSubGrpd(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     l.GlyphStyle.Color = setFitColors[set]
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
-    p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
+    p.Legend.Add(strings.Trim(asLabel[set], " ras"), l)
   }
 
   date := time.Now()
