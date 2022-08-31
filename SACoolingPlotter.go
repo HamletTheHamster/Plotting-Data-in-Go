@@ -38,7 +38,7 @@ func main() {
 
   s, as := subtractBackground(pras, pas, prs, ps)
 
-  subtracted := []int{}
+  subtracted := []int{0,1,2}
   if len(subtracted) > 0 {
     plotSubtracted(subtracted, s, as, prsLabel, prasLabel)
   }
@@ -48,7 +48,7 @@ func main() {
     plotSubtractedTogether(subtractedTogether, s, as, prsLabel, prasLabel)
   }
 
-  subtractedGrouped := []int{0,1,2}
+  subtractedGrouped := []int{}
   if len(subtractedGrouped) > 0 {
     goPlotSubGrpd(subtractedGrouped, s, as, prsLabel, prasLabel)
   }
@@ -425,8 +425,8 @@ func plotSubtracted(sets []int, s, as [][][]float64, sLabel, asLabel []string) {
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (nV)")
 
-    plot.AddPointGroup(strings.Trim(sLabel[set], " prs") + " s", "points", s[set])
-    plot.AddPointGroup(strings.Trim(asLabel[set], " pras") + " as", "points", as[set])
+    plot.AddPointGroup(strings.Trim(sLabel[set], " rs") + " s", "points", s[set])
+    plot.AddPointGroup(strings.Trim(asLabel[set], " ras") + " as", "points", as[set])
   }
 }
 

@@ -1,13 +1,13 @@
-Date,Name,probe@sample mW,Filepath,Notes
-21-9-14,0mW ps,20,Data/0/ps.csv,1MHz RBW - 25 avg - 10s sweep - dither
-,0mW pas,0,Data/0/pas.csv,
-,0mW pras,20,Data/0/pras.csv, (57.22mW@probeVOA)
-,0mW prs,20,Data/0/prs.csv,
-,80mW ps,20,Data/80/ps.csv,
-,80mW pas,0,Data/80/pas.csv,
-,80mW pras,20,Data/80/pras.csv,
-,80mW prs,20,Data/80/prs.csv,
-,170mW prs,20,Data/170/prs.csv,
-,170mW pras,20,Data/170/pras.csv,
-,170mW pas,0,Data/170/pas.csv,
-,170mW ps,0,Data/170/ps.csv,
+Date,Label,Probe,Filepath,Notes
+21-9-14,0 bs,20,0/bs.csv,1MHz RBW - 25 avg - 10s sweep - dither
+,0 bas,0,0/bas.csv,
+,0 ras,20,0/ras.csv, (57.22mW@probeVOA)
+,0 rs,20,0/rs.csv,
+,80 bs,20,80/bs.csv,
+,80 bas,0,80/bas.csv,
+,80 ras,20,80/ras.csv,
+,80 rs,20,80/rs.csv,
+,170 rs,20,170/rs.csv,
+,170 ras,20,170/ras.csv,
+,170 bas,0,170/bas.csv,
+,170 bs,0,170/bs.csv,

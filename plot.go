@@ -60,12 +60,12 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
     }
 
-    fitSets := false
+    fitSets := true
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -1105,16 +1105,11 @@ func subtractBackground(
   var s, as [][][]float64
 
   for i := range rs {
-    if i == 15 {
-      sOutlier := true
-      s = append(s, subtract(bs[0], rs[i], sOutlier))
-    } else {
-      s = append(s, subtract(bs[0], rs[i], false))
-    }
+    s = append(s, subtract(bs[0], rs[i]))
   }
 
   for i := range ras {
-    as = append(as, subtract(bas[0], ras[i], false))
+    as = append(as, subtract(bas[0], ras[i]))
   }
 
   return s, as
@@ -1122,19 +1117,12 @@ func subtractBackground(
 
 func subtract(
   b, s [][]float64,
-  sOutlier bool,
 ) (
   [][]float64,
 ) {
 
   var shift float64
-
-  if sOutlier {
-    shift = -(avg(s[1][:250]) - avg(b[1][:250]))
-  } else {
-    shift = -(avg(s[1][:100]) - avg(b[1][:100]))
-  }
-
+  shift = -(avg(s[1][:100]) - avg(b[1][:100]))
 
   // lastTenSigPts := s[1][len(s[1]) - 10:len(s[1])]
   // lastTenBgPts := b[1][len(b[1]) - 10:len(b[1])]
@@ -1188,8 +1176,8 @@ func plotSubtractedTogether(
   plot.SetYLabel("Signal (uV)")
 
   for _, set := range sets {
-    plot.AddPointGroup(strings.Trim(sLabel[sets[set]], " rs") + " s", "points", s[sets[set]])
-    //plot.AddPointGroup(strings.Trim(asLabel[sets[set]], " ras") + " as", "points", as[sets[set]])
+    //plot.AddPointGroup(strings.Trim(sLabel[sets[set]], " rs") + " s", "points", s[sets[set]])
+    plot.AddPointGroup(strings.Trim(asLabel[sets[set]], " ras") + " as", "points", as[sets[set]])
   }
 }
 
