@@ -1,3 +1,13 @@
-Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-22-8-18,Glass Slide,1,112.2,35.90,36.50,1/frequency.csv,1/signal.csv,pump 1549 probe 1549.08 filter 1549.168 - spontaneous smf28
-22-8-18,Slide Removed,2,117.2,38.52,36.50,2/frequency.csv,2/signal.csv,probe 1549.08 filter 1549.168
+Date,Name,probe@sample mW,Filepath,Notes
+21-9-14,0mW ps,20,Data/0/ps.csv,10kHz RBW - 25 avg - 20s sweep - dither
+,0mW pas,0,Data/0/pas.csv,
+,0mW pras,20,Data/0/pras.csv, (57.07mW@probeVOA)
+,0mW prs,20,Data/0/prs.csv,
+,80mW ps,20,Data/80/ps.csv,
+,80mW pas,0,Data/80/pas.csv,
+,80mW pras,20,Data/80/pras.csv,
+,80mW prs,20,Data/80/prs.csv,
+,170mW prs,20,Data/170/prs.csv,
+,170mW pras,20,Data/170/pras.csv,
+,170mW pas,0,Data/170/pas.csv,
+,170mW ps,0,Data/170/ps.csv,

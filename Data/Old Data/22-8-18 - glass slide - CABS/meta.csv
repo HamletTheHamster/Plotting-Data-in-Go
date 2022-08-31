@@ -1,0 +1,3 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+22-8-18,Glass Slide,1,112.2,35.90,36.50,1/frequency.csv,1/signal.csv,pump 1549 probe 1549.08 filter 1549.168 - spontaneous smf28
+22-8-18,Slide Removed,2,117.2,38.52,36.50,2/frequency.csv,2/signal.csv,probe 1549.08 filter 1549.168
