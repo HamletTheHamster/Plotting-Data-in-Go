@@ -31,7 +31,7 @@ func main() {
     cooling, cabs, lock, temp,
   )
 
-  log := header(cooling, cabs, lock, temp, lcof, date, run, sample, length)
+  log := header(cooling, cabs, lock, temp, lcof, date, run, sample, note, length)
 
   if cooling {
 
@@ -767,7 +767,7 @@ func readCSV(
 
 func header(
   cooling, cabs, lock, temp, lcof bool,
-  date, run, sample string,
+  date, run, sample, note string,
   length float64,
 ) (
   []string,
@@ -780,6 +780,9 @@ func header(
   }
   if sample != "" {
     log = append(log, "Sample: " + sample + "\n")
+  }
+  if note != "" {
+    log = append(log, "Runtime note: " + note + "\n")
   }
 
   fmt.Printf(log[0])
