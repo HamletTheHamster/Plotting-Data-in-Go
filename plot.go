@@ -60,7 +60,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
     }
@@ -1242,12 +1242,12 @@ func goPlotSubGrpd(
   xlabel = "Frequency (GHz)"
   ylabel = "Spectral Density (nV)"
   legend = "Pump"
-  xrange = []float64{1, 1.36}
-  yrange = []float64{0, 17.5}
-  xtick = []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-  ytick = []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-  xtickLabels = []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-  ytickLabels = []string{"0", "", "5", "", "10", "", "15", ""}
+  xrange = []float64{2, 2.36}
+  yrange = []float64{-0.5, 10}
+  xtick = []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+  ytick = []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+  xtickLabels = []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+  ytickLabels = []string{"0", "", "2", "", "4", "", "6", "", "8", "", "10"}
 
   p = prepPlot(
     title, xlabel, ylabel, legend,
