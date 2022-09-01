@@ -287,7 +287,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{0,1,2}
+    setsToPlotCABS := []int{}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length)
   }
 
