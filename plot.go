@@ -23,11 +23,9 @@ import (
 
 func main() {
 
-  t := time.Now()
-
   cooling, cabs, lock, temp, lcof, sample, note, length := flags()
 
-  logpath := "plots/" + t.Format("2006-Jan-02") + "/" + t.Format("15:04:05") + ": " + note
+  logpath := logpath(note)
 
   date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
     cooling, cabs, lock, temp,
@@ -327,6 +325,14 @@ func flags() (
   }
 
   return cooling, cabs, lock, temp, lcof, sample, note, length
+}
+
+func logpath(
+  note string,
+) (
+  string,
+) {
+  return "plots/" + time.Now().Format("2006-Jan-02") + "/" + time.Now().Format("15:04:05") + ": " + note
 }
 
 func readMeta(
