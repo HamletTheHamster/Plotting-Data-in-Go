@@ -62,7 +62,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{0,4,8,12,15}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath)
     }
@@ -97,13 +97,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}
+      binSets := []int{0,4,8,12,15}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,4,8,12,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -177,7 +177,7 @@ func main() {
         goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample, logpath)
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,4,8,12,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
