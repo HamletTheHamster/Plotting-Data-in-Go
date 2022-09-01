@@ -23,7 +23,11 @@ import (
 
 func main() {
 
-  cooling, cabs, lock, temp, lcof, sample, length := flags()
+  t := time.Now()
+
+  cooling, cabs, lock, temp, lcof, sample, note, length := flags()
+
+  logpath := "plots/" + t.Format("2006-Jan-02") + "/" + t.Format("15:04:05") + ": " + note
 
   date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
     cooling, cabs, lock, temp,
@@ -62,7 +66,7 @@ func main() {
 
     subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
-      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel)
+      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath)
     }
 
     fitSets := true
@@ -169,10 +173,10 @@ func main() {
         }
 
         // goPlot as fits
-        goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample)
+        goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample, logpath)
 
         // goPlot power vs width
-        goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample)
+        goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample, logpath)
       }
 
       fitStokes := []int{}
@@ -247,9 +251,9 @@ func main() {
         fmt.Printf("\n")
         log = append(log, "\n")
 
-        goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample)
+        goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample, logpath)
 
-        goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample)
+        goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample, logpath)
 
         eq := true
         if len(fitAntiStokes) != len(fitStokes) {
@@ -267,10 +271,10 @@ func main() {
           for i, v := range asPowers {
             powers = append(powers, (v + sPowers[i])/2)
           }
-          goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample)
+          goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample, logpath)
 
           ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
-          goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample)
+          goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample, logpath)
 
         } else {
           str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
@@ -286,20 +290,20 @@ func main() {
     cabsData := getCABSData(lock, file)
 
     setsToPlotCABS := []int{}
-    plotCABS(setsToPlotCABS, cabsData, label, sample, length)
+    plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length)
   }
 
-  writeLog(log)
+  writeLog(logpath, log)
 }
 
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, string, float64,
+  bool, bool, bool, bool, bool, string, string, float64,
 ) {
 
   var cooling, cabs, lock, temp, lcof bool
-  var sample string
+  var sample, note string
   var length float64
 
   flag.BoolVar(&cooling, "cooling", false, "cooling data")
@@ -308,6 +312,7 @@ func flags() (
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
   flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, glass slide")
+  flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
 
@@ -321,7 +326,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cooling, cabs, lock, temp, lcof, sample, length
+  return cooling, cabs, lock, temp, lcof, sample, note, length
 }
 
 func readMeta(
@@ -869,7 +874,7 @@ func plotCABS(
   sets []int,
   cabsData [][][]float64,
   label []string,
-  sample string,
+  sample, logpath string,
   length float64,
 ) {
 
@@ -930,7 +935,7 @@ func plotCABS(
     p.Legend.Add(label[set], l)
   }
 
-  savePlot(p, "CABS")
+  savePlot(p, "CABS", logpath)
 }
 
 func axes(
@@ -1185,6 +1190,7 @@ func goPlotSubGrpd(
   sets []int,
   s, as [][][]float64,
   sLabel, asLabel []string,
+  logpath string,
 ) {
 
   // Anti-Stokes
@@ -1235,7 +1241,7 @@ func goPlotSubGrpd(
     p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
   }
 
-  savePlot(p, "Anti-Stokes Background Subtracted")
+  savePlot(p, "Anti-Stokes Background Subtracted", logpath)
 
   // Stokes
   title = "Stokes"
@@ -1286,7 +1292,7 @@ func goPlotSubGrpd(
     p.Legend.Add(strings.Trim(sLabel[set], " rs"), l)
   }
 
-  savePlot(p, "Stokes Background Subtracted")
+  savePlot(p, "Stokes Background Subtracted", logpath)
 }
 
 func generateFitData(
@@ -1316,7 +1322,7 @@ func goPlotasFits(
   labels []string,
   widths, notes []float64,
   temp bool,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := sample + " Anti-Stokes"
@@ -1397,7 +1403,7 @@ func goPlotasFits(
 
   }
 
-  savePlot(p, "Anti-Stokes w Fits")
+  savePlot(p, "Anti-Stokes w Fits", logpath)
 }
 
 func bin(
@@ -1475,7 +1481,7 @@ func goPlotasPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := "Anti-Stokes Pump Power vs Widths of Fits"
@@ -1565,7 +1571,7 @@ func goPlotasPowerVsWid(
     }
   }
 
-  savePlot(p, "as Pow vs Wid")
+  savePlot(p, "as Pow vs Wid", logpath)
 }
 
 func goPlotsFits(
@@ -1574,7 +1580,7 @@ func goPlotsFits(
   labels []string,
   widths, notes []float64,
   temp bool,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := sample + " Stokes"
@@ -1654,7 +1660,7 @@ func goPlotsFits(
     }
   }
 
-  savePlot(p, "Stokes w Fits")
+  savePlot(p, "Stokes w Fits", logpath)
 }
 
 func goPlotsPowerVsWid(
@@ -1662,7 +1668,7 @@ func goPlotsPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp bool,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := "Stokes Pump Power vs Widths of Fits"
@@ -1751,14 +1757,14 @@ func goPlotsPowerVsWid(
     }
   }
 
-  savePlot(p, "s Pow vs Wid")
+  savePlot(p, "s Pow vs Wid", logpath)
 }
 
 func goPlotHeightRatios(
   sets []int,
   heightRatios, powers []float64,
   labels []string,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := "Height Ratios vs Power"
@@ -1870,7 +1876,7 @@ func goPlotHeightRatios(
     //p.Legend.Add(strings.Trim(labels[set], " prs"), plotPts)
   }
 
-  savePlot(p, "height ratios")
+  savePlot(p, "height ratios", logpath)
 }
 
 func Γeff(
@@ -1897,7 +1903,7 @@ func goPlotLinewidths(
   ΓasEff, ΓsEff [][]float64,
   asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
-  sample string,
+  sample, logpath string,
 ) {
 
   title := "Linewidths vs Power"
@@ -2118,7 +2124,7 @@ func goPlotLinewidths(
     p.Add(sPlotPts)
   }
 
-  savePlot(p, "linewidths")
+  savePlot(p, "linewidths", logpath)
 }
 
 func prepPlot(
@@ -2238,7 +2244,8 @@ func palette(
 }
 
 func savePlot(
-  p *plot.Plot, name string,
+  p *plot.Plot,
+  name, logpath string,
 ) {
 
   date := time.Now()
@@ -2252,14 +2259,14 @@ func savePlot(
   }
 
   // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+  if _, err := os.Stat(logpath); os.IsNotExist(err) {
+    if err := os.Mkdir(logpath, 0755); err != nil {
       fmt.Println(err)
       os.Exit(1)
     }
   }
 
-  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05") + "/" + name
+  path := logpath + "/" + name
 
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
     fmt.Println(err)
@@ -2292,6 +2299,7 @@ func normalizeFit(
 }
 
 func writeLog(
+  logpath string,
   log []string,
 ) {
 
@@ -2306,16 +2314,16 @@ func writeLog(
   }
 
   // Make current time folder if it doesn't already exist
-  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")); os.IsNotExist(err) {
-    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05"), 0755); err != nil {
+  if _, err := os.Stat(logpath); os.IsNotExist(err) {
+    if err := os.Mkdir(logpath, 0755); err != nil {
       fmt.Println(err)
       os.Exit(1)
     }
   }
 
-  path := "plots/" + date.Format("2006-Jan-02") + "/" + date.Format("15:04:05")
 
-  txt, err := os.Create(path + "/log.txt")
+
+  txt, err := os.Create(logpath + "/log.txt")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
