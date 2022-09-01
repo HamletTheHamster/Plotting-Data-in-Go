@@ -1,7 +1,7 @@
 Date,Label,Probe,Filepath,Notes
-21-9-14,0 bs,20,0/bs.csv,1MHz RBW - 25 avg - 10s sweep - dither
+21-9-14,0 bs,20,0/bs.csv,10kHz RBW - 25 avg - 20s sweep - dither
 ,0 bas,0,0/bas.csv,
-,0 ras,20,0/ras.csv, (57.22mW@probeVOA)
+,0 ras,20,0/ras.csv, (57.07mW@probeVOA)
 ,0 rs,20,0/rs.csv,
 ,80 bs,20,80/bs.csv,
 ,80 bas,0,80/bas.csv,
