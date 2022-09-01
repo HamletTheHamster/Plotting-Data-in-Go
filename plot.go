@@ -97,13 +97,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{}
+      binSets := []int{0,1,2}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -177,7 +177,7 @@ func main() {
         goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample, logpath)
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -988,11 +988,11 @@ func axes(
     switch sample {
     case "Liquid-Core":
       xrange := []float64{2, 2.5}
-      yrange := []float64{0, 17.5}
+      yrange := []float64{0, 5}
       xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+      ytick := []float64{0, 1, 2, 3, 4, 5}
       xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+      ytickLabel := []string{"0", "1", "2", "3", "4", "5"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
