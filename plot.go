@@ -97,7 +97,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}
+      binSets := []int{}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
@@ -872,10 +872,10 @@ func plotRaw(
     plot.SetXLabel("Frequency (GHz)")
     plot.SetYLabel("Signal (uV)")
 
-    //plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
-    //plot.AddPointGroup(basLabel[0], "points", bas[0])
-    plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
-    plot.AddPointGroup(bsLabel[0], "points", bs[0])
+    plot.AddPointGroup(rasLabel[sets[i]], "points", ras[sets[i]])
+    plot.AddPointGroup(basLabel[sets[i]], "points", bas[sets[i]])
+    //plot.AddPointGroup(rsLabel[sets[i]], "points", rs[sets[i]])
+    //plot.AddPointGroup(bsLabel[sets[i]], "points", bs[sets[i]])
   }
 }
 
@@ -1137,14 +1137,6 @@ func subtract(
 
   var shift float64
   shift = -(avg(s[1][:100]) - avg(b[1][:100]))
-
-  // lastTenSigPts := s[1][len(s[1]) - 10:len(s[1])]
-  // lastTenBgPts := b[1][len(b[1]) - 10:len(b[1])]
-  // if below := lastTenSigPts - lastTenBgPts; below < 0 {
-  //   shift = below
-  // } else {
-  //   shift = -below
-  // }
 
   for i := range b[0] {
     s[1][i] = s[1][i] - b[1][i] + shift
@@ -2212,15 +2204,15 @@ func palette(
   if dark {
     darkColor := make([]color.RGBA, 16)
     darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-    darkColor[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
-    darkColor[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+    darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+    darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
     darkColor[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
     darkColor[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
-    darkColor[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+    darkColor[4] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
     darkColor[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
     darkColor[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
     darkColor[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-    darkColor[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+    darkColor[8] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
     darkColor[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
     darkColor[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
     darkColor[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
@@ -2233,15 +2225,15 @@ func palette(
 
   col := make([]color.RGBA, 16)
   col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  col[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
-  col[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+  col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+  col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
   col[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
   col[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
-  col[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+  col[4] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
   col[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
   col[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
   col[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
-  col[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+  col[8] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
   col[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
   col[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
   col[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
@@ -2271,6 +2263,7 @@ func savePlot(
   if _, err := os.Stat(logpath); os.IsNotExist(err) {
     if err := os.Mkdir(logpath, 0755); err != nil {
       fmt.Println(err)
+      fmt.Println(logpath)
       os.Exit(1)
     }
   }
@@ -2329,8 +2322,6 @@ func writeLog(
       os.Exit(1)
     }
   }
-
-
 
   txt, err := os.Create(logpath + "/log.txt")
   if err != nil {
