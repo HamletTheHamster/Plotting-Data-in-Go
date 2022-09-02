@@ -1119,11 +1119,11 @@ func subtractBackground(
   var s, as [][][]float64
 
   for i := range rs {
-    s = append(s, subtract(bs[0], rs[i]))
+    s = append(s, subtract(bs[i], rs[i]))
   }
 
   for i := range ras {
-    as = append(as, subtract(bas[0], ras[i]))
+    as = append(as, subtract(bas[i], ras[i]))
   }
 
   return s, as
