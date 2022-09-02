@@ -1,0 +1,22 @@
+Data taken: 21-9-14
+Run: 21-9-14
+Runtime note: Github History data?
+
+*Cooling Data*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 0.00 mW 	 99.15 MHz 	 9.769579 nV 	 2.2678 GHz
+1 	 80.00 mW 	 108.43 MHz 	 25.813211 nV 	 2.2646 GHz
+2 	 170.00 mW 	 108.30 MHz 	 35.112690 nV 	 2.2621 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 0.00 mW 	 95.80 MHz 	 6.283281 nV 	 2.2724 GHz
+1 	 80.00 mW 	 92.66 MHz 	 8.469600 nV 	 2.2672 GHz
+2 	 170.00 mW 	 95.63 MHz 	 10.785186 nV 	 2.2668 GHz
+
