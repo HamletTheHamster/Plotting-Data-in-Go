@@ -67,7 +67,7 @@ func main() {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath)
     }
 
-    fitSets := false
+    fitSets := true
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
