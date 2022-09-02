@@ -39,7 +39,7 @@ func main() {
 
     asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
-    setsToPlotRaw := []int{}
+    setsToPlotRaw := []int{0,1,2}
     plotRaw(
       setsToPlotRaw,
       bas, ras, bs, rs,
