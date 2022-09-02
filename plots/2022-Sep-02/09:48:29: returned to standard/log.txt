@@ -1,0 +1,9 @@
+Data taken: 21-9-14
+Run: 21-9-14
+Runtime note: returned to standard
+
+*Cooling Data*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*

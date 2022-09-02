@@ -634,7 +634,7 @@ func getData(
 
   if !lock {
     // Convert to Linear if dBm
-    if dataStr[1][3] == "dBm" {
+    if dataStr[1][3] == " dBm" {
       var nV []float64
 
       for _, dBm := range signal {
@@ -1135,11 +1135,11 @@ func subtract(
   [][]float64,
 ) {
 
-  // var shift float64
-  // shift = -(avg(s[1][:100]) - avg(b[1][:100]))
+  var shift float64
+  shift = -(avg(s[1][:100]) - avg(b[1][:100]))
 
   for i := range b[0] {
-    s[1][i] = s[1][i] - b[1][i] //+ shift
+    s[1][i] = s[1][i] - b[1][i] + shift
   }
 
   return s
