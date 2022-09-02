@@ -103,7 +103,7 @@ func main() {
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
