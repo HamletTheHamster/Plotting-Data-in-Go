@@ -39,7 +39,7 @@ func main() {
 
     asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
-    setsToPlotRaw := []int{}
+    setsToPlotRaw := []int{0,1,2}
     plotRaw(
       setsToPlotRaw,
       bas, ras, bs, rs,
@@ -55,19 +55,19 @@ func main() {
       sLabel, asLabel,
     )
 
-    setsToPlotSubtractedTogether := []int{}
+    setsToPlotSubtractedTogether := []int{0,1,2}
     plotSubtractedTogether(
       setsToPlotSubtractedTogether,
       as, s,
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath)
     }
 
-    fitSets := true
+    fitSets := false
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
