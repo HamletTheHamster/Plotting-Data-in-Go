@@ -1,0 +1,22 @@
+Data taken: 21-9-14
+Run: 21-9-14
+Runtime note: 9-14-21 run 2
+
+*Cooling Data*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 0.00 mW 	 108.31 MHz 	 1.221226 nV 	 2.2741 GHz
+1 	 80.00 mW 	 121.76 MHz 	 1.260959 nV 	 2.2706 GHz
+2 	 170.00 mW 	 122.93 MHz 	 2.286725 nV 	 2.2721 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 0.00 mW 	 95.39 MHz 	 3.663036 nV 	 2.2667 GHz
+1 	 80.00 mW 	 98.26 MHz 	 3.173017 nV 	 2.2616 GHz
+2 	 170.00 mW 	 92.42 MHz 	 10.091591 nV 	 2.2636 GHz
+
