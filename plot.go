@@ -1329,7 +1329,7 @@ func goPlotasFits(
   title := sample + " Anti-Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
-  legend := "Power"
+  legend := "Pump"
 
   xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("fits", sample)
   if err != nil {
