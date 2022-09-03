@@ -988,11 +988,11 @@ func axes(
     switch sample {
     case "Liquid-Core":
       xrange := []float64{2, 2.5}
-      yrange := []float64{-1, 2.5}
+      yrange := []float64{-0.25, 2.5}
       xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-      ytick := []float64{-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
+      ytick := []float64{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
       xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-      ytickLabel := []string{"", "", "-0.5", "", "0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
+      ytickLabel := []string{"0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
