@@ -23,7 +23,7 @@ import (
 
 func main() {
 
-  cooling, cabs, lock, temp, lcof, sample, note, length := flags()
+  cooling, cabs, lock, temp, lcof, slide, sample, note, length := flags()
 
   logpath := logpath(note)
 
@@ -31,7 +31,7 @@ func main() {
     cooling, cabs, lock, temp,
   )
 
-  log := header(cooling, cabs, lock, temp, lcof, date, run, sample, note, length)
+  log := header(cooling, cabs, lock, temp, lcof, slide, date, run, sample, note, length)
 
   if cooling {
 
@@ -64,7 +64,7 @@ func main() {
 
     subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
-      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath)
+      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath, slide)
     }
 
     fitSets := true
@@ -171,10 +171,15 @@ func main() {
         }
 
         // goPlot as fits
-        goPlotasFits(fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes, temp, sample, logpath)
+        goPlotasFits(
+          fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes,
+          temp, slide, sample, logpath,
+        )
 
         // goPlot power vs width
-        goPlotasPowerVsWid(fitAntiStokes, asLabel, asNotes, asfwhm, temp, sample, logpath)
+        goPlotasPowerVsWid(
+          fitAntiStokes, asLabel, asNotes, asfwhm, temp, slide, sample, logpath,
+        )
       }
 
       fitStokes := []int{0,1,2}
@@ -249,9 +254,14 @@ func main() {
         fmt.Printf("\n")
         log = append(log, "\n")
 
-        goPlotsFits(fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, sample, logpath)
+        goPlotsFits(
+          fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, slide,
+          sample, logpath,
+        )
 
-        goPlotsPowerVsWid(fitStokes, sLabel, sNotes, sfwhm, temp, sample, logpath)
+        goPlotsPowerVsWid(
+          fitStokes, sLabel, sNotes, sfwhm, temp, slide, sample, logpath,
+        )
 
         eq := true
         if len(fitAntiStokes) != len(fitStokes) {
@@ -269,10 +279,15 @@ func main() {
           for i, v := range asPowers {
             powers = append(powers, (v + sPowers[i])/2)
           }
-          goPlotHeightRatios(fitStokes, ampRatios, powers, sLabel, sample, logpath)
+          goPlotHeightRatios(
+            fitStokes, ampRatios, powers, sLabel, sample, logpath, slide,
+          )
 
           ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
-          goPlotLinewidths(fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers, sPowers, sLabel, sample, logpath)
+          goPlotLinewidths(
+            fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers,
+            sPowers, sLabel, sample, logpath, slide,
+          )
 
         } else {
           str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
@@ -288,7 +303,7 @@ func main() {
     cabsData := getCABSData(lock, file)
 
     setsToPlotCABS := []int{}
-    plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length)
+    plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
   writeLog(logpath, log)
@@ -297,10 +312,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, string, string, float64,
+  bool, bool, bool, bool, bool, bool, string, string, float64,
 ) {
 
-  var cooling, cabs, lock, temp, lcof bool
+  var cooling, cabs, lock, temp, lcof, slide bool
   var sample, note string
   var length float64
 
@@ -309,6 +324,7 @@ func flags() (
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
+  flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, glass slide")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
@@ -324,7 +340,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cooling, cabs, lock, temp, lcof, sample, note, length
+  return cooling, cabs, lock, temp, lcof, slide, sample, note, length
 }
 
 func logpath(
@@ -766,7 +782,7 @@ func readCSV(
 }
 
 func header(
-  cooling, cabs, lock, temp, lcof bool,
+  cooling, cabs, lock, temp, lcof, slide bool,
   date, run, sample, note string,
   length float64,
 ) (
@@ -783,6 +799,9 @@ func header(
   }
   if note != "" {
     log = append(log, "Runtime note: " + note + "\n")
+  }
+  if slide {
+    log = append(log, "Figures formatted for slide presentation\n")
   }
 
   fmt.Printf(log[0])
@@ -885,6 +904,7 @@ func plotCABS(
   label []string,
   sample, logpath string,
   length float64,
+  slide bool,
 ) {
 
   var len string
@@ -913,6 +933,7 @@ func plotCABS(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
+    slide,
   )
 
   for _, set := range sets {
@@ -1192,6 +1213,7 @@ func goPlotSubGrpd(
   s, as [][][]float64,
   sLabel, asLabel []string,
   logpath string,
+  slide bool,
 ) {
 
   // Anti-Stokes
@@ -1210,6 +1232,7 @@ func goPlotSubGrpd(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
+    slide,
   )
 
   for _, set := range sets {
@@ -1224,7 +1247,11 @@ func goPlotSubGrpd(
     }
 
     plotSet.GlyphStyle.Color = palette(set, false)
-    plotSet.GlyphStyle.Radius = vg.Points(3)
+    if slide {
+      plotSet.GlyphStyle.Radius = vg.Points(5)
+    } else {
+      plotSet.GlyphStyle.Radius = vg.Points(3)
+    }
     plotSet.Shape = draw.CircleGlyph{}
 
     p.Add(plotSet)
@@ -1260,6 +1287,7 @@ func goPlotSubGrpd(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
+    slide,
   )
 
   for _, set := range sets {
@@ -1274,7 +1302,11 @@ func goPlotSubGrpd(
     }
 
     plotSet.GlyphStyle.Color = palette(set, false)
-    plotSet.GlyphStyle.Radius = vg.Points(3)
+    if slide {
+      plotSet.GlyphStyle.Radius = vg.Points(5)
+    } else {
+      plotSet.GlyphStyle.Radius = vg.Points(3)
+    }
     plotSet.Shape = draw.CircleGlyph{}
 
     p.Add(plotSet)
@@ -1322,7 +1354,7 @@ func goPlotasFits(
   as, fits, widthLines [][][]float64,
   labels []string,
   widths, notes []float64,
-  temp bool,
+  temp, slide bool,
   sample, logpath string,
 ) {
 
@@ -1341,6 +1373,7 @@ func goPlotasFits(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   for i, set := range sets {
@@ -1357,7 +1390,11 @@ func goPlotasFits(
     }
 
     plotPts.GlyphStyle.Color = palette(set, false)
-    plotPts.GlyphStyle.Radius = vg.Points(3)
+    if slide {
+      plotPts.GlyphStyle.Radius = vg.Points(5)
+    } else {
+      plotPts.GlyphStyle.Radius = vg.Points(3)
+    }
     plotPts.Shape = draw.CircleGlyph{}
 
     // Plot fit
@@ -1481,7 +1518,7 @@ func goPlotasPowerVsWid(
   sets []int,
   labels []string,
   notes, widths []float64,
-  temp bool,
+  temp, slide bool,
   sample, logpath string,
 ) {
 
@@ -1500,6 +1537,7 @@ func goPlotasPowerVsWid(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   for i, set := range sets {
@@ -1580,7 +1618,7 @@ func goPlotsFits(
   s, fits, widthLines [][][]float64,
   labels []string,
   widths, notes []float64,
-  temp bool,
+  temp, slide bool,
   sample, logpath string,
 ) {
 
@@ -1599,6 +1637,7 @@ func goPlotsFits(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   for i, set := range sets {
@@ -1615,7 +1654,11 @@ func goPlotsFits(
     }
 
     plotPts.GlyphStyle.Color = palette(set, false)
-    plotPts.GlyphStyle.Radius = vg.Points(3)
+    if slide {
+      plotPts.GlyphStyle.Radius = vg.Points(5)
+    } else {
+      plotPts.GlyphStyle.Radius = vg.Points(3)
+    }
     plotPts.Shape = draw.CircleGlyph{}
 
     // Plot fit
@@ -1668,7 +1711,7 @@ func goPlotsPowerVsWid(
   sets []int,
   labels []string,
   notes, widths []float64,
-  temp bool,
+  temp, slide bool,
   sample, logpath string,
 ) {
 
@@ -1687,6 +1730,7 @@ func goPlotsPowerVsWid(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   for i, set := range sets {
@@ -1766,6 +1810,7 @@ func goPlotHeightRatios(
   heightRatios, powers []float64,
   labels []string,
   sample, logpath string,
+  slide bool,
 ) {
 
   title := "Height Ratios vs Power"
@@ -1783,6 +1828,7 @@ func goPlotHeightRatios(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   // Linear fit line
@@ -1905,6 +1951,7 @@ func goPlotLinewidths(
   asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
   sample, logpath string,
+  slide bool,
 ) {
 
   title := "Linewidths vs Power"
@@ -1922,6 +1969,7 @@ func goPlotLinewidths(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
+    slide,
   )
 
   // as linear fit
@@ -2132,6 +2180,7 @@ func prepPlot(
   title, xlabel, ylabel, legend string,
   xrange, yrange, xtick, ytick []float64,
   xtickLabels, ytickLabels []string,
+  slide bool,
 ) (
   *plot.Plot,
 ) {
@@ -2141,18 +2190,13 @@ func prepPlot(
   p.Title.Text = title
   p.Title.TextStyle.Font.Typeface = "liberation"
   p.Title.TextStyle.Font.Variant = "Sans"
-  p.Title.TextStyle.Font.Size = 80 //50
-  p.Title.Padding = font.Length(80) //50
 
   p.X.Label.Text = xlabel
   p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.Label.TextStyle.Font.Size = 56 //36
-  p.X.Label.Padding = font.Length(40) //20
   p.X.LineStyle.Width = vg.Points(1.5)
   p.X.Min = xrange[0]
   p.X.Max = xrange[1]
   p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Size = 56 //36
   p.X.Tick.Label.Font.Variant = "Sans"
 
   xticks := []plot.Tick{}
@@ -2165,13 +2209,10 @@ func prepPlot(
 
   p.Y.Label.Text = ylabel
   p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.Label.TextStyle.Font.Size = 56 //36
-  p.Y.Label.Padding = font.Length(40) //20
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = yrange[0]
   p.Y.Max = yrange[1]
   p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Size = 56 //36
   p.Y.Tick.Label.Font.Variant = "Sans"
 
   yticks := []plot.Tick{}
@@ -2182,7 +2223,6 @@ func prepPlot(
   p.Y.Tick.Marker = plot.ConstantTicks(yticks)
   p.Y.Padding = vg.Points(-0.5)
 
-  p.Legend.TextStyle.Font.Size = 56 //36
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-25)
@@ -2190,6 +2230,38 @@ func prepPlot(
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)
+
+  if slide {
+    p.Title.TextStyle.Font.Size = 80
+    p.Title.Padding = font.Length(80)
+
+    p.X.Label.TextStyle.Font.Size = 56
+    p.X.Label.Padding = font.Length(40)
+
+    p.X.Tick.Label.Font.Size = 56
+
+    p.Y.Label.TextStyle.Font.Size = 56
+    p.Y.Label.Padding = font.Length(40)
+
+    p.Y.Tick.Label.Font.Size = 56
+
+    p.Legend.TextStyle.Font.Size = 56
+  } else {
+    p.Title.TextStyle.Font.Size = 50
+    p.Title.Padding = font.Length(50)
+
+    p.X.Label.TextStyle.Font.Size = 36
+    p.X.Label.Padding = font.Length(20)
+
+    p.X.Tick.Label.Font.Size = 36
+
+    p.Y.Label.TextStyle.Font.Size = 36
+    p.Y.Label.Padding = font.Length(20)
+
+    p.Y.Tick.Label.Font.Size = 36
+
+    p.Legend.TextStyle.Font.Size = 36
+  }
 
   return p
 }
