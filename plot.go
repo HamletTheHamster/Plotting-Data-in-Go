@@ -65,9 +65,12 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+    subtractedGrouped := []int{0,4,8,12,15}
     if len(subtractedGrouped) > 0 {
-      goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath, slide)
+      goPlotSubGrpd(
+        subtractedGrouped, s, as, sLabel, asLabel, logpath, coolingExperiment,
+        slide,
+      )
     }
 
     fitSets := true
@@ -100,13 +103,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      binSets := []int{0,4,8,12,15}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      fitAntiStokes := []int{0,4,8,12,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -176,16 +179,17 @@ func main() {
         // goPlot as fits
         goPlotasFits(
           fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes,
-          temp, slide, sample, logpath,
+          temp, slide, sample, logpath, coolingExperiment,
         )
 
         // goPlot power vs width
         goPlotasPowerVsWid(
           fitAntiStokes, asLabel, asNotes, asfwhm, temp, slide, sample, logpath,
+          coolingExperiment,
         )
       }
 
-      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      fitStokes := []int{0,4,8,12,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -259,11 +263,12 @@ func main() {
 
         goPlotsFits(
           fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, slide,
-          sample, logpath,
+          sample, logpath, coolingExperiment,
         )
 
         goPlotsPowerVsWid(
           fitStokes, sLabel, sNotes, sfwhm, temp, slide, sample, logpath,
+          coolingExperiment,
         )
 
         eq := true
@@ -950,7 +955,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    plotSet.GlyphStyle.Color = palette(set, false)
+    plotSet.GlyphStyle.Color = palette(set, false, "")
     plotSet.GlyphStyle.Radius = vg.Points(5) //3
     plotSet.Shape = draw.CircleGlyph{}
 
@@ -963,7 +968,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false)
+    l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -973,7 +978,7 @@ func plotCABS(
 }
 
 func axes(
-  plot, sample string,
+  plot, sample, coolingExperiment string,
 ) (
   []float64, []float64, []float64, []float64, []string, []string, error,
 ) {
@@ -1073,11 +1078,11 @@ func axes(
     switch sample {
     case "Liquid-Core":
       xrange := []float64{0, 200}
-      yrange := []float64{1, 3.5}
+      yrange := []float64{1, 3.75}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{1, 1.5, 2, 2.5, 3, 3.5}
+      ytick := []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75}
       xtickLabel := []string{"", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"1", "", "2", "", "3", ""}
+      ytickLabel := []string{"1", "", "1.5", "", "2", "", "2.5", "", "3", "", "3.5", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1239,7 +1244,7 @@ func goPlotSubGrpd(
   sets []int,
   s, as [][][]float64,
   sLabel, asLabel []string,
-  logpath string,
+  logpath, coolingExperiment string,
   slide bool,
 ) {
 
@@ -1273,7 +1278,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    plotSet.GlyphStyle.Color = palette(set, false)
+    plotSet.GlyphStyle.Color = palette(set, false, coolingExperiment)
     if slide {
       plotSet.GlyphStyle.Radius = vg.Points(5)
     } else {
@@ -1290,7 +1295,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false)
+    l.GlyphStyle.Color = palette(set, false, coolingExperiment)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(strings.Trim(asLabel[set], " pras"), l)
@@ -1328,7 +1333,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    plotSet.GlyphStyle.Color = palette(set, false)
+    plotSet.GlyphStyle.Color = palette(set, false, coolingExperiment)
     if slide {
       plotSet.GlyphStyle.Radius = vg.Points(5)
     } else {
@@ -1345,7 +1350,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false)
+    l.GlyphStyle.Color = palette(set, false, coolingExperiment)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
 
@@ -1382,7 +1387,7 @@ func goPlotasFits(
   labels []string,
   widths, notes []float64,
   temp, slide bool,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
 ) {
 
   title := " "
@@ -1416,7 +1421,7 @@ func goPlotasFits(
       os.Exit(1)
     }
 
-    plotPts.GlyphStyle.Color = palette(set, false)
+    plotPts.GlyphStyle.Color = palette(set, false, coolingExperiment)
     if slide {
       plotPts.GlyphStyle.Radius = vg.Points(5)
     } else {
@@ -1431,7 +1436,7 @@ func goPlotasFits(
       os.Exit(1)
     }
 
-    plotFit.LineStyle.Color = palette(set, true)
+    plotFit.LineStyle.Color = palette(set, true, coolingExperiment)
     plotFit.LineStyle.Width = vg.Points(3)
 
     // Width lines
@@ -1441,7 +1446,7 @@ func goPlotasFits(
       os.Exit(1)
     }
 
-    plotWid.LineStyle.Color = palette(set, true)
+    plotWid.LineStyle.Color = palette(set, true, coolingExperiment)
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1455,7 +1460,7 @@ func goPlotasFits(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, true)
+    l.GlyphStyle.Color = palette(set, true, coolingExperiment)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     power := strings.Trim(labels[set], " pras")
@@ -1546,7 +1551,7 @@ func goPlotasPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp, slide bool,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
 ) {
 
   title := " "
@@ -1587,7 +1592,7 @@ func goPlotasPowerVsWid(
       os.Exit(1)
     }
 
-    plotPts.GlyphStyle.Color = palette(set, true)
+    plotPts.GlyphStyle.Color = palette(set, true, coolingExperiment)
     plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1607,7 +1612,7 @@ func goPlotasPowerVsWid(
       os.Exit(1)
     }
 
-    vDash.LineStyle.Color = palette(set, true)
+    vDash.LineStyle.Color = palette(set, true, coolingExperiment)
     vDash.LineStyle.Width = vg.Points(4)
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1646,7 +1651,7 @@ func goPlotsFits(
   labels []string,
   widths, notes []float64,
   temp, slide bool,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
 ) {
 
   title := sample + " Stokes"
@@ -1680,7 +1685,7 @@ func goPlotsFits(
       os.Exit(1)
     }
 
-    plotPts.GlyphStyle.Color = palette(set, false)
+    plotPts.GlyphStyle.Color = palette(set, false, coolingExperiment)
     if slide {
       plotPts.GlyphStyle.Radius = vg.Points(5)
     } else {
@@ -1695,7 +1700,7 @@ func goPlotsFits(
       os.Exit(1)
     }
 
-    plotFit.LineStyle.Color = palette(set, true)
+    plotFit.LineStyle.Color = palette(set, true, coolingExperiment)
     plotFit.LineStyle.Width = vg.Points(3)
 
     // Width lines
@@ -1705,7 +1710,7 @@ func goPlotsFits(
       os.Exit(1)
     }
 
-    plotWid.LineStyle.Color = palette(set, true)
+    plotWid.LineStyle.Color = palette(set, true, coolingExperiment)
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1719,7 +1724,7 @@ func goPlotsFits(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, true)
+    l.GlyphStyle.Color = palette(set, true, coolingExperiment)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
     power := strings.Trim(labels[set], " prs")
@@ -1739,7 +1744,7 @@ func goPlotsPowerVsWid(
   labels []string,
   notes, widths []float64,
   temp, slide bool,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
 ) {
 
   title := "Stokes Pump Power vs Widths of Fits"
@@ -1779,7 +1784,7 @@ func goPlotsPowerVsWid(
       os.Exit(1)
     }
 
-    plotPts.GlyphStyle.Color = palette(set, true)
+    plotPts.GlyphStyle.Color = palette(set, true, coolingExperiment)
     plotPts.GlyphStyle.Radius = vg.Points(6)
     plotPts.Shape = draw.CircleGlyph{}
 
@@ -1799,7 +1804,7 @@ func goPlotsPowerVsWid(
       os.Exit(1)
     }
 
-    vDash.LineStyle.Color = palette(set, true)
+    vDash.LineStyle.Color = palette(set, true, coolingExperiment)
     vDash.LineStyle.Width = vg.Points(4)
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -1840,7 +1845,7 @@ func goPlotHeightRatios(
   slide bool,
 ) {
 
-  title := "Height Ratios vs Power"
+  title := " " // Height Ratios vs Power
   xlabel := "Pump Power (mW)"
   ylabel := "Stokes/Anti-Stokes Heights"
   legend := ""
@@ -1981,7 +1986,7 @@ func goPlotLinewidths(
   slide bool,
 ) {
 
-  title := "Linewidths vs Power"
+  title := " " // Linewidths vs Power
   xlabel := "Power (mW)"
   ylabel := "Dissipation Rate (MHz)"
   legend := ""
@@ -2139,7 +2144,7 @@ func goPlotLinewidths(
     os.Exit(1)
   }
 
-  ΓasEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
+  ΓasEffPlot.LineStyle.Color = color.NRGBA{R: 99, G: 124, B: 198, A: 125} // R: 0, G: 89, B: 128, A: 255
   ΓasEffPlot.LineStyle.Width = vg.Points(3)
   ΓasEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -2149,7 +2154,7 @@ func goPlotLinewidths(
     os.Exit(1)
   }
 
-  ΓsEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
+  ΓsEffPlot.LineStyle.Color = color.NRGBA{R: 201, G: 104, B: 146, A: 125} // R: 0, G: 89, B: 128, A: 255
   ΓsEffPlot.LineStyle.Width = vg.Points(3)
   ΓsEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
@@ -2301,9 +2306,71 @@ func prepPlot(
 func palette(
   brush int,
   dark bool,
+  coolingExperiment string,
 ) (
   color.RGBA,
 ) {
+
+  if coolingExperiment == "pump-probe" {
+    if dark {
+      darkColor := make([]color.RGBA, 16)
+      darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+      darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+
+      return darkColor[brush]
+    }
+
+    col := make([]color.RGBA, 16)
+    col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+
+    return col[brush]
+
+  } else if coolingExperiment == "pump-only" {
+    if dark {
+      darkColor := make([]color.RGBA, 16)
+      darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+      darkColor[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+      darkColor[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
+      darkColor[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
+      darkColor[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+      darkColor[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+      darkColor[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+      darkColor[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+      darkColor[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+      darkColor[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+      darkColor[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+      darkColor[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+      darkColor[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+      darkColor[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+      darkColor[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+
+      return darkColor[brush]
+    }
+
+    col := make([]color.RGBA, 16)
+    col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    col[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    col[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
+    col[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}
+    col[1] = color.RGBA{R: 188, G: 117, B: 255, A: 255}
+    col[5] = color.RGBA{R: 234, G: 156, B: 172, A: 255}
+    col[6] = color.RGBA{R: 1, G: 56, B: 84, A: 255}
+    col[7] = color.RGBA{R: 46, G: 140, B: 60, A: 255}
+    col[2] = color.RGBA{R: 140, G: 46, B: 49, A: 255}
+    col[9] = color.RGBA{R: 122, G: 41, B: 104, A: 255}
+    col[10] = color.RGBA{R: 41, G: 122, B: 100, A: 255}
+    col[11] = color.RGBA{R: 122, G: 90, B: 41, A: 255}
+    col[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
+    col[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
+    col[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+
+    return col[brush]
+  }
 
   if dark {
     darkColor := make([]color.RGBA, 16)
