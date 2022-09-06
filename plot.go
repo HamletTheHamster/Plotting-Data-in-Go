@@ -1972,6 +1972,10 @@ func goPlotLinewidths(
     slide,
   )
 
+  p.Legend.Left = true
+  p.Legend.XOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(25)
+
   // as linear fit
   // linewidth fit parameter guesses
   m := 1.
