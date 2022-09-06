@@ -2226,7 +2226,7 @@ func prepPlot(
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-25)
-  p.Legend.YOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(-25)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)
