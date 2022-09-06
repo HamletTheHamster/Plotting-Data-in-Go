@@ -1358,7 +1358,7 @@ func goPlotasFits(
   sample, logpath string,
 ) {
 
-  title := sample + " Anti-Stokes"
+  title := " "
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
   legend := "Pump"
@@ -1522,9 +1522,9 @@ func goPlotasPowerVsWid(
   sample, logpath string,
 ) {
 
-  title := "Anti-Stokes Pump Power vs Widths of Fits"
+  title := " "
   xlabel := "Pump Power (mW)"
-  ylabel := "Full Width Half Max (MHz)"
+  ylabel := "FWHM (MHz)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("pow vs wid", sample)
@@ -1602,12 +1602,12 @@ func goPlotasPowerVsWid(
 
     // Add set plots to p
     p.Add(plotPts, vDash, hDash)
-    if temp {
+    /*if temp {
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
     } else {
       p.Legend.Add(power + " mW", plotPts)
-    }
+    }*/
   }
 
   savePlot(p, "as Pow vs Wid", logpath)
