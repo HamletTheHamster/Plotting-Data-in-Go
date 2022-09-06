@@ -23,7 +23,7 @@ import (
 
 func main() {
 
-  cooling, cabs, lock, temp, lcof, slide, sample, note, length := flags()
+  cooling, cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length := flags()
 
   logpath := logpath(note)
 
@@ -31,7 +31,10 @@ func main() {
     cooling, cabs, lock, temp,
   )
 
-  log := header(cooling, cabs, lock, temp, lcof, slide, date, run, sample, note, length)
+  log := header(
+    cooling, cabs, lock, temp, lcof, slide, date, run, sample,
+    coolingExperiment, note, length,
+  )
 
   if cooling {
 
@@ -46,7 +49,7 @@ func main() {
       basLabel, asLabel, bsLabel, sLabel,
     )
 
-    s, as := subtractBackground(ras, bas, rs, bs)
+    s, as := subtractBackground(ras, bas, rs, bs, coolingExperiment)
 
     setsToPlotSubtracted := []int{}
     plotSubtracted(
@@ -312,23 +315,27 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, string, string, float64,
+  bool, bool, bool, bool, bool, bool, string, string, string, float64,
 ) {
 
   var cooling, cabs, lock, temp, lcof, slide bool
-  var sample, note string
+  var sample, coolingExperiment, note string
   var length float64
 
-  flag.BoolVar(&cooling, "cooling", false, "cooling data")
   flag.BoolVar(&cabs, "cabs", false, "CABS data")
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, glass slide")
+  flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
+
+  if coolingExperiment != "" {
+    cooling = true
+  }
 
   if cooling && cabs {
     fmt.Println("flag.Parse(): data flagged as both cooling and CABS.")
@@ -340,7 +347,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cooling, cabs, lock, temp, lcof, slide, sample, note, length
+  return cooling, cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length
 }
 
 func logpath(
@@ -783,7 +790,7 @@ func readCSV(
 
 func header(
   cooling, cabs, lock, temp, lcof, slide bool,
-  date, run, sample, note string,
+  date, run, sample, coolingExperiment, note string,
   length float64,
 ) (
   []string,
@@ -1133,18 +1140,34 @@ func axes(
 
 func subtractBackground(
   ras, bas, rs, bs [][][]float64,
+  coolingExperiment string,
 ) (
   [][][]float64, [][][]float64,
 ) {
 
   var s, as [][][]float64
 
-  for i := range rs {
-    s = append(s, subtract(bs[i], rs[i]))
-  }
+  if coolingExperiment == "pump-only" {
+    for i := range rs {
+     if i == 15 {
+       sOutlier := true
+       s = append(s, subtract(bs[0], rs[i], sOutlier))
+     } else {
+       s = append(s, subtract(bs[0], rs[i], false))
+     }
+   }
 
-  for i := range ras {
-    as = append(as, subtract(bas[i], ras[i]))
+    for i := range ras {
+      as = append(as, subtract(bas[0], ras[i], false))
+    }
+  } else {
+    for i := range rs {
+      s = append(s, subtract(bs[i], rs[i], false))
+   }
+
+    for i := range ras {
+      as = append(as, subtract(bas[i], ras[i], false))
+    }
   }
 
   return s, as
@@ -1152,12 +1175,19 @@ func subtractBackground(
 
 func subtract(
   b, s [][]float64,
+  sOutlier bool,
 ) (
   [][]float64,
 ) {
 
   var shift float64
-  shift = -(avg(s[1][:100]) - avg(b[1][:100]))
+
+  // Applies to pump-only cooling data
+  if sOutlier {
+    shift = -(avg(s[1][:250]) - avg(b[1][:250]))
+  } else {
+    shift = -(avg(s[1][:100]) - avg(b[1][:100]))
+  }
 
   for i := range b[0] {
     s[1][i] = s[1][i] - b[1][i] + shift
