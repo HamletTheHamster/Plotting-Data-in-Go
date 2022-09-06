@@ -62,7 +62,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{0,4,8,12,15}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath, slide)
     }
@@ -97,13 +97,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}
+      binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -182,7 +182,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -2114,6 +2114,7 @@ func goPlotLinewidths(
 
   ΓasEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
   ΓasEffPlot.LineStyle.Width = vg.Points(3)
+  ΓasEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
   ΓsEffPlot, err := plotter.NewLine(buildData(ΓsEff))
   if err != nil {
@@ -2123,7 +2124,7 @@ func goPlotLinewidths(
 
   ΓsEffPlot.LineStyle.Color = color.RGBA{R: 0, G: 89, B: 128, A: 255}
   ΓsEffPlot.LineStyle.Width = vg.Points(3)
-
+  ΓsEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
   p.Add(asPlotFit, sPlotFit, ΓasEffPlot, ΓsEffPlot)
   p.Legend.Add("Anti-Stokes", asPlotFit)
