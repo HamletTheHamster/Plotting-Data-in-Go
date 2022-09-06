@@ -23,20 +23,20 @@ import (
 
 func main() {
 
-  cooling, cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length := flags()
+  cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length := flags()
 
   logpath := logpath(note)
 
   date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
-    cooling, cabs, lock, temp,
+    cabs, lock, temp, coolingExperiment,
   )
 
   log := header(
-    cooling, cabs, lock, temp, lcof, slide, date, run, sample,
-    coolingExperiment, note, length,
+    cabs, lock, temp, lcof, slide, date, run, sample, coolingExperiment, note,
+    length,
   )
 
-  if cooling {
+  if coolingExperiment != "" {
 
     ras, bas, rs, bs := getCoolingData(lock, file, label)
 
@@ -65,7 +65,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(subtractedGrouped, s, as, sLabel, asLabel, logpath, slide)
     }
@@ -100,13 +100,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}
+      binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2} //,3,4,5,6,7,8,9,10,11,12,13,14,15
+      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -185,7 +185,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -315,10 +315,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, string, string, string, float64,
+  bool, bool, bool, bool, bool, string, string, string, float64,
 ) {
 
-  var cooling, cabs, lock, temp, lcof, slide bool
+  var cabs, lock, temp, lcof, slide bool
   var sample, coolingExperiment, note string
   var length float64
 
@@ -327,17 +327,13 @@ func flags() (
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
-  flag.StringVar(&sample, "sample", "", "sample: UHNA3, CS2, TeO2, glass slide")
+  flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.Parse()
 
-  if coolingExperiment != "" {
-    cooling = true
-  }
-
-  if cooling && cabs {
+  if coolingExperiment != "" && cabs {
     fmt.Println("flag.Parse(): data flagged as both cooling and CABS.")
     os.Exit(1)
   }
@@ -347,7 +343,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cooling, cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length
+  return cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length
 }
 
 func logpath(
@@ -359,7 +355,8 @@ func logpath(
 }
 
 func readMeta(
-  cooling, cabs, lock, temp bool,
+  cabs, lock, temp bool,
+  coolingExperiment string,
 ) (
   string, string, []string, []float64, []float64, []string, []float64, []float64,
 ) {
@@ -421,7 +418,7 @@ func readMeta(
 
       label = append(label, v[labelCol])
 
-      if cooling {
+      if coolingExperiment != "" {
         if strings.Contains(v[labelCol], "ras") {
           if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
             asPowers = append(asPowers, v)
@@ -789,7 +786,7 @@ func readCSV(
 }
 
 func header(
-  cooling, cabs, lock, temp, lcof, slide bool,
+  cabs, lock, temp, lcof, slide bool,
   date, run, sample, coolingExperiment, note string,
   length float64,
 ) (
@@ -813,9 +810,9 @@ func header(
 
   fmt.Printf(log[0])
 
-  if cooling {
-    log = append(log, "\n*Cooling Data*\n")
-    fmt.Printf("\n*Cooling Data*\n")
+  if coolingExperiment != "" {
+    log = append(log, "\n*Cooling Data: " + coolingExperiment + "*\n")
+    fmt.Printf("\n*Cooling Data: " + coolingExperiment + "*\n")
   } else if cabs {
     log = append(log, "\n*CABS Data*\n")
     fmt.Printf("\n*CABS Data*\n")
