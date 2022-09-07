@@ -65,7 +65,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{0,4,8,12,15}
+    subtractedGrouped := []int{}  // 0,4,8,12,15
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, coolingExperiment,
@@ -103,13 +103,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,4,8,12,15}
+      binSets := []int{0,1,2}  // 0,4,8,12,15
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,4,8,12,15}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,4,8,12,15}
+      fitStokes := []int{}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1060,11 +1060,11 @@ func axes(
     switch sample {
     case "Liquid-Core":
       xrange := []float64{0, 200}
-      yrange := []float64{90, 130}
+      yrange := []float64{95, 125}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{90, 95, 100, 105, 110, 115, 120, 125, 130}
+      ytick := []float64{95, 100, 105, 110, 115, 120, 125}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"90", "", "100", "", "110", "", "120", "", "130"}
+      ytickLabel := []string{"", "100", "", "110", "", "120", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1624,7 +1624,7 @@ func goPlotasPowerVsWid(
 
     // Vertical
     v[0].X = pts[0].X
-    v[0].Y = 90
+    v[0].Y = 95
     v[1].X = pts[0].X
     v[1].Y = pts[0].Y
 
