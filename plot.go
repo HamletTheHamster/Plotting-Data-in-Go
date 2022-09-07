@@ -103,13 +103,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}  // 0,4,8,12,15
+      binSets := []int{0,4,8,12,15}  // 0,4,8,12,15
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,4,8,12,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,4,8,12,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
