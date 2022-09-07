@@ -288,13 +288,14 @@ func main() {
             powers = append(powers, (v + sPowers[i])/2)
           }
           goPlotHeightRatios(
-            fitStokes, ampRatios, powers, sLabel, sample, logpath, slide,
+            fitStokes, ampRatios, powers, sLabel, sample, logpath,
+            coolingExperiment, slide,
           )
 
           ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
           goPlotLinewidths(
             fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers,
-            sPowers, sLabel, sample, logpath, slide,
+            sPowers, sLabel, sample, logpath, coolingExperiment, slide,
           )
 
         } else {
@@ -932,7 +933,7 @@ func plotCABS(
   ylabel := "Spectral Density (uV)"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample)
+  xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1017,14 +1018,25 @@ func axes(
   case "fits":
     switch sample {
     case "Liquid-Core":
-      xrange := []float64{2, 2.5}
-      yrange := []float64{-0.25, 2.5}
-      xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-      ytick := []float64{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
-      xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-      ytickLabel := []string{"0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
+      if coolingExperiment == "pump-only" {
+        xrange := []float64{2, 2.5}
+        yrange := []float64{-0.25, 17.5}
+        xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+        ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+        xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+        ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
 
-      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+        return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+      } else if coolingExperiment == "pump-probe" {
+        xrange := []float64{2, 2.5}
+        yrange := []float64{-0.25, 2.5}
+        xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+        ytick := []float64{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
+        xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+        ytickLabel := []string{"0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
+
+        return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+      }
     case "UHNA3":
       xrange := []float64{1, 1.36}
       yrange := []float64{0, 17.5}
@@ -1393,9 +1405,17 @@ func goPlotasFits(
   title := " "
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
-  legend := "Pump"
+  legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("fits", sample)
+  if coolingExperiment == "pump-only" {
+    legend = "Power"
+  } else if coolingExperiment == "pump-probe" {
+    legend = "Pump"
+  }
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "fits", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1559,7 +1579,9 @@ func goPlotasPowerVsWid(
   ylabel := "FWHM (MHz)"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("pow vs wid", sample)
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "pow vs wid", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1654,12 +1676,20 @@ func goPlotsFits(
   sample, logpath, coolingExperiment string,
 ) {
 
-  title := sample + " Stokes"
+  title := " " // sample + " Stokes"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
-  legend := "Power"
+  legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("fits", sample)
+  if coolingExperiment == "pump-only" {
+    legend = "Power"
+  } else if coolingExperiment == "pump-probe" {
+    legend = "Pump"
+  }
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "fits", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1752,7 +1782,9 @@ func goPlotsPowerVsWid(
   ylabel := "Full Width Half Max (MHz)"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("pow vs wid", sample)
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "pow vs wid", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1841,7 +1873,7 @@ func goPlotHeightRatios(
   sets []int,
   heightRatios, powers []float64,
   labels []string,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
   slide bool,
 ) {
 
@@ -1850,7 +1882,9 @@ func goPlotHeightRatios(
   ylabel := "Stokes/Anti-Stokes Heights"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("height ratios", sample)
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "height ratios", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1982,7 +2016,7 @@ func goPlotLinewidths(
   ΓasEff, ΓsEff [][]float64,
   asLinewidths, sLinewidths, asPowers, sPowers []float64,
   labels []string,
-  sample, logpath string,
+  sample, logpath, coolingExperiment string,
   slide bool,
 ) {
 
@@ -1991,7 +2025,9 @@ func goPlotLinewidths(
   ylabel := "Dissipation Rate (MHz)"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("linewidths", sample)
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "linewidths", sample, coolingExperiment,
+  )
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
