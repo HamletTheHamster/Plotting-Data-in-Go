@@ -23,7 +23,7 @@ import (
 
 func main() {
 
-  cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length := flags()
+  cabs, lock, temp, slide, sample, coolingExperiment, note, length := flags()
 
   logpath := logpath(note)
 
@@ -32,7 +32,7 @@ func main() {
   )
 
   log := header(
-    cabs, lock, temp, lcof, slide, date, run, sample, coolingExperiment, note,
+    cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
     length,
   )
 
@@ -77,10 +77,8 @@ func main() {
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
-      var sample string
 
-      if lcof {
-        sample = "Liquid-Core"
+      if sample == "LCOF" {
         amp = 5
         wid = 0.1
         cen = 2.275
@@ -321,17 +319,16 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, string, string, string, float64,
+  bool, bool, bool, bool, string, string, string, float64,
 ) {
 
-  var cabs, lock, temp, lcof, slide bool
+  var cabs, lock, temp, slide bool
   var sample, coolingExperiment, note string
   var length float64
 
   flag.BoolVar(&cabs, "cabs", false, "CABS data")
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
-  flag.BoolVar(&lcof, "lcof", false, "liquid-core optical fiber sample")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
@@ -344,12 +341,12 @@ func flags() (
     os.Exit(1)
   }
 
-  if (lcof) && length == 0 {
+  if sample == "LCOF" && length == 0 {
     fmt.Println("Specify length of sample in meters with -len=")
     os.Exit(1)
   }
 
-  return cabs, lock, temp, lcof, slide, sample, coolingExperiment, note, length
+  return cabs, lock, temp, slide, sample, coolingExperiment, note, length
 }
 
 func logpath(
@@ -792,7 +789,7 @@ func readCSV(
 }
 
 func header(
-  cabs, lock, temp, lcof, slide bool,
+  cabs, lock, temp, slide bool,
   date, run, sample, coolingExperiment, note string,
   length float64,
 ) (
@@ -827,7 +824,7 @@ func header(
     log = append(log, "\n*Temperature-dependent data*\n")
     fmt.Printf("\n*Temperature-dependent data*\n")
   }
-  if lcof {
+  if sample == "LCOF" {
     str := fmt.Sprintf("\n*Liquid-core optical fiber sample*\n")
     log = append(log, str)
     fmt.Printf(str)
@@ -1017,7 +1014,7 @@ func axes(
     }
   case "fits":
     switch sample {
-    case "Liquid-Core":
+    case "LCOF":
       if coolingExperiment == "pump-only" {
         xrange := []float64{2, 2.5}
         yrange := []float64{-0.25, 17.5}
@@ -1058,7 +1055,7 @@ func axes(
     }
   case "pow vs wid":
     switch sample {
-    case "Liquid-Core":
+    case "LCOF":
       xrange := []float64{0, 200}
       yrange := []float64{95, 125}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
@@ -1088,7 +1085,7 @@ func axes(
     }
   case "height ratios":
     switch sample {
-    case "Liquid-Core":
+    case "LCOF":
       xrange := []float64{0, 200}
       yrange := []float64{1, 3.75}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
@@ -1118,7 +1115,7 @@ func axes(
     }
   case "linewidths":
     switch sample {
-    case "Liquid-Core":
+    case "LCOF":
       xrange := []float64{0, 200}
       yrange := []float64{60, 120}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
