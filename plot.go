@@ -65,7 +65,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{}  // 0,4,8,12,15
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, coolingExperiment,
@@ -101,13 +101,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+      binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -936,7 +936,7 @@ func plotCABS(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
@@ -957,7 +957,7 @@ func plotCABS(
     plotSet.GlyphStyle.Radius = vg.Points(5) //3
     plotSet.Shape = draw.CircleGlyph{}
 
-    p.Add(plotSet)
+    p.Add(plotSet, t, r)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1017,11 +1017,11 @@ func axes(
     case "LCOF":
       if coolingExperiment == "pump-only" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-0.25, 17.5}
+        yrange := []float64{-0.5, 17.5}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
+        ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+        ytickLabel := []string{"0", "", "5", "", "10", "", "15"}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
@@ -1089,8 +1089,8 @@ func axes(
       xrange := []float64{0, 200}
       yrange := []float64{1, 3.75}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5, 3.75}
-      xtickLabel := []string{"", "", "50", "", "100", "", "150", "", "200"}
+      ytick := []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
       ytickLabel := []string{"1", "", "1.5", "", "2", "", "2.5", "", "3", "", "3.5", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
@@ -1120,8 +1120,8 @@ func axes(
       yrange := []float64{60, 120}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
       ytick := []float64{60, 70, 80, 90, 100, 110, 120}
-      xtickLabel := []string{"", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"", "", "80", "", "100", "", "110", "", "120"}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"60", "", "80", "", "100", "", "110", "", "120"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1269,7 +1269,7 @@ func goPlotSubGrpd(
   xtickLabels := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
   ytickLabels := []string{"-0.5", "", "0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
@@ -1295,7 +1295,7 @@ func goPlotSubGrpd(
     }
     plotSet.Shape = draw.CircleGlyph{}
 
-    p.Add(plotSet)
+    p.Add(plotSet, t, r)
 
     // Legend
     l, err := plotter.NewScatter(asPts)
@@ -1324,7 +1324,7 @@ func goPlotSubGrpd(
   xtickLabels = []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
   ytickLabels = []string{"0", "", "2", "", "4", "", "6", "", "8", "", "10"}
 
-  p = prepPlot(
+  p, t, r = prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabels, ytickLabels,
@@ -1350,7 +1350,7 @@ func goPlotSubGrpd(
     }
     plotSet.Shape = draw.CircleGlyph{}
 
-    p.Add(plotSet)
+    p.Add(plotSet, t, r)
 
     // Legend
     l, err := plotter.NewScatter(sPts)
@@ -1418,7 +1418,7 @@ func goPlotasFits(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
@@ -1468,7 +1468,7 @@ func goPlotasFits(
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, plotFit, plotWid)
+    p.Add(plotPts, t, r, plotFit, plotWid)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1584,40 +1584,12 @@ func goPlotasPowerVsWid(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
     slide,
   )
-
-  // Enclosed plot
-  t := make(plotter.XYs, 2)
-  r := make(plotter.XYs, 2)
-
-  // Top
-  t[0].X = xrange[0]
-  t[0].Y = yrange[1]
-  t[1].X = xrange[1]
-  t[1].Y = yrange[1]
-
-  tAxis, err := plotter.NewLine(t)
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
-
-  // Right
-  r[0].X = xrange[1]
-  r[0].Y = yrange[0]
-  r[1].X = xrange[1]
-  r[1].Y = yrange[1]
-
-  rAxis, err := plotter.NewLine(r)
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
 
   for i, set := range sets {
 
@@ -1680,7 +1652,7 @@ func goPlotasPowerVsWid(
     hDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, tAxis, rAxis, vDash, hDash)
+    p.Add(plotPts, t, r, vDash, hDash)
     /*if temp {
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
@@ -1720,7 +1692,7 @@ func goPlotsFits(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
@@ -1770,7 +1742,7 @@ func goPlotsFits(
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, plotFit, plotWid)
+    p.Add(plotPts, t, r, plotFit, plotWid)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1815,7 +1787,7 @@ func goPlotsPowerVsWid(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
@@ -1882,7 +1854,7 @@ func goPlotsPowerVsWid(
     hDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, vDash, hDash)
+    p.Add(plotPts, t, r, vDash, hDash)
     if temp {
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
@@ -1915,7 +1887,7 @@ func goPlotHeightRatios(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
@@ -1986,7 +1958,7 @@ func goPlotHeightRatios(
     os.Exit(1)
   }
 
-  p.Add(plotFit)
+  p.Add(plotFit, t, r)
 
   plotFit.LineStyle.Color = color.RGBA{R: 127, G: 127, B: 127, A: 255}
   plotFit.LineStyle.Width = vg.Points(3)
@@ -2058,7 +2030,7 @@ func goPlotLinewidths(
     os.Exit(1)
   }
 
-  p := prepPlot(
+  p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
     xtickLabel, ytickLabel,
@@ -2219,7 +2191,7 @@ func goPlotLinewidths(
   ΓsEffPlot.LineStyle.Width = vg.Points(3)
   ΓsEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
-  p.Add(asPlotFit, sPlotFit, ΓasEffPlot, ΓsEffPlot)
+  p.Add(asPlotFit, t, r, sPlotFit, ΓasEffPlot, ΓsEffPlot)
   p.Legend.Add("Anti-Stokes", asPlotFit)
   p.Legend.Add("Γas,eff", ΓasEffPlot)
   p.Legend.Add("Stokes", sPlotFit)
@@ -2281,6 +2253,7 @@ func prepPlot(
   slide bool,
 ) (
   *plot.Plot,
+  *plotter.Line, *plotter.Line,
 ) {
 
   p := plot.New()
@@ -2303,7 +2276,7 @@ func prepPlot(
   }
 
   p.X.Tick.Marker = plot.ConstantTicks(xticks)
-  p.X.Padding = vg.Points(-8.5)
+  p.X.Padding = vg.Points(-12.5)
 
   p.Y.Label.Text = ylabel
   p.Y.Label.TextStyle.Font.Variant = "Sans"
@@ -2361,7 +2334,35 @@ func prepPlot(
     p.Legend.TextStyle.Font.Size = 36
   }
 
-  return p
+  // Enclose plot
+  t := make(plotter.XYs, 2)
+  r := make(plotter.XYs, 2)
+
+  // Top
+  t[0].X = xrange[0]
+  t[0].Y = yrange[1]
+  t[1].X = xrange[1]
+  t[1].Y = yrange[1]
+
+  tAxis, err := plotter.NewLine(t)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  // Right
+  r[0].X = xrange[1]
+  r[0].Y = yrange[0]
+  r[1].X = xrange[1]
+  r[1].Y = yrange[1]
+
+  rAxis, err := plotter.NewLine(r)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  return p, tAxis, rAxis
 }
 
 func palette(
