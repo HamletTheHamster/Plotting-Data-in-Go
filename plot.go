@@ -1017,7 +1017,7 @@ func axes(
     case "LCOF":
       if coolingExperiment == "pump-only" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-0.5, 17.5}
+        yrange := []float64{-0.5, 15}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
         ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
@@ -1425,6 +1425,10 @@ func goPlotasFits(
     slide,
   )
 
+  p.Legend.Left = true
+  p.Legend.XOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(-50)
+
   for i, set := range sets {
 
     pts := buildData(as[set])
@@ -1698,6 +1702,10 @@ func goPlotsFits(
     xtickLabel, ytickLabel,
     slide,
   )
+
+  p.Legend.Left = true
+  p.Legend.XOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(-50)
 
   for i, set := range sets {
 
@@ -2193,9 +2201,9 @@ func goPlotLinewidths(
 
   p.Add(asPlotFit, t, r, sPlotFit, ΓasEffPlot, ΓsEffPlot)
   p.Legend.Add("Anti-Stokes", asPlotFit)
-  p.Legend.Add("Γas,eff", ΓasEffPlot)
+  p.Legend.Add("$\gamma$ as,eff", ΓasEffPlot)
   p.Legend.Add("Stokes", sPlotFit)
-  p.Legend.Add("Γs,eff", ΓsEffPlot)
+  p.Legend.Add("$\gamma$ s,eff", ΓsEffPlot)
 
   // as points
   for i, set := range sets {
