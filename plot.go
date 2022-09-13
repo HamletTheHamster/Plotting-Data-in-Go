@@ -2201,9 +2201,9 @@ func goPlotLinewidths(
 
   p.Add(asPlotFit, t, r, sPlotFit, ΓasEffPlot, ΓsEffPlot)
   p.Legend.Add("Anti-Stokes", asPlotFit)
-  p.Legend.Add("$\gamma$ as,eff", ΓasEffPlot)
+  p.Legend.Add("Γ as,eff", ΓasEffPlot)
   p.Legend.Add("Stokes", sPlotFit)
-  p.Legend.Add("$\gamma$ s,eff", ΓsEffPlot)
+  p.Legend.Add("Γ s,eff", ΓsEffPlot)
 
   // as points
   for i, set := range sets {
