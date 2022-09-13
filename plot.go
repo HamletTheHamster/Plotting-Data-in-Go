@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1056,12 +1056,12 @@ func axes(
   case "pow vs wid":
     switch sample {
     case "LCOF":
-      xrange := []float64{0, 200}
+      xrange := []float64{-25, 200}
       yrange := []float64{95, 125}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{95, 100, 105, 110, 115, 120, 125}
+      ytick := []float64{100, 105, 110, 115, 120}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"", "100", "", "110", "", "120", ""}
+      ytickLabel := []string{"100", "", "110", "", "120"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1591,6 +1591,34 @@ func goPlotasPowerVsWid(
     slide,
   )
 
+  // Enclosed plot
+  t := make(plotter.XYs, 2)
+  r := make(plotter.XYs, 2)
+
+  // Top
+  t[0].X = xrange[0]
+  t[0].Y = yrange[1]
+  t[1].X = xrange[1]
+  t[1].Y = yrange[1]
+
+  tAxis, err := plotter.NewLine(t)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  // Right
+  r[0].X = xrange[1]
+  r[0].Y = yrange[0]
+  r[1].X = xrange[1]
+  r[1].Y = yrange[1]
+
+  rAxis, err := plotter.NewLine(r)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
   for i, set := range sets {
 
     pts := make(plotter.XYs, 1)
@@ -1621,7 +1649,7 @@ func goPlotasPowerVsWid(
 
     // Vertical
     v[0].X = pts[0].X
-    v[0].Y = 95
+    v[0].Y = yrange[0]
     v[1].X = pts[0].X
     v[1].Y = pts[0].Y
 
@@ -1636,7 +1664,7 @@ func goPlotasPowerVsWid(
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
     // Horizontal
-    h[0].X = -15
+    h[0].X = xrange[0]
     h[0].Y = pts[0].Y
     h[1].X = pts[0].X
     h[1].Y = pts[0].Y
@@ -1652,7 +1680,7 @@ func goPlotasPowerVsWid(
     hDash.LineStyle.Dashes = []vg.Length{vg.Points(5), vg.Points(5)}
 
     // Add set plots to p
-    p.Add(plotPts, vDash, hDash)
+    p.Add(plotPts, tAxis, rAxis, vDash, hDash)
     /*if temp {
       temperature := strconv.FormatFloat(notes[set], 'f', -1, 64)
       p.Legend.Add(power + " mW @" + temperature + "K", plotPts)
