@@ -1,0 +1,10 @@
+Data taken: 21-9-14
+Run: 21-9-14
+Sample: LCOF
+Runtime note: test std dev tacked onto data
+
+*Cooling Data: pump-probe*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*

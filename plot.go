@@ -107,7 +107,7 @@ func main() {
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -1508,16 +1508,17 @@ func bin(
   binGHz := binMHz/1000
   nBins := int((as[0][0][len(as[0][0]) - 1] - as[0][0][0])/binGHz + 1)
 
-  asBinned :=  make([][][]float64, len(as))
+  // [set][0: feq, 1: sig, 2: err][values]
+  asBinned := make([][][]float64, len(as))
   for i := range asBinned {
-    asBinned[i] = make([][]float64, 2)
+    asBinned[i] = make([][]float64, 3)
     for j := range asBinned[i] {
       asBinned[i][j] = make([]float64, nBins)
     }
   }
-  sBinned :=  make([][][]float64, len(s))
+  sBinned := make([][][]float64, len(s))
   for i := range sBinned {
-    sBinned[i] = make([][]float64, nBins)
+    sBinned[i] = make([][]float64, 3)
     for j := range sBinned[i] {
       sBinned[i][j] = make([]float64, nBins)
     }
@@ -1551,22 +1552,19 @@ func bin(
       sBinned[set][1][i] = avg(sSigsInBin)
 
       // Find standard deviation of the mean within bin
-      var σs float64
       dev := 0.
       for _, v := range asSigsInBin {
         dev += math.Pow(v - avg(asSigsInBin), 2)
       }
       n := float64(len(asSigsInBin))
-      //σas = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
-      //fmt.Println(fmt.Sprint(asBinned[set][1][i]) + " +/- " + fmt.Sprint(σas))
+      asBinned[set][2][i] = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
 
       dev = 0
       for _, v := range sSigsInBin {
         dev += math.Pow(v - avg(sSigsInBin), 2)
       }
       n = float64(len(sSigsInBin))
-      σs = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
-      fmt.Println(fmt.Sprint(sBinned[set][1][i]) + " +/- " + fmt.Sprint(σs))
+      sBinned[set][2][i] = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
     }
   }
   return asBinned, sBinned
