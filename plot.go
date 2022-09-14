@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -882,6 +882,21 @@ func buildData(
   return xy
 }
 
+/*
+func buildErrors(
+  data [][]float64,
+) (
+  plotter.Errors,
+) {
+
+  error := make(plotter.Errors, len(data[2]))
+
+  for i := range error {
+    error[i].Low = data[2][i]
+  }
+}
+*/
+
 func plotRaw(
   sets []int,
   bas, ras, bs, rs [][][]float64,
@@ -1571,6 +1586,7 @@ func σ(
     dev += math.Pow(v - avg(values), 2)
   }
   n := float64(len(values))
+
   return math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
 }
 
