@@ -101,13 +101,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+      binSets := []int{0,1,2}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      fitAntiStokes := []int{}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      fitStokes := []int{}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1549,6 +1549,24 @@ func bin(
       }
       sBinned[set][0][i] = sBound - (binGHz/2)
       sBinned[set][1][i] = avg(sSigsInBin)
+
+      // Find standard deviation of the mean within bin
+      var σs float64
+      dev := 0.
+      for _, v := range asSigsInBin {
+        dev += math.Pow(v - avg(asSigsInBin), 2)
+      }
+      n := float64(len(asSigsInBin))
+      //σas = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
+      //fmt.Println(fmt.Sprint(asBinned[set][1][i]) + " +/- " + fmt.Sprint(σas))
+
+      dev = 0
+      for _, v := range sSigsInBin {
+        dev += math.Pow(v - avg(sSigsInBin), 2)
+      }
+      n = float64(len(sSigsInBin))
+      σs = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
+      fmt.Println(fmt.Sprint(sBinned[set][1][i]) + " +/- " + fmt.Sprint(σs))
     }
   }
   return asBinned, sBinned
