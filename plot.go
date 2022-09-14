@@ -1551,23 +1551,27 @@ func bin(
       sBinned[set][0][i] = sBound - (binGHz/2)
       sBinned[set][1][i] = avg(sSigsInBin)
 
-      // Find standard deviation of the mean within bin
-      dev := 0.
-      for _, v := range asSigsInBin {
-        dev += math.Pow(v - avg(asSigsInBin), 2)
-      }
-      n := float64(len(asSigsInBin))
-      asBinned[set][2][i] = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
-
-      dev = 0
-      for _, v := range sSigsInBin {
-        dev += math.Pow(v - avg(sSigsInBin), 2)
-      }
-      n = float64(len(sSigsInBin))
-      sBinned[set][2][i] = math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
+      // Error for each binned point
+      asBinned[set][2][i] = σ(asSigsInBin)
+      sBinned[set][2][i] = σ(sSigsInBin)
     }
   }
   return asBinned, sBinned
+}
+
+func σ(
+  values []float64,
+) (
+  float64,
+) {
+
+  // Standard deviation of the mean within bin
+  dev := 0.
+  for _, v := range values {
+    dev += math.Pow(v - avg(values), 2)
+  }
+  n := float64(len(values))
+  return math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
 }
 
 func avg(
