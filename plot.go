@@ -101,13 +101,13 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+      binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
       }
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{3,7,11,15,18}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{3,7,11,15,18}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -2419,7 +2419,7 @@ func palette(
 
   if coolingExperiment == "pump-probe" {
     if dark {
-      darkColor := make([]color.RGBA, 16)
+      darkColor := make([]color.RGBA, 21)
       darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
       darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
@@ -2427,7 +2427,7 @@ func palette(
       return darkColor[brush]
     }
 
-    col := make([]color.RGBA, 16)
+    col := make([]color.RGBA, 21)
     col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
     col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
@@ -2436,7 +2436,7 @@ func palette(
 
   } else if coolingExperiment == "pump-only" {
     if dark {
-      darkColor := make([]color.RGBA, 16)
+      darkColor := make([]color.RGBA, 21)
       darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
       darkColor[4] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[8] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
@@ -2453,11 +2453,16 @@ func palette(
       darkColor[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
       darkColor[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
       darkColor[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+      darkColor[16] = color.RGBA{R: 36, G: 117, B: 100, A: 255}
+      darkColor[17] = color.RGBA{R: 117, G: 85, B: 41, A: 255}
+      darkColor[18] = color.RGBA{R: 86, G: 17, B: 22, A: 255}
+      darkColor[19] = color.RGBA{R: 17, G: 39, B: 91, A: 255}
+      darkColor[20] = color.RGBA{R: 54, G: 12, B: 66, A: 255}
 
       return darkColor[brush]
     }
 
-    col := make([]color.RGBA, 16)
+    col := make([]color.RGBA, 21)
     col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
     col[4] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[8] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
@@ -2474,6 +2479,11 @@ func palette(
     col[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
     col[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
     col[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+    col[16] = color.RGBA{R: 36, G: 117, B: 100, A: 255}
+    col[17] = color.RGBA{R: 117, G: 85, B: 41, A: 255}
+    col[18] = color.RGBA{R: 86, G: 17, B: 22, A: 255}
+    col[19] = color.RGBA{R: 17, G: 39, B: 91, A: 255}
+    col[20] = color.RGBA{R: 54, G: 12, B: 66, A: 255}
 
     return col[brush]
   }

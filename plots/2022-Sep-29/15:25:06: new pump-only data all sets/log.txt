@@ -1,0 +1,51 @@
+Data taken: 22-9-29
+Run: 22-9-29
+Sample: LCOF
+Runtime note: new pump-only data all sets
+
+*Cooling Data: pump-only*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+2 	 20.00 mW 	 100.98 MHz 	 1.851261 nV 	 2.2564 GHz
+3 	 30.00 mW 	 84.15 MHz 	 2.975127 nV 	 2.2572 GHz
+4 	 40.00 mW 	 84.44 MHz 	 3.924757 nV 	 2.2563 GHz
+5 	 50.00 mW 	 86.73 MHz 	 4.924434 nV 	 2.2572 GHz
+6 	 60.00 mW 	 87.22 MHz 	 5.895569 nV 	 2.2567 GHz
+7 	 70.00 mW 	 88.93 MHz 	 6.841011 nV 	 2.2567 GHz
+8 	 80.00 mW 	 88.98 MHz 	 7.809044 nV 	 2.2562 GHz
+9 	 90.00 mW 	 90.09 MHz 	 8.693066 nV 	 2.2563 GHz
+10 	 100.00 mW 	 89.67 MHz 	 9.726983 nV 	 2.2559 GHz
+11 	 110.00 mW 	 90.44 MHz 	 10.702220 nV 	 2.2559 GHz
+12 	 120.00 mW 	 89.84 MHz 	 11.729266 nV 	 2.2558 GHz
+13 	 130.00 mW 	 92.73 MHz 	 12.641101 nV 	 2.2558 GHz
+14 	 140.00 mW 	 91.54 MHz 	 13.533781 nV 	 2.2553 GHz
+15 	 150.00 mW 	 91.46 MHz 	 14.573242 nV 	 2.2555 GHz
+16 	 160.00 mW 	 92.56 MHz 	 15.502548 nV 	 2.2550 GHz
+17 	 170.00 mW 	 92.51 MHz 	 16.447235 nV 	 2.2549 GHz
+18 	 180.00 mW 	 92.84 MHz 	 17.330878 nV 	 2.2546 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+2 	 20.00 mW 	 31.63 MHz 	 2.786208 nV 	 2.4621 GHz
+3 	 30.00 mW 	 85.18 MHz 	 3.217097 nV 	 2.2571 GHz
+4 	 40.00 mW 	 82.07 MHz 	 4.269893 nV 	 2.2583 GHz
+5 	 50.00 mW 	 84.95 MHz 	 5.343416 nV 	 2.2575 GHz
+6 	 60.00 mW 	 88.74 MHz 	 6.457501 nV 	 2.2574 GHz
+7 	 70.00 mW 	 86.41 MHz 	 7.643001 nV 	 2.2574 GHz
+8 	 80.00 mW 	 86.12 MHz 	 8.847516 nV 	 2.2571 GHz
+9 	 90.00 mW 	 84.72 MHz 	 10.219172 nV 	 2.2567 GHz
+10 	 100.00 mW 	 85.63 MHz 	 11.392215 nV 	 2.2570 GHz
+11 	 110.00 mW 	 84.73 MHz 	 12.809556 nV 	 2.2569 GHz
+12 	 120.00 mW 	 84.74 MHz 	 14.030515 nV 	 2.2568 GHz
+13 	 130.00 mW 	 84.70 MHz 	 15.456349 nV 	 2.2569 GHz
+14 	 140.00 mW 	 85.37 MHz 	 16.610242 nV 	 2.2568 GHz
+15 	 150.00 mW 	 55.72 MHz 	 17.215827 nV 	 2.2578 GHz
+16 	 160.00 mW 	 84.92 MHz 	 19.460323 nV 	 2.2566 GHz
+17 	 170.00 mW 	 83.67 MHz 	 21.287107 nV 	 2.2565 GHz
+18 	 180.00 mW 	 84.54 MHz 	 22.560111 nV 	 2.2565 GHz
+

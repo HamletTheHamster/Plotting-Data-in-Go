@@ -9,7 +9,7 @@ Date,Label,Probe,Filepath,Notes
 ,10 mW rs,,10/rs.csv,10
 ,20 mW bas,,20/bas.csv,
 ,20 mW bs,,20/bs.csv,
-,20 mW ras,,320/ras.csv,20
+,20 mW ras,,20/ras.csv,20
 ,20 mW rs,,20/rs.csv,20
 ,30 mW bas,,30/bas.csv,
 ,30 mW bs,,30/bs.csv,
