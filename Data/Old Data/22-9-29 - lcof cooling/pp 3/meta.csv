@@ -1,0 +1,13 @@
+Date,Label,Probe,Filepath,Notes
+22-9-29,0 mW bs,55,0/bs.csv,Probe powers are @sample
+,0 mW bas,0,0/bas.csv,
+,0 mW ras,55,0/ras.csv,
+,0 mW rs,55,0/rs.csv,
+,80 mW bs,55,80/bs.csv,
+,80 mW bas,0,80/bas.csv,
+,80 mW ras,55,80/ras.csv,
+,80 mW rs,55,80/rs.csv,
+,169 mW rs,55,169/rs.csv,
+,169 mW ras,55,169/ras.csv,
+,169 mW bas,0,169/bas.csv,
+,169 mW bs,0,169/bs.csv,
