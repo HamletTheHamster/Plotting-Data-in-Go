@@ -101,7 +101,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+      binSets := []int{3,7,11,15,18}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
       if len(binSets) > 0 {
         binMHz := 10.
         as, s = bin(binSets, as, s, binMHz)
@@ -1032,11 +1032,11 @@ func axes(
     case "LCOF":
       if coolingExperiment == "pump-only" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-0.5, 15}
+        yrange := []float64{-5, 25}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15}
+        ytick := []float64{0, 5, 10, 15, 20, 25}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "5", "", "10", "", "15"}
+        ytickLabel := []string{"0", "5", "10", "15", "20", "25"}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
