@@ -1041,11 +1041,11 @@ func axes(
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-0.25, 2.5}
+        yrange := []float64{-1, 10}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
+        ytick := []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
+        ytickLabel := []string{"0", "", "2", "", "4", "", "6", "", "8", "", "10"}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       }
@@ -1072,11 +1072,11 @@ func axes(
     switch sample {
     case "LCOF":
       xrange := []float64{-25, 200}
-      yrange := []float64{95, 125}
+      yrange := []float64{90, 105}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{100, 105, 110, 115, 120}
+      ytick := []float64{90, 92, 94, 96, 98, 100, 102, 104, 106}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"100", "", "110", "", "120"}
+      ytickLabel := []string{"90", "", "94", "", "98", "", "102", "", "106"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
