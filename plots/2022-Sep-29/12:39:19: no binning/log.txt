@@ -1,0 +1,23 @@
+Data taken: 22-9-29
+Run: 22-9-29
+Sample: LCOF
+Runtime note: no binning
+
+*Cooling Data: pump-probe*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 0.00 mW 	 92.25 MHz 	 5.866164 nV 	 2.2582 GHz
+1 	 80.00 mW 	 94.04 MHz 	 5.483639 nV 	 2.2576 GHz
+2 	 169.00 mW 	 100.16 MHz 	 5.189992 nV 	 2.2549 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 0.00 mW 	 87.45 MHz 	 6.349983 nV 	 2.2580 GHz
+1 	 80.00 mW 	 85.45 MHz 	 7.153729 nV 	 2.2582 GHz
+2 	 169.00 mW 	 84.75 MHz 	 7.744187 nV 	 2.2593 GHz
+
