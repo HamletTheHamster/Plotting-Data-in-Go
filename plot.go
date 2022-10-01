@@ -1041,11 +1041,11 @@ func axes(
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-1, 10}
+        yrange := []float64{-1, 4.5}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+        ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "2", "", "4", "", "6", "", "8", "", "10"}
+        ytickLabel := []string{"0", "", "1", "", "2", "", "3", "", "4", ""}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       }
