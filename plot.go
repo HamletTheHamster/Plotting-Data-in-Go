@@ -1102,11 +1102,11 @@ func axes(
     switch sample {
     case "LCOF":
       xrange := []float64{0, 200}
-      yrange := []float64{1, 3.75}
+      yrange := []float64{1, 1.5}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 3.5}
+      ytick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"1", "", "1.5", "", "2", "", "2.5", "", "3", "", "3.5", ""}
+      ytickLabel := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4", "", "1.5"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
