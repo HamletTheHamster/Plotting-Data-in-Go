@@ -65,11 +65,17 @@ func main() {
       asLabel, sLabel,
     )
 
-    subtractedGrouped := []int{}
+    binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+    if len(binSets) > 0 {
+      binMHz := 5.
+      as, s = bin(binSets, as, s, binMHz)
+    }
+
+    subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
-        subtractedGrouped, s, as, sLabel, asLabel, logpath, coolingExperiment,
-        slide,
+        subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
+        coolingExperiment, slide,
       )
     }
 
@@ -100,12 +106,6 @@ func main() {
       }
 
       var asAmps, asLinewidths []float64
-
-      binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
-      if len(binSets) > 0 {
-        binMHz := 10.
-        as, s = bin(binSets, as, s, binMHz)
-      }
 
       fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
@@ -1072,11 +1072,11 @@ func axes(
     switch sample {
     case "LCOF":
       xrange := []float64{-25, 200}
-      yrange := []float64{90, 105}
+      yrange := []float64{75, 110}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{90, 92, 94, 96, 98, 100, 102, 104, 106}
+      ytick := []float64{75, 80, 85, 90, 95, 100, 105, 110}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"90", "", "94", "", "98", "", "102", "", "106"}
+      ytickLabel := []string{"", "80", "", "90", "", "100", "", "110"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1131,12 +1131,12 @@ func axes(
   case "linewidths":
     switch sample {
     case "LCOF":
-      xrange := []float64{0, 200}
-      yrange := []float64{60, 120}
-      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{60, 70, 80, 90, 100, 110, 120}
-      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"60", "", "80", "", "100", "", "110", "", "120"}
+      xrange := []float64{-25, 200}
+      yrange := []float64{75, 110}
+      xtick := []float64{-25, 0, 25, 50, 75, 100, 125, 150, 175, 200}
+      ytick := []float64{75, 80, 85, 90, 95, 100, 105, 110}
+      xtickLabel := []string{"", "0", "", "50", "", "100", "", "150", "", "200"}
+      ytickLabel := []string{"", "80", "", "90", "", "100", "", "110"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1268,7 +1268,7 @@ func goPlotSubGrpd(
   sets []int,
   s, as [][][]float64,
   sLabel, asLabel []string,
-  logpath, coolingExperiment string,
+  logpath, sample, coolingExperiment string,
   slide bool,
 ) {
 
@@ -1277,19 +1277,25 @@ func goPlotSubGrpd(
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (nV)"
   legend := "Pump"
-  xrange := []float64{2, 2.36}
-  yrange := []float64{-0.5, 2.5}
-  xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4}
-  ytick := []float64{-0.5, -0.25, 0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
-  xtickLabels := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-  ytickLabels := []string{"-0.5", "", "0", "", "0.5", "", "1", "", "1.5", "", "2", "", "2.5"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
+    "fits", sample, coolingExperiment,
+  )
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
     slide,
   )
+
+  p.Legend.Left = true
+  p.Legend.XOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(-50)
 
   for _, set := range sets {
 
@@ -1332,19 +1338,25 @@ func goPlotSubGrpd(
   xlabel = "Frequency (GHz)"
   ylabel = "Spectral Density (nV)"
   legend = "Pump"
-  xrange = []float64{2, 2.36}
-  yrange = []float64{-0.5, 10}
-  xtick = []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-  ytick = []float64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-  xtickLabels = []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-  ytickLabels = []string{"0", "", "2", "", "4", "", "6", "", "8", "", "10"}
+
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err = axes(
+    "fits", sample, coolingExperiment,
+  )
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
 
   p, t, r = prepPlot(
     title, xlabel, ylabel, legend,
     xrange, yrange, xtick, ytick,
-    xtickLabels, ytickLabels,
+    xtickLabel, ytickLabel,
     slide,
   )
+
+  p.Legend.Left = true
+  p.Legend.XOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(-50)
 
   for _, set := range sets {
 
@@ -1867,7 +1879,7 @@ func goPlotsPowerVsWid(
 
     // Vertical
     v[0].X = pts[0].X
-    v[0].Y = 0
+    v[0].Y = yrange[0]
     v[1].X = pts[0].X
     v[1].Y = pts[0].Y
 
@@ -1882,7 +1894,7 @@ func goPlotsPowerVsWid(
     vDash.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
     // Horizontal
-    h[0].X = -15
+    h[0].X = xrange[0]
     h[0].Y = pts[0].Y
     h[1].X = pts[0].X
     h[1].Y = pts[0].Y
