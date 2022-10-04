@@ -513,6 +513,33 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
+/*
+func condense(
+  repeatedSets int,
+  powers []float64,
+) {
+
+  for _, powFloat := range powers {
+
+    if pow, err := strconv.ParseFloat(powFloat, 64); err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    } else {
+      for i := 0; i < repeatedSets; i++ {
+        // Read
+        f, err := os.Open("Data/" + strconv.ParseFloat(pow, 64) + "ras" + i + ".csv")
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+        defer f.Close()
+        dataStr, err := readCSV(f)
+      }
+    }
+  }
+}
+*/
+
 func getCoolingData(
   lock bool,
   fileNames, labels []string,
