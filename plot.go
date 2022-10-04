@@ -2082,8 +2082,8 @@ func Γeff(
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
   pow := []float64{0, maxPow}
-  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/4)}
-  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/4)}
+  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*length/4)}
+  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*length/4)}
 
   fmt.Printf("\nΓasEff: %.4f\n", ΓasEff[1])
   fmt.Printf("ΓsEff: %.4f\n", ΓsEff[1])
