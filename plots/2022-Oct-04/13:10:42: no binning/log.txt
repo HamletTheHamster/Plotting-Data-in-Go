@@ -1,7 +1,7 @@
 Data taken: 22-10-3
 Run: 22-10-3
 Sample: LCOF
-Runtime note: checking 110 mW
+Runtime note: no binning
 
 *Cooling Data: pump-only*
 
@@ -30,7 +30,7 @@ Set  	 Power 		 Width 		 Peak 		 Center
 17 	 170.00 mW 	 95.59 MHz 	 18.259963 nV 	 2.2563 GHz
 
 Stokes
-Set 	 Power 		 Width 		 Peak 		 Center 
+Set 	 Power 		 Width 		 Peak 		 Center
 1 	 10.00 mW 	 84.18 MHz 	 1.171059 nV 	 2.2611 GHz
 2 	 20.00 mW 	 86.52 MHz 	 2.360993 nV 	 2.2596 GHz
 3 	 30.00 mW 	 88.40 MHz 	 3.553727 nV 	 2.2591 GHz
@@ -48,4 +48,3 @@ Set 	 Power 		 Width 		 Peak 		 Center
 15 	 150.00 mW 	 57.82 MHz 	 18.643699 nV 	 2.2592 GHz
 16 	 160.00 mW 	 86.28 MHz 	 21.165612 nV 	 2.2581 GHz
 17 	 170.00 mW 	 85.86 MHz 	 22.832189 nV 	 2.2581 GHz
-
