@@ -65,13 +65,13 @@ func main() {
       asLabel, sLabel,
     )
 
-    binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+    binSets := []int{0,1,2,3}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
     if len(binSets) > 0 {
-      binMHz := 2.5
+      binMHz := 5.
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{0,1,2,3}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -85,7 +85,7 @@ func main() {
       var amp, wid, cen, gb, Γ float64
 
       if sample == "LCOF" {
-        amp = 5
+        amp = 2.
         wid = 0.1
         cen = 2.275
         gb = 4.75 // W^{-1}m^{-1}
@@ -107,7 +107,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{3,4,5,6,7,8,9,10,11,12,13,14,16,17}
+      fitAntiStokes := []int{0,1,2,3}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{3,4,5,6,7,8,9,10,11,12,13,14,16,17}
+      fitStokes := []int{0,1,2,3}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -685,13 +685,22 @@ func getData(
   if !lock {
     // Convert to Linear if dBm
     if dataStr[1][3] == " dBm" {
-      var nV []float64
 
+      // uV
+      var uV []float64
+      for _, dBm := range signal {
+        uV = append(uV, math.Pow(10, 6)*math.Pow(10, dBm/10.))
+      }
+      return [][]float64{frequency, uV}
+
+      /* nV
+      var nV []float64
       for _, dBm := range signal {
         nV = append(nV, 1000*math.Pow(10, 6)*math.Pow(10, dBm/10.))
       }
-
       return [][]float64{frequency, nV}
+      */
+
     } else if dataStr[1][3] == "  uV" {
       var nV []float64
 
@@ -1068,11 +1077,11 @@ func axes(
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-1, 4.5}
+        yrange := []float64{0, 2.5}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5}
+        ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "1", "", "2", "", "3", "", "4", ""}
+        ytickLabel := []string{"0", "", "1", "", "2", ""}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       }
@@ -1302,7 +1311,7 @@ func goPlotSubGrpd(
   // Anti-Stokes
   title := "Anti-Stokes"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (nV)"
+  ylabel := "Spectral Density (uV)"
   legend := "Pump"
 
   xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes(
@@ -2458,18 +2467,20 @@ func palette(
 
   if coolingExperiment == "pump-probe" {
     if dark {
-      darkColor := make([]color.RGBA, 21)
+      darkColor := make([]color.RGBA, 4)
       darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
       darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+      darkColor[3] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
 
       return darkColor[brush]
     }
 
-    col := make([]color.RGBA, 21)
+    col := make([]color.RGBA, 4)
     col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
     col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    col[3] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
 
     return col[brush]
 
