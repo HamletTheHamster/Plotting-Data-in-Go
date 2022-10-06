@@ -1464,7 +1464,7 @@ func goPlotasFits(
 
   title := " "
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (nV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
 
   if coolingExperiment == "pump-only" {
@@ -1763,7 +1763,7 @@ func goPlotsFits(
 
   title := " " // sample + " Stokes"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (nV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
 
   if coolingExperiment == "pump-only" {
