@@ -1,0 +1,17 @@
+Date,Label,Probe,Filepath,Notes
+22-10-5,0 mW bs,0,0/bs.csv,Probe powers are from 1% @sample - s: 1549.032 as:1548.968 - Whisper mode - 250 ms sweep - 1 MHz RBW
+,0 mW bas,0,0/bas.csv,
+,0 mW ras,1,0/ras.csv,
+,0 mW rs,1,0/rs.csv,
+,55 mW rs,1,55/rs.csv,
+,55 mW ras,1,55/ras.csv,
+,55 mW bas,0,55/bas.csv,
+,55 mW bs,0,55/bs.csv,
+,110 mW rs,1,110/rs.csv,
+,110 mW ras,1,110/ras.csv,
+,110 mW bas,0,110/bas.csv,
+,110 mW bs,0,110/bs.csv,
+,165 mW rs,1,165/rs.csv,
+,165 mW ras,1,165/ras.csv,
+,165 mW bas,0,165/bas.csv,
+,165 mW bs,0,165/bs.csv,
