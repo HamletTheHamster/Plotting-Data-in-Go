@@ -65,7 +65,7 @@ func main() {
       asLabel, sLabel,
     )
 
-    binSets := []int{0,1,2,3}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
+    binSets := []int{}  // 0,4,8,12,15 // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
     if len(binSets) > 0 {
       binMHz := 5.
       as, s = bin(binSets, as, s, binMHz)
@@ -153,7 +153,7 @@ func main() {
 
           asfwhm = append(asfwhm, wid*1000)
 
-          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
+          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f uV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
           fmt.Printf(str)
           log = append(log, str)
 
@@ -234,7 +234,7 @@ func main() {
 
           sfwhm = append(sfwhm, wid*1000)
 
-          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f nV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
+          str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f uV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
           fmt.Printf(str)
           log = append(log, str)
 
