@@ -88,8 +88,8 @@ func main() {
         amp = 25.
         wid = 0.1
         cen = 2.275
-        gb = .875 // W^{-1}m^{-1}
-        Γ = 87.625//*2*math.Pi // MHz
+        gb = 5.5 // W^{-1}m^{-1}
+        Γ = 87.625 //*2*math.Pi // MHz
       } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
@@ -2091,8 +2091,8 @@ func Γeff(
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
   pow := []float64{0, maxPow}
-  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/4)}
-  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/4)}
+  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/(4*2*math.Pi))}
+  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/(4*2*math.Pi))}
 
   fmt.Printf("\nΓasEff: %.4f\n", ΓasEff[1])
   fmt.Printf("ΓsEff: %.4f\n", ΓsEff[1])
