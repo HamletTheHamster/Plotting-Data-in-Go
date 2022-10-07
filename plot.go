@@ -31,6 +31,8 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
+  //avgCSVs(5, asPowers)
+
   log := header(
     cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
     length,
@@ -71,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -79,7 +81,7 @@ func main() {
       )
     }
 
-    fitSets := true
+    fitSets := true //<----------*************########
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -513,32 +515,64 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
-/*
-func condense(
-  repeatedSets int,
+func avgCSVs(
+  nAvg int,
   powers []float64,
 ) {
 
   for _, powFloat := range powers {
 
-    if pow, err := strconv.ParseFloat(powFloat, 64); err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    } else {
-      for i := 0; i < repeatedSets; i++ {
-        // Read
-        f, err := os.Open("Data/" + strconv.ParseFloat(pow, 64) + "ras" + i + ".csv")
+    pow := fmt.Sprint(powFloat)
+
+    //var sigColsToAvg [][]float64
+    var newCSV [][]string
+
+    for i := 0; i < nAvg; i++ {
+      // Read
+      f, err := os.Open("Data/" + pow + "/bs" + fmt.Sprint(i) + ".csv")
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+      defer f.Close()
+      data, err := readCSV(f)
+
+      for j := 1; j < len(data); j++ {
+        s := strings.ReplaceAll(data[j][2]," ","")
+
+        if pow == "10" && i == 0 && j == 1 {
+          fmt.Println(s)
+        }
+
+        sig, err := strconv.ParseFloat(s, 64)
         if err != nil {
           fmt.Println(err)
           os.Exit(1)
         }
-        defer f.Close()
-        dataStr, err := readCSV(f)
+
+      if false {
+        fmt.Println(sig)
       }
+
+        //sigColsToAvg[i] = append(sigColsToAvg[i], sig)
+      }
+      //fmt.Println(sigColsToAvg)
+    }
+
+    fNew, err := os.Create("Data/" + pow + "/bs.csv")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+    writer := csv.NewWriter(fNew)
+    err = writer.WriteAll(newCSV)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
     }
   }
 }
-*/
 
 func getCoolingData(
   lock bool,
