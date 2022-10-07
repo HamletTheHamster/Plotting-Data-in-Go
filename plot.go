@@ -71,7 +71,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3}
+    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -85,11 +85,11 @@ func main() {
       var amp, wid, cen, gb, Γ float64
 
       if sample == "LCOF" {
-        amp = 2.
+        amp = 25.
         wid = 0.1
         cen = 2.275
-        gb = 4.75 // W^{-1}m^{-1}
-        Γ = 89.5//*2*math.Pi // MHz
+        gb = .875 // W^{-1}m^{-1}
+        Γ = 87.625//*2*math.Pi // MHz
       } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
@@ -107,7 +107,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3}
+      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -187,7 +187,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3}
+      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -290,7 +290,7 @@ func main() {
             coolingExperiment, slide,
           )
 
-          ΓasEff, ΓsEff := Γeff(asPowers[0], Γ, length, gb)
+          ΓasEff, ΓsEff := Γeff(asPowers[14], Γ, length, gb)
           goPlotLinewidths(
             fitStokes, ΓasEff, ΓsEff, asLinewidths, sLinewidths, asPowers,
             sPowers, sLabel, sample, logpath, coolingExperiment, slide,
@@ -1068,11 +1068,11 @@ func axes(
     case "LCOF":
       if coolingExperiment == "pump-only" {
         xrange := []float64{2, 2.5}
-        yrange := []float64{-5, 25}
+        yrange := []float64{0, 110}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 5, 10, 15, 20, 25}
+        ytick := []float64{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "5", "10", "15", "20", "25"}
+        ytickLabel := []string{"0", "", "20", "", "40", "", "60", "", "80", "", "100", ""}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
@@ -1107,12 +1107,12 @@ func axes(
   case "pow vs wid":
     switch sample {
     case "LCOF":
-      xrange := []float64{-25, 200}
-      yrange := []float64{75, 110}
-      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{75, 80, 85, 90, 95, 100, 105, 110}
-      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"", "80", "", "90", "", "100", "", "110"}
+      xrange := []float64{0, 300}
+      yrange := []float64{75, 100}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300}
+      ytick := []float64{75, 80, 85, 90, 95, 100}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", "", "250", "", "300"}
+      ytickLabel := []string{"", "80", "", "90", "", "100"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1137,11 +1137,11 @@ func axes(
   case "height ratios":
     switch sample {
     case "LCOF":
-      xrange := []float64{0, 200}
+      xrange := []float64{0, 300}
       yrange := []float64{1, 1.5}
-      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300}
       ytick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5}
-      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", "", "250", "", "300"}
       ytickLabel := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4", "", "1.5"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
@@ -1167,12 +1167,12 @@ func axes(
   case "linewidths":
     switch sample {
     case "LCOF":
-      xrange := []float64{-25, 200}
-      yrange := []float64{75, 110}
-      xtick := []float64{-25, 0, 25, 50, 75, 100, 125, 150, 175, 200}
-      ytick := []float64{75, 80, 85, 90, 95, 100, 105, 110}
-      xtickLabel := []string{"", "0", "", "50", "", "100", "", "150", "", "200"}
-      ytickLabel := []string{"", "80", "", "90", "", "100", "", "110"}
+      xrange := []float64{0, 300}
+      yrange := []float64{75, 100}
+      xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300}
+      ytick := []float64{75, 80, 85, 90, 95, 100}
+      xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", "", "250", "", "300"}
+      ytickLabel := []string{"", "80", "", "90", "", "100"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -2091,8 +2091,8 @@ func Γeff(
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
   pow := []float64{0, maxPow}
-  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*length/4)}
-  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*length/4)}
+  ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/4)}
+  ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/4)}
 
   fmt.Printf("\nΓasEff: %.4f\n", ΓasEff[1])
   fmt.Printf("ΓsEff: %.4f\n", ΓsEff[1])
@@ -2135,8 +2135,8 @@ func goPlotLinewidths(
 
   // as linear fit
   // linewidth fit parameter guesses
-  m := 1.
-  b := 100.
+  m := 0.01
+  b := 87.5
 
   f := func(dst, guess []float64) {
 
@@ -2284,9 +2284,9 @@ func goPlotLinewidths(
   ΓsEffPlot.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
   p.Add(asPlotFit, t, r, sPlotFit, ΓasEffPlot, ΓsEffPlot)
-  p.Legend.Add("Anti-Stokes", asPlotFit)
+  p.Legend.Add("Anti-Stokes Fit", asPlotFit)
   p.Legend.Add("Γ as,eff", ΓasEffPlot)
-  p.Legend.Add("Stokes", sPlotFit)
+  p.Legend.Add("Stokes Fit", sPlotFit)
   p.Legend.Add("Γ s,eff", ΓsEffPlot)
 
   // as points

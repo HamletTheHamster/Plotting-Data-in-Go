@@ -1,0 +1,47 @@
+Data taken: 22-10-6
+Run: 22-10-6
+Sample: LCOF
+Runtime note: plot gamma_eff
+
+*Cooling Data: pump-only*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 10.00 mW 	 88.30 MHz 	 2.932210 uV 	 2.2692 GHz
+1 	 30.00 mW 	 88.16 MHz 	 8.567695 uV 	 2.2690 GHz
+2 	 50.00 mW 	 88.88 MHz 	 13.936398 uV 	 2.2687 GHz
+3 	 70.00 mW 	 89.20 MHz 	 18.759191 uV 	 2.2684 GHz
+4 	 90.00 mW 	 89.41 MHz 	 24.484823 uV 	 2.2680 GHz
+5 	 110.00 mW 	 89.97 MHz 	 30.743753 uV 	 2.2687 GHz
+6 	 130.00 mW 	 90.18 MHz 	 35.479597 uV 	 2.2685 GHz
+7 	 150.00 mW 	 90.50 MHz 	 40.873863 uV 	 2.2684 GHz
+8 	 170.00 mW 	 90.93 MHz 	 45.976549 uV 	 2.2682 GHz
+9 	 190.00 mW 	 91.41 MHz 	 50.828973 uV 	 2.2681 GHz
+10 	 210.00 mW 	 91.77 MHz 	 56.064888 uV 	 2.2680 GHz
+11 	 230.00 mW 	 92.18 MHz 	 60.497553 uV 	 2.2680 GHz
+12 	 250.00 mW 	 92.56 MHz 	 65.375163 uV 	 2.2679 GHz
+13 	 270.00 mW 	 93.11 MHz 	 69.390121 uV 	 2.2679 GHz
+14 	 290.00 mW 	 93.53 MHz 	 73.513043 uV 	 2.2678 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 10.00 mW 	 87.62 MHz 	 3.160882 uV 	 2.2684 GHz
+1 	 30.00 mW 	 87.12 MHz 	 9.467424 uV 	 2.2683 GHz
+2 	 50.00 mW 	 86.36 MHz 	 15.591764 uV 	 2.2680 GHz
+3 	 70.00 mW 	 86.16 MHz 	 21.586894 uV 	 2.2677 GHz
+4 	 90.00 mW 	 85.67 MHz 	 28.021307 uV 	 2.2675 GHz
+5 	 110.00 mW 	 85.54 MHz 	 37.070599 uV 	 2.2679 GHz
+6 	 130.00 mW 	 85.08 MHz 	 42.949139 uV 	 2.2678 GHz
+7 	 150.00 mW 	 84.83 MHz 	 50.300141 uV 	 2.2677 GHz
+8 	 170.00 mW 	 84.43 MHz 	 57.521633 uV 	 2.2676 GHz
+9 	 190.00 mW 	 84.17 MHz 	 64.210682 uV 	 2.2675 GHz
+10 	 210.00 mW 	 83.86 MHz 	 72.513773 uV 	 2.2673 GHz
+11 	 230.00 mW 	 83.57 MHz 	 80.013296 uV 	 2.2672 GHz
+12 	 250.00 mW 	 83.35 MHz 	 88.306182 uV 	 2.2671 GHz
+13 	 270.00 mW 	 83.03 MHz 	 96.545772 uV 	 2.2671 GHz
+14 	 290.00 mW 	 82.51 MHz 	 105.023941 uV 	 2.2669 GHz
+
