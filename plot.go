@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{0,1,2,3}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitAntiStokes := []int{0,1,2,3}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitStokes := []int{0,1,2,3}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -515,6 +515,7 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
+/*
 func avgCSVs(
   nAvg int,
   powers []float64,
@@ -524,7 +525,7 @@ func avgCSVs(
 
     pow := fmt.Sprint(powFloat)
 
-    //var sigColsToAvg [][]float64
+    var sigColsToAvg [][]float64 //<- use make
     var newCSV [][]string
 
     for i := 0; i < nAvg; i++ {
@@ -550,11 +551,11 @@ func avgCSVs(
           os.Exit(1)
         }
 
-      if false {
-        fmt.Println(sig)
-      }
+        if pow == "10" && i == 0 && j == 1 {
+          fmt.Println(sig)
+        }
 
-        //sigColsToAvg[i] = append(sigColsToAvg[i], sig)
+        //sigColsToAvg[i][j] = sig
       }
       //fmt.Println(sigColsToAvg)
     }
@@ -573,6 +574,7 @@ func avgCSVs(
     }
   }
 }
+*/
 
 func getCoolingData(
   lock bool,
