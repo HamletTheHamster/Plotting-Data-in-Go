@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3}
+    subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"

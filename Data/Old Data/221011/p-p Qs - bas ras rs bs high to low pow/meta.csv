@@ -1,0 +1,13 @@
+Date,Label,Probe,Filepath,Notes
+22-10-11,0 mW bs,10,0/bs.csv,bas ras rs bs high to low pow - 1 MHz RBW - 100 avg - 150ms sweep - dither - Probe powers are @sample
+,0 mW bas,0,0/bas.csv,
+,0 mW ras,10,0/ras.csv,
+,0 mW rs,10,0/rs.csv,
+,70 mW bs,10,70/bs.csv,
+,70 mW bas,0,70/bas.csv,
+,70 mW ras,10,70/ras.csv,
+,70 mW rs,10,70/rs.csv,
+,140 mW rs,10,140/rs.csv,
+,140 mW ras,10,140/ras.csv,
+,140 mW bas,0,140/bas.csv,
+,140 mW bs,0,140/bs.csv,
