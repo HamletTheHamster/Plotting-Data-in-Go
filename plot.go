@@ -1268,13 +1268,14 @@ func subtract(
 /*
   // Outlier applies to pump-only cooling data
   if sOutlier {
-    shift = -(avg(s[1][:250]) - avg(b[1][:250]))
+    shift = -(avg(s[1][:100]) - avg(b[1][:100]))
   } else {
     shift = -(avg(s[1][:100]) - avg(b[1][:100]))
   }
 */
 
-  shift = -(s[1][0] - b[1][0])
+  shift = -(avg(s[1][:10]) - avg(b[1][:10]))
+  //shift = -(s[1][0] - b[1][0])
 
   for i := range b[0] {
     s[1][i] = s[1][i] - b[1][i] + shift
