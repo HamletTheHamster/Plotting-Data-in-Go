@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3}
+    subtractedGrouped := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3}
+      fitAntiStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3}
+      fitStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -2116,7 +2116,7 @@ func Γeff(
   // Γ_as,eff = 2*pi*Γ*(1 + GPL/4)
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
-  pow := []float64{-10, maxPow}
+  pow := []float64{0, maxPow}
   ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/(4*2*math.Pi))}
   ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/(4*2*math.Pi))}
 
