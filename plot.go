@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2}
+    subtractedGrouped := []int{0,1,2,3}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -81,7 +81,7 @@ func main() {
       )
     }
 
-    fitSets := true //<----------*************########
+    fitSets := true //<-
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -91,7 +91,7 @@ func main() {
         wid = 0.1
         cen = 2.275
         gb = 5.5 // W^{-1}m^{-1}
-        Γ = 87.625 //*2*math.Pi // MHz
+        Γ = 90.25 //*2*math.Pi // MHz
       } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2}
+      fitAntiStokes := []int{0,1,2,3}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2}
+      fitStokes := []int{0,1,2,3}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1245,27 +1245,12 @@ func subtractBackground(
 
   var s, as [][][]float64
 
-  if coolingExperiment == "pump-only" {
-    for i := range rs {
-     if i == 15 {
-       sOutlier := true
-       s = append(s, subtract(bs[0], rs[i], sOutlier))
-     } else {
-       s = append(s, subtract(bs[0], rs[i], false))
-     }
+  for i := range rs {
+     s = append(s, subtract(bs[i], rs[i], false))
    }
 
-    for i := range ras {
-      as = append(as, subtract(bas[0], ras[i], false))
-    }
-  } else {
-    for i := range rs {
-      s = append(s, subtract(bs[i], rs[i], false))
-   }
-
-    for i := range ras {
-      as = append(as, subtract(bas[i], ras[i], false))
-    }
+  for i := range ras {
+    as = append(as, subtract(bas[i], ras[i], false))
   }
 
   return s, as
@@ -1280,12 +1265,16 @@ func subtract(
 
   var shift float64
 
-  // Applies to pump-only cooling data
+/*
+  // Outlier applies to pump-only cooling data
   if sOutlier {
     shift = -(avg(s[1][:250]) - avg(b[1][:250]))
   } else {
     shift = -(avg(s[1][:100]) - avg(b[1][:100]))
   }
+*/
+
+  shift = -(s[1][0] - b[1][0])
 
   for i := range b[0] {
     s[1][i] = s[1][i] - b[1][i] + shift
@@ -2126,7 +2115,7 @@ func Γeff(
   // Γ_as,eff = 2*pi*Γ*(1 + GPL/4)
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
-  pow := []float64{0, maxPow}
+  pow := []float64{-10, maxPow}
   ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/(4*2*math.Pi))}
   ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/(4*2*math.Pi))}
 
@@ -2503,20 +2492,44 @@ func palette(
 
   if coolingExperiment == "pump-probe" {
     if dark {
-      darkColor := make([]color.RGBA, 4)
+      darkColor := make([]color.RGBA, 16)
       darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
       darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
       darkColor[3] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
+      darkColor[4] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[5] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+      darkColor[6] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+      darkColor[7] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
+      darkColor[8] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[9] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+      darkColor[10] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+      darkColor[11] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
+      darkColor[12] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[13] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+      darkColor[14] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
+      darkColor[15] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
 
       return darkColor[brush]
     }
 
-    col := make([]color.RGBA, 4)
+    col := make([]color.RGBA, 16)
     col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
     col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
     col[3] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
+    col[4] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[5] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    col[6] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    col[7] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
+    col[8] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[9] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    col[10] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    col[11] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
+    col[12] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[13] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+    col[14] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
+    col[15] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
 
     return col[brush]
 
