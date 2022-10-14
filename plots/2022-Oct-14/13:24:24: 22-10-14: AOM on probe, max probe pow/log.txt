@@ -1,0 +1,23 @@
+Data taken: 22-10-10
+Run: 22-10-10
+Sample: LCOF
+Runtime note: 22-10-14: AOM on probe, max probe pow
+
+*Cooling Data: pump-probe*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*
+
+Anti-Stokes
+Set  	 Power 		 Width 		 Peak 		 Center
+0 	 0.00 mW 	 83.05 MHz 	 7.144769 uV 	 2.2962 GHz
+1 	 75.00 mW 	 79.88 MHz 	 6.953797 uV 	 2.2976 GHz
+2 	 155.00 mW 	 76.09 MHz 	 6.712091 uV 	 2.2988 GHz
+
+Stokes
+Set 	 Power 		 Width 		 Peak 		 Center 
+0 	 0.00 mW 	 117.34 MHz 	 7.532311 uV 	 2.2146 GHz
+1 	 75.00 mW 	 115.97 MHz 	 7.608614 uV 	 2.2136 GHz
+2 	 155.00 mW 	 115.06 MHz 	 7.653183 uV 	 2.2128 GHz
+

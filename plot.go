@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3,4}
+    subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3,4}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3,4}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1103,20 +1103,20 @@ func axes(
     switch sample {
     case "LCOF":
       if coolingExperiment == "pump-only" {
-        xrange := []float64{2, 2.5}
+        xrange := []float64{1.9, 2.64}
         yrange := []float64{0, 110}
-        xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+        xtick := []float64{1.9, 1.95, 2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.60, 2.65}
         ytick := []float64{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110}
-        xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+        xtickLabel := []string{"1.9", "", "2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5", "", "2.6", ""}
         ytickLabel := []string{"0", "", "20", "", "40", "", "60", "", "80", "", "100", ""}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
-        xrange := []float64{2, 2.5}
+        xrange := []float64{1.9, 2.64}
         yrange := []float64{-.05, 3}
-        xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
+        xtick := []float64{1.9, 1.95, 2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.60, 2.65}
         ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3}
-        xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
+        xtickLabel := []string{"1.9", "", "2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5", "", "2.6", ""}
         ytickLabel := []string{"0", "", "1", "", "2", "", "3"}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
@@ -2498,7 +2498,7 @@ func palette(
       darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
       darkColor[3] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
-      darkColor[4] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+      darkColor[4] = color.RGBA{R: 7, G: 150, B: 189, A: 255}
       darkColor[5] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
       darkColor[6] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
       darkColor[7] = color.RGBA{R: 194, G: 140, B: 86, A: 255}
@@ -2519,7 +2519,7 @@ func palette(
     col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
     col[3] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
-    col[4] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+    col[4] = color.RGBA{R: 11, G: 191, B: 222, A: 255}
     col[5] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
     col[6] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
     col[7] = color.RGBA{R: 255, G: 182, B: 110, A: 255}
