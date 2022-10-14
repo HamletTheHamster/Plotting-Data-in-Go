@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{0,1,2,3,4}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -91,7 +91,7 @@ func main() {
         wid = 0.1
         cen = 2.275
         gb = 5.5 // W^{-1}m^{-1}
-        Γ = 90.25 //*2*math.Pi // MHz
+        Γ = 99 //*2*math.Pi // MHz
       } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitAntiStokes := []int{0,1,2,3,4}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitStokes := []int{0,1,2,3,4}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1204,11 +1204,11 @@ func axes(
     switch sample {
     case "LCOF":
       xrange := []float64{0, 300}
-      yrange := []float64{75, 100}
+      yrange := []float64{85, 110}
       xtick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300}
-      ytick := []float64{75, 80, 85, 90, 95, 100}
+      ytick := []float64{85, 90, 95, 100, 105, 110}
       xtickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", "", "250", "", "300"}
-      ytickLabel := []string{"", "80", "", "90", "", "100"}
+      ytickLabel := []string{"80", "", "90", "", "100", "", "110"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "UHNA3":
@@ -1263,7 +1263,7 @@ func subtract(
   [][]float64,
 ) {
 
-  var shift float64
+  //var shift float64
 
 /*
   // Outlier applies to pump-only cooling data
@@ -1274,11 +1274,11 @@ func subtract(
   }
 */
 
-  shift = -(avg(s[1][:10]) - avg(b[1][:10]))
+  //shift = -(avg(s[1][:10]) - avg(b[1][:10]))
   //shift = -(s[1][0] - b[1][0])
 
   for i := range b[0] {
-    s[1][i] = s[1][i] - b[1][i] + shift
+    s[1][i] = s[1][i] - b[1][i] //+ shift
   }
 
   return s
@@ -2116,7 +2116,7 @@ func Γeff(
   // Γ_as,eff = 2*pi*Γ*(1 + GPL/4)
   // Γ_s,eff = 2*pi*Γ*(1 - GPL/4)
 
-  pow := []float64{0, maxPow}
+  pow := []float64{-10, maxPow}
   ΓasEff := []float64{Γ, Γ*(1 + gb*pow[1]*.001*length/(4*2*math.Pi))}
   ΓsEff := []float64{Γ, Γ*(1 - gb*pow[1]*.001*length/(4*2*math.Pi))}
 
