@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"

@@ -1,5 +1,5 @@
 Date,Label,Probe,Filepath,Notes
-22-10-17,0 mW bs,0,0/bs.csv,Circulator to detector (take 2) - Probe powers are from 1% @sample - s: 1549.032 as:1548.968 - Dither mode - 250 ms sweep - 1 MHz RBW
+22-10-17,0 mW bs,0,0/bs.csv,Circulator to detector - Probe powers are from 1% @sample - s: 1549.032 as:1548.968 - Dither mode - 250 ms sweep - 1 MHz RBW
 ,0 mW bas,0,0/bas.csv,
 ,0 mW ras,10,0/ras.csv,
 ,0 mW rs,10,0/rs.csv,
