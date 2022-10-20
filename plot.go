@@ -31,7 +31,7 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
-  //avgCSVs(5, asPowers)
+  avgCSVs(5, asPowers)
 
   log := header(
     cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitAntiStokes := []int{}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitStokes := []int{}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -515,7 +515,7 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
-/*
+
 func avgCSVs(
   nAvg int,
   powers []float64,
@@ -525,8 +525,14 @@ func avgCSVs(
 
     pow := fmt.Sprint(powFloat)
 
-    var sigColsToAvg [][]float64 //<- use make
+    //var sigColsToAvg [][]float64 //<- use make
     var newCSV [][]string
+
+    // sigColsToAvg[nAvg][sig]
+    sigColsToAvg := make([][]float64, nAvg)
+    for k := range sigColsToAvg {
+      sigColsToAvg[k] = make([]float64, 601)
+    }
 
     for i := 0; i < nAvg; i++ {
       // Read
@@ -539,11 +545,8 @@ func avgCSVs(
       data, err := readCSV(f)
 
       for j := 1; j < len(data); j++ {
-        s := strings.ReplaceAll(data[j][2]," ","")
 
-        if pow == "10" && i == 0 && j == 1 {
-          fmt.Println(s)
-        }
+        s := strings.ReplaceAll(data[j][2]," ","")
 
         sig, err := strconv.ParseFloat(s, 64)
         if err != nil {
@@ -551,13 +554,21 @@ func avgCSVs(
           os.Exit(1)
         }
 
-        if pow == "10" && i == 0 && j == 1 {
-          fmt.Println(sig)
-        }
-
-        //sigColsToAvg[i][j] = sig
+        sigColsToAvg[i][j-1] = sig
       }
-      //fmt.Println(sigColsToAvg)
+    }
+
+    toAvg := make([]float64, nAvg)
+    averagedCol := make([]float64, len(sigColsToAvg[0]))
+    for i := 0; i < len(sigColsToAvg[0]); i++ {
+      for j := 0; j < nAvg; j++ {
+        toAvg[j] = sigColsToAvg[j][i]
+      }
+      averagedCol[i] = avg(toAvg)
+    }
+    if pow == "10" {
+      fmt.Println(averagedCol[0])
+      fmt.Println(len(toAvg))
     }
 
     fNew, err := os.Create("Data/" + pow + "/bs.csv")
@@ -574,7 +585,6 @@ func avgCSVs(
     }
   }
 }
-*/
 
 func getCoolingData(
   lock bool,
