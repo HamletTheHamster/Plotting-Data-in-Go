@@ -31,7 +31,10 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
-  avgCSVs(5, asPowers)
+  csvToAvg := 5
+  if csvToAvg > 0 {
+    avgCSVs(csvToAvg, asPowers)
+  }
 
   log := header(
     cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
@@ -73,7 +76,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -91,7 +94,7 @@ func main() {
         wid = 0.1
         cen = 2.275
         gb = 6 // W^{-1}m^{-1}
-        Γ = 98.95 //*2*math.Pi // MHz
+        Γ = 98.65 //*2*math.Pi // MHz
       } else if sample == "UHNA3" {
         amp = 12
         wid = 0.1
@@ -109,7 +112,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{}
+      fitAntiStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +192,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -521,67 +524,70 @@ func avgCSVs(
   powers []float64,
 ) {
 
-  for _, powFloat := range powers {
+  for _, name := range []string{"bs", "rs", "ras", "bas"} {
 
-    pow := fmt.Sprint(powFloat)
+    for _, powFloat := range powers {
 
-    //var sigColsToAvg [][]float64 //<- use make
-    var newCSV [][]string
+      pow := fmt.Sprint(powFloat)
 
-    // sigColsToAvg[nAvg][sig]
-    sigColsToAvg := make([][]float64, nAvg)
-    for k := range sigColsToAvg {
-      sigColsToAvg[k] = make([]float64, 601)
-    }
+      var newCSV [][]string
 
-    for i := 0; i < nAvg; i++ {
-      // Read
-      f, err := os.Open("Data/" + pow + "/bs" + fmt.Sprint(i) + ".csv")
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
+      // sigColsToAvg[nAvg][sig]
+      sigColsToAvg := make([][]float64, nAvg)
+      for k := range sigColsToAvg {
+        sigColsToAvg[k] = make([]float64, 601)
       }
-      defer f.Close()
-      data, err := readCSV(f)
 
-      for j := 1; j < len(data); j++ {
-
-        s := strings.ReplaceAll(data[j][2]," ","")
-
-        sig, err := strconv.ParseFloat(s, 64)
+      for i := 0; i < nAvg; i++ {
+        // Read
+        f, err := os.Open("Data/" + pow + "/" + name + fmt.Sprint(i) + ".csv")
         if err != nil {
           fmt.Println(err)
           os.Exit(1)
         }
+        //defer f.Close()
+        data, err := readCSV(f)
+        newCSV = data
 
-        sigColsToAvg[i][j-1] = sig
+        for j := 1; j < len(data); j++ {
+
+          s := strings.ReplaceAll(data[j][2]," ","")
+
+          sig, err := strconv.ParseFloat(s, 64)
+          if err != nil {
+            fmt.Println(err)
+            os.Exit(1)
+          }
+
+          sigColsToAvg[i][j-1] = sig
+        }
       }
-    }
 
-    toAvg := make([]float64, nAvg)
-    averagedCol := make([]float64, len(sigColsToAvg[0]))
-    for i := 0; i < len(sigColsToAvg[0]); i++ {
-      for j := 0; j < nAvg; j++ {
-        toAvg[j] = sigColsToAvg[j][i]
+      toAvg := make([]float64, nAvg)
+      averagedCol := make([]float64, len(sigColsToAvg[0]))
+      for i := 0; i < len(sigColsToAvg[0]); i++ {
+        for j := 0; j < nAvg; j++ {
+          toAvg[j] = sigColsToAvg[j][i]
+        }
+        averagedCol[i] = avg(toAvg)
       }
-      averagedCol[i] = avg(toAvg)
-    }
-    if pow == "10" {
-      fmt.Println(averagedCol[0])
-      fmt.Println(len(toAvg))
-    }
 
-    fNew, err := os.Create("Data/" + pow + "/bs.csv")
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
+      for i := 2; i < len(newCSV); i++ {
+        newCSV[i][2] = strconv.FormatFloat(averagedCol[i-2], 'f', -1, 64)
+      }
 
-    writer := csv.NewWriter(fNew)
-    err = writer.WriteAll(newCSV)
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
+      fNew, err := os.Create("Data/" + pow + "/" + name + ".csv")
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+
+      writer := csv.NewWriter(fNew)
+      err = writer.WriteAll(newCSV)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
     }
   }
 }
