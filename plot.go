@@ -76,7 +76,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
@@ -112,7 +112,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitAntiStokes := []int{}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -192,7 +192,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitStokes := []int{}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -318,7 +318,7 @@ func main() {
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
-  writeLog(logpath, log)
+  //writeLog(logpath, log)
 }
 
 //----------------------------------------------------------------------------//
@@ -530,13 +530,24 @@ func avgCSVs(
 
       pow := fmt.Sprint(powFloat)
 
-      var newCSV [][]string
+      var newDataCSV [][]string
+
+      // Peek at 0th file to get length
+      f, err := os.Open("Data/" + pow + "/" + name + "0.csv")
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+      peek, err := readCSV(f)
 
       // sigColsToAvg[nAvg][sig]
       sigColsToAvg := make([][]float64, nAvg)
       for k := range sigColsToAvg {
-        sigColsToAvg[k] = make([]float64, 601)
+        sigColsToAvg[k] = make([]float64, len(peek)-1)
       }
+
+      σCSV := make([][]string, 1)
+      σCSV[0] = make([]string, len(peek)-2)
 
       for i := 0; i < nAvg; i++ {
         // Read
@@ -545,9 +556,9 @@ func avgCSVs(
           fmt.Println(err)
           os.Exit(1)
         }
-        //defer f.Close()
+
         data, err := readCSV(f)
-        newCSV = data
+        newDataCSV = data
 
         for j := 1; j < len(data); j++ {
 
@@ -565,25 +576,41 @@ func avgCSVs(
 
       toAvg := make([]float64, nAvg)
       averagedCol := make([]float64, len(sigColsToAvg[0]))
+      σCol := make([]float64, len(sigColsToAvg[0]))
       for i := 0; i < len(sigColsToAvg[0]); i++ {
         for j := 0; j < nAvg; j++ {
           toAvg[j] = sigColsToAvg[j][i]
         }
         averagedCol[i] = avg(toAvg)
+        σCol[i] = σ(toAvg)
       }
 
-      for i := 2; i < len(newCSV); i++ {
-        newCSV[i][2] = strconv.FormatFloat(averagedCol[i-2], 'f', -1, 64)
+      for i := 2; i < len(newDataCSV); i++ {
+        newDataCSV[i][2] = strconv.FormatFloat(averagedCol[i-2], 'f', -1, 64)
+        σCSV[0][i-2] = strconv.FormatFloat(σCol[i-2], 'f', -1, 64)
       }
 
-      fNew, err := os.Create("Data/" + pow + "/" + name + ".csv")
+      fData, err := os.Create("Data/" + pow + "/" + name + ".csv")
       if err != nil {
         fmt.Println(err)
         os.Exit(1)
       }
 
-      writer := csv.NewWriter(fNew)
-      err = writer.WriteAll(newCSV)
+      wData := csv.NewWriter(fData)
+      err = wData.WriteAll(newDataCSV)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+
+      fσ, err := os.Create("Data/" + pow + "/" + name + "σ.csv")
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+
+      wσ := csv.NewWriter(fσ)
+      err = wσ.WriteAll(σCSV)
       if err != nil {
         fmt.Println(err)
         os.Exit(1)
