@@ -23,7 +23,7 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sample, coolingExperiment, note, length := flags()
+  cabs, lock, temp, slide, sample, coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
 
@@ -31,17 +31,17 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
-  csvToAvg := 5
-  if csvToAvg > 0 {
-    avgCSVs(csvToAvg, asPowers)
-  }
-
   log := header(
     cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
     length,
   )
 
   if coolingExperiment != "" {
+
+    σas, σs := avgCSVs(csvToAvg, asPowers)
+
+    fmt.Println(σas)
+    fmt.Println(σs)
 
     ras, bas, rs, bs := getCoolingData(lock, file, label)
 
@@ -84,7 +84,7 @@ func main() {
       )
     }
 
-    fitSets := true //<-
+    fitSets := true
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -324,12 +324,13 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, string, string, string, float64,
+  bool, bool, bool, bool, string, string, string, float64, int,
 ) {
 
   var cabs, lock, temp, slide bool
   var sample, coolingExperiment, note string
   var length float64
+  var avg int
 
   flag.BoolVar(&cabs, "cabs", false, "CABS data")
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
@@ -339,6 +340,7 @@ func flags() (
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
+  flag.IntVar(&avg, "avg", 0, "number of CSV files to average")
   flag.Parse()
 
   if coolingExperiment != "" && cabs {
@@ -351,7 +353,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sample, coolingExperiment, note, length
+  return cabs, lock, temp, slide, sample, coolingExperiment, note, length, avg
 }
 
 func logpath(
@@ -518,105 +520,163 @@ func readMeta(
   return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
 }
 
-
 func avgCSVs(
   nAvg int,
   powers []float64,
+) (
+  [][]float64, [][]float64,
 ) {
 
-  for _, name := range []string{"bs", "rs", "ras", "bas"} {
+  // Peek at 0th file to get length
+  f, err := os.Open("Data/" + fmt.Sprint(powers[0]) + "/rs0.csv")
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+  peek, err := readCSV(f)
 
-    for _, powFloat := range powers {
+  σbs, σrs, σras, σbas, σas, σs := make([][]float64, len(powers)),
+  make([][]float64, len(powers)), make([][]float64, len(powers)),
+  make([][]float64, len(powers)), make([][]float64, len(powers)),
+  make([][]float64, len(powers))
+  for i := range σbs {
+    σbs[i], σrs[i], σras[i], σbas[i], σas[i], σs[i] = make([]float64, len(peek)-2),
+    make([]float64, len(peek)-2), make([]float64, len(peek)-2),
+    make([]float64, len(peek)-2), make([]float64, len(peek)-2),
+    make([]float64, len(peek)-2)
+  }
 
-      pow := fmt.Sprint(powFloat)
+  if nAvg > 0 {
+    for _, name := range []string{"bs", "rs", "ras", "bas"} {
 
-      var newDataCSV [][]string
+      for set, powFloat := range powers {
 
-      // Peek at 0th file to get length
-      f, err := os.Open("Data/" + pow + "/" + name + "0.csv")
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-      }
-      peek, err := readCSV(f)
+        pow := fmt.Sprint(powFloat)
 
-      // sigColsToAvg[nAvg][sig]
-      sigColsToAvg := make([][]float64, nAvg)
-      for k := range sigColsToAvg {
-        sigColsToAvg[k] = make([]float64, len(peek)-1)
-      }
+        var newDataCSV [][]string
 
-      σCSV := make([][]string, 1)
-      σCSV[0] = make([]string, len(peek)-2)
-
-      for i := 0; i < nAvg; i++ {
-        // Read
-        f, err := os.Open("Data/" + pow + "/" + name + fmt.Sprint(i) + ".csv")
-        if err != nil {
-          fmt.Println(err)
-          os.Exit(1)
+        // sigColsToAvg[nAvg][sig]
+        sigColsToAvg := make([][]float64, nAvg)
+        for k := range sigColsToAvg {
+          sigColsToAvg[k] = make([]float64, len(peek)-1)
         }
 
-        data, err := readCSV(f)
-        newDataCSV = data
+        σCSV := make([][]string, 1)
+        σCSV[0] = make([]string, len(peek)-2)
 
-        for j := 1; j < len(data); j++ {
-
-          s := strings.ReplaceAll(data[j][2]," ","")
-
-          sig, err := strconv.ParseFloat(s, 64)
+        for i := 0; i < nAvg; i++ {
+          // Read
+          f, err := os.Open("Data/" + pow + "/" + name + fmt.Sprint(i) + ".csv")
           if err != nil {
             fmt.Println(err)
             os.Exit(1)
           }
 
-          sigColsToAvg[i][j-1] = sig
+          data, err := readCSV(f)
+          newDataCSV = data
+
+          for j := 1; j < len(data); j++ {
+
+            s := strings.ReplaceAll(data[j][2]," ","")
+
+            sig, err := strconv.ParseFloat(s, 64)
+            if err != nil {
+              fmt.Println(err)
+              os.Exit(1)
+            }
+
+            sigColsToAvg[i][j-1] = sig
+          }
         }
-      }
 
-      toAvg := make([]float64, nAvg)
-      averagedCol := make([]float64, len(sigColsToAvg[0]))
-      σCol := make([]float64, len(sigColsToAvg[0]))
-      for i := 0; i < len(sigColsToAvg[0]); i++ {
-        for j := 0; j < nAvg; j++ {
-          toAvg[j] = sigColsToAvg[j][i]
+        toAvg := make([]float64, nAvg)
+        averagedCol := make([]float64, len(sigColsToAvg[0]))
+        σCol := make([]float64, len(sigColsToAvg[0]))
+        for i := 0; i < len(sigColsToAvg[0]); i++ {
+          for j := 0; j < nAvg; j++ {
+            toAvg[j] = sigColsToAvg[j][i]
+          }
+          averagedCol[i] = avg(toAvg)
+          σCol[i] = σ(toAvg)
         }
-        averagedCol[i] = avg(toAvg)
-        σCol[i] = σ(toAvg)
-      }
 
-      for i := 2; i < len(newDataCSV); i++ {
-        newDataCSV[i][2] = strconv.FormatFloat(averagedCol[i-2], 'f', -1, 64)
-        σCSV[0][i-2] = strconv.FormatFloat(σCol[i-2], 'f', -1, 64)
-      }
+        switch name {
+          case "bs":
+            σbs[set] = σCol
+          case "rs":
+            σrs[set] = σCol
+          case "ras":
+            σras[set] = σCol
+          case "bas":
+            σbas[set] = σCol
+          default:
+            fmt.Println("error in switch statement with σ in avgCSVs\n\n")
+            os.Exit(1)
+        }
 
-      fData, err := os.Create("Data/" + pow + "/" + name + ".csv")
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-      }
+        for i := 2; i < len(newDataCSV); i++ {
+          newDataCSV[i][2] = strconv.FormatFloat(averagedCol[i-2], 'f', -1, 64)
+          σCSV[0][i-2] = strconv.FormatFloat(σCol[i-2], 'f', -1, 64)
+        }
 
-      wData := csv.NewWriter(fData)
-      err = wData.WriteAll(newDataCSV)
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-      }
+        fData, err := os.Create("Data/" + pow + "/" + name + ".csv")
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
 
-      fσ, err := os.Create("Data/" + pow + "/" + name + "σ.csv")
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-      }
+        wData := csv.NewWriter(fData)
+        err = wData.WriteAll(newDataCSV)
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
 
-      wσ := csv.NewWriter(fσ)
-      err = wσ.WriteAll(σCSV)
-      if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
+        fσ, err := os.Create("Data/" + pow + "/" + name + "σ.csv")
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+
+        wσ := csv.NewWriter(fσ)
+        err = wσ.WriteAll(σCSV)
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
       }
     }
-  }
+  } /*else {
+
+    // Peek at 0th file to get length
+    f, err := os.Open("Data/" + pow + "/" + name + "σ.csv")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    peek, err := readCSV(f)
+
+    // σ[0] = bs, σ[1] = rs, σ[2] = ras, σ[3] = bas
+    σ := make([])
+
+    for _, name := range []string{"bs", "rs", "ras", "bas"} {
+
+      for _, powFloat := range powers {
+
+        pow := fmt.Sprint(powFloat)
+
+
+      }
+    }
+
+    //return thing[0] (bs), thing[1] (rs), etc
+  }*/
+
+  // σs = σrs - σbs
+
+  // σas = σras - σbas
+
+  return σas, σs
 }
 
 func getCoolingData(
