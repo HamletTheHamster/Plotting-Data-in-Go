@@ -40,8 +40,8 @@ func main() {
 
     σas, σs := avgCSVs(csvToAvg, asPowers)
 
-    fmt.Println(σas)
-    fmt.Println(σs)
+    fmt.Println(σas[0][0])
+    fmt.Println(σs[0][0])
 
     ras, bas, rs, bs := getCoolingData(lock, file, label)
 
@@ -672,9 +672,12 @@ func avgCSVs(
     //return thing[0] (bs), thing[1] (rs), etc
   }*/
 
-  // σs = σrs - σbs
-
-  // σas = σras - σbas
+  for set := range powers {
+    for i := range σs[0] {
+      σs[set][i] = math.Sqrt(math.Pow(σrs[set][i], 2) + math.Pow(σbs[set][i], 2))
+      σas[set][i] = math.Sqrt(math.Pow(σras[set][i], 2) + math.Pow(σbas[set][i], 2))
+    }
+  }
 
   return σas, σs
 }
@@ -1768,7 +1771,7 @@ func σ(
   float64,
 ) {
 
-  // Standard deviation of the mean within bin
+  // Standard deviation of the mean
   dev := 0.
   for _, v := range values {
     dev += math.Pow(v - avg(values), 2)
