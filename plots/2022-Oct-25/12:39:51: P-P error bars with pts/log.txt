@@ -1,0 +1,10 @@
+Data taken: 22-10-5
+Run: 22-10-5
+Sample: LCOF
+Runtime note: P-P error bars with pts
+
+*Cooling Data: pump-probe*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*

@@ -81,7 +81,7 @@ func main() {
       )
     }
 
-    fitSets := false
+    fitSets := true
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -178,7 +178,7 @@ func main() {
 
         // goPlot as fits
         goPlotasFits(
-          fitAntiStokes, as, asFits, asWidthLines, asLabel, asfwhm, asNotes,
+          fitAntiStokes, as, asFits, asWidthLines, σas, asLabel, asfwhm, asNotes,
           temp, slide, sample, logpath, coolingExperiment,
         )
 
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -262,7 +262,7 @@ func main() {
         log = append(log, "\n")
 
         goPlotsFits(
-          fitStokes, s, sFits, sWidthLines, sLabel, sfwhm, sNotes, temp, slide,
+          fitStokes, s, sFits, sWidthLines, σs, sLabel, sfwhm, sNotes, temp, slide,
           sample, logpath, coolingExperiment,
         )
 
@@ -1502,10 +1502,6 @@ func goPlotSubGrpd(
     plotter.YErrors
   }
 
-  // σ[set][σi]
-  //fmt.Println(σas[0][0])
-  //fmt.Println(σs[0][0])
-
   // Anti-Stokes
   title := "Anti-Stokes"
   xlabel := "Frequency (GHz)"
@@ -1540,7 +1536,7 @@ func goPlotSubGrpd(
   for _, set := range sets {
 
     asPts := buildData(as[set])
-    σasErr := buildErrors(σas[set])
+    σasErr := buildErrors(σas[set]) // σ[set][σi]
 
     antiStokes := errorPoints {
       XYs: asPts,
@@ -1570,7 +1566,7 @@ func goPlotSubGrpd(
     }
     e.LineStyle.Color = palette(set, false, coolingExperiment)
 
-    p.Add(t, r, e) // plotSet,
+    p.Add(e, t, r) // plotSet,
 
     // Legend
     l, err := plotter.NewScatter(antiStokes)
@@ -1620,7 +1616,7 @@ func goPlotSubGrpd(
   for _, set := range sets {
 
     sPts := buildData(s[set])
-    σsErr := buildErrors(σs[set])
+    σsErr := buildErrors(σs[set]) // σ[set][σi]
 
     stokes := errorPoints {
       XYs: sPts,
@@ -1634,7 +1630,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    plotSet.GlyphStyle.Color = palette(set, false, coolingExperiment)
+    plotSet.GlyphStyle.Color = palette(set, true, coolingExperiment)
     if slide {
       plotSet.GlyphStyle.Radius = vg.Points(5)
     } else {
@@ -1650,7 +1646,7 @@ func goPlotSubGrpd(
     }
     e.LineStyle.Color = palette(set, false, coolingExperiment)
 
-    p.Add(t, r, e) // plotSet,
+    p.Add(e, t, r) // plotSet,
 
     // Legend
     l, err := plotter.NewScatter(stokes)
@@ -1659,7 +1655,7 @@ func goPlotSubGrpd(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, coolingExperiment)
+    l.GlyphStyle.Color = palette(set, true, coolingExperiment)
     l.GlyphStyle.Radius = vg.Points(6)
     l.Shape = draw.CircleGlyph{}
 
@@ -1693,11 +1689,17 @@ func generateFitData(
 func goPlotasFits(
   sets []int,
   as, fits, widthLines [][][]float64,
+  σas [][]float64,
   labels []string,
   widths, notes []float64,
   temp, slide bool,
   sample, logpath, coolingExperiment string,
 ) {
+
+  type errorPoints struct {
+    plotter.XYs
+    plotter.YErrors
+  }
 
   title := " "
   xlabel := "Frequency (GHz)"
@@ -1734,9 +1736,15 @@ func goPlotasFits(
     pts := buildData(as[set])
     fit := buildData(fits[i])
     wid := buildData(widthLines[i])
+    σasErr := buildErrors(σas[set]) // σ[set][σi]
+
+    antiStokes := errorPoints {
+      XYs: pts,
+      YErrors: plotter.YErrors(σasErr),
+    }
 
     // Plot points
-    plotPts, err := plotter.NewScatter(pts)
+    plotPts, err := plotter.NewScatter(antiStokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -1771,8 +1779,16 @@ func goPlotasFits(
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
+    // Error bars
+    e, err := plotter.NewYErrorBars(antiStokes)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    e.LineStyle.Color = palette(set, false, coolingExperiment)
+
     // Add set plots to p
-    p.Add(plotPts, t, r, plotFit, plotWid)
+    p.Add(e, t, r, plotFit, plotWid)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1997,11 +2013,17 @@ func goPlotasPowerVsWid(
 func goPlotsFits(
   sets []int,
   s, fits, widthLines [][][]float64,
+  σs [][]float64,
   labels []string,
   widths, notes []float64,
   temp, slide bool,
   sample, logpath, coolingExperiment string,
 ) {
+
+  type errorPoints struct {
+    plotter.XYs
+    plotter.YErrors
+  }
 
   title := " " // sample + " Stokes"
   xlabel := "Frequency (GHz)"
@@ -2038,9 +2060,15 @@ func goPlotsFits(
     pts := buildData(s[set])
     fit := buildData(fits[i])
     wid := buildData(widthLines[i])
+    σsErr := buildErrors(σs[set]) // σ[set][σi]
+
+    stokes := errorPoints {
+      XYs: pts,
+      YErrors: plotter.YErrors(σsErr),
+    }
 
     // Plot points
-    plotPts, err := plotter.NewScatter(pts)
+    plotPts, err := plotter.NewScatter(stokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -2075,8 +2103,16 @@ func goPlotsFits(
     plotWid.LineStyle.Width = vg.Points(4)
     plotWid.LineStyle.Dashes = []vg.Length{vg.Points(15), vg.Points(5)}
 
+    // Error bars
+    e, err := plotter.NewYErrorBars(stokes)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    e.LineStyle.Color = palette(set, false, coolingExperiment)
+
     // Add set plots to p
-    p.Add(plotPts, t, r, plotFit, plotWid)
+    p.Add(e, t, r, plotFit, plotWid)
 
     // Legend
     l, err := plotter.NewScatter(pts)
