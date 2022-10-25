@@ -40,6 +40,7 @@ func main() {
 
     σas, σs := avgCSVs(csvToAvg, asPowers)
 
+    // σ[set][σi]
     fmt.Println(σas[0][0])
     fmt.Println(σs[0][0])
 
@@ -546,6 +547,11 @@ func avgCSVs(
     make([]float64, len(peek)-2)
   }
 
+  σsString, σasString := make([][]string, len(powers)), make([][]string, len(powers))
+  for i := range σsString {
+    σsString[i], σasString[i] = make([]string, len(peek)-2), make([]string, len(peek)-2)
+  }
+
   if nAvg > 0 {
     for _, name := range []string{"bs", "rs", "ras", "bas"} {
 
@@ -646,18 +652,44 @@ func avgCSVs(
         }
       }
     }
-  } /*else {
 
-    // Peek at 0th file to get length
-    f, err := os.Open("Data/" + pow + "/" + name + "σ.csv")
+    for set := range powers {
+      for i := range σs[0] {
+        σs[set][i] = math.Sqrt(math.Pow(σrs[set][i], 2) + math.Pow(σbs[set][i], 2))
+        σas[set][i] = math.Sqrt(math.Pow(σras[set][i], 2) + math.Pow(σbas[set][i], 2))
+
+        σsString[set][i] = fmt.Sprint(σs[set][i])
+        σasString[set][i] = fmt.Sprint(σas[set][i])
+      }
+    }
+
+    fσs, err := os.Create("Data/σs.csv")
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
     }
-    peek, err := readCSV(f)
 
-    // σ[0] = bs, σ[1] = rs, σ[2] = ras, σ[3] = bas
-    σ := make([])
+    wσs := csv.NewWriter(fσs)
+    err = wσs.WriteAll(σsString)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+    fσas, err := os.Create("Data/σas.csv")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+    wσas := csv.NewWriter(fσas)
+    err = wσas.WriteAll(σasString)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+
+  }/* else {
 
     for _, name := range []string{"bs", "rs", "ras", "bas"} {
 
@@ -668,16 +700,7 @@ func avgCSVs(
 
       }
     }
-
-    //return thing[0] (bs), thing[1] (rs), etc
   }*/
-
-  for set := range powers {
-    for i := range σs[0] {
-      σs[set][i] = math.Sqrt(math.Pow(σrs[set][i], 2) + math.Pow(σbs[set][i], 2))
-      σas[set][i] = math.Sqrt(math.Pow(σras[set][i], 2) + math.Pow(σbas[set][i], 2))
-    }
-  }
 
   return σas, σs
 }
