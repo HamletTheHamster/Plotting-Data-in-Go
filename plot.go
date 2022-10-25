@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{0,1,2}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, σs, σas, sLabel, asLabel, logpath, sample,
