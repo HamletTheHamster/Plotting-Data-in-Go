@@ -1,0 +1,10 @@
+Data taken: 22-10-6
+Run: 22-10-6
+Sample: LCOF
+Runtime note: σ
+
+*Cooling Data: pump-only*
+
+*Liquid-core optical fiber sample*
+
+*Data gathered from Spectrum Analyzer*

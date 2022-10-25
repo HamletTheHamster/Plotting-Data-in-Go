@@ -40,10 +40,6 @@ func main() {
 
     σas, σs := avgCSVs(csvToAvg, asPowers)
 
-    // σ[set][σi]
-    fmt.Println(σas[0][0])
-    fmt.Println(σs[0][0])
-
     ras, bas, rs, bs := getCoolingData(lock, file, label)
 
     asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
@@ -77,15 +73,15 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{}
+    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
-        subtractedGrouped, s, as, sLabel, asLabel, logpath, sample,
+        subtractedGrouped, s, as, σs, σas, sLabel, asLabel, logpath, sample,
         coolingExperiment, slide,
       )
     }
 
-    fitSets := true
+    fitSets := false
     if fitSets {
 
       var amp, wid, cen, gb, Γ float64
@@ -319,7 +315,7 @@ func main() {
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
-  //writeLog(logpath, log)
+  writeLog(logpath, log)
 }
 
 //----------------------------------------------------------------------------//
@@ -1120,20 +1116,20 @@ func buildData(
   return xy
 }
 
-/*
 func buildErrors(
-  data [][]float64,
+   σ []float64,
 ) (
   plotter.Errors,
 ) {
 
-  error := make(plotter.Errors, len(data[2]))
+  error := make(plotter.Errors, len(σ))
 
   for i := range error {
-    error[i].Low = data[2][i]
+    error[i].Low, error[i].High = σ[i], σ[i]
   }
+
+  return error
 }
-*/
 
 func plotRaw(
   sets []int,
@@ -1495,10 +1491,20 @@ func plotSubtractedTogether(
 func goPlotSubGrpd(
   sets []int,
   s, as [][][]float64,
+  σs, σas [][]float64,
   sLabel, asLabel []string,
   logpath, sample, coolingExperiment string,
   slide bool,
 ) {
+
+  type errorPoints struct {
+    plotter.XYs
+    plotter.YErrors
+  }
+
+  // σ[set][σi]
+  //fmt.Println(σas[0][0])
+  //fmt.Println(σs[0][0])
 
   // Anti-Stokes
   title := "Anti-Stokes"
@@ -1534,9 +1540,15 @@ func goPlotSubGrpd(
   for _, set := range sets {
 
     asPts := buildData(as[set])
+    σasErr := buildErrors(σas[set])
+
+    antiStokes := errorPoints {
+      XYs: asPts,
+      YErrors: plotter.YErrors(σasErr),
+    }
 
     // Make a scatter plotter and set its style.
-    plotSet, err := plotter.NewScatter(asPts)
+    plotSet, err := plotter.NewScatter(antiStokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -1550,10 +1562,18 @@ func goPlotSubGrpd(
     }
     plotSet.Shape = draw.CircleGlyph{}
 
-    p.Add(plotSet, t, r)
+    // Error bars
+    e, err := plotter.NewYErrorBars(antiStokes)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    e.LineStyle.Color = palette(set, false, coolingExperiment)
+
+    p.Add(t, r, e) // plotSet,
 
     // Legend
-    l, err := plotter.NewScatter(asPts)
+    l, err := plotter.NewScatter(antiStokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -1600,9 +1620,15 @@ func goPlotSubGrpd(
   for _, set := range sets {
 
     sPts := buildData(s[set])
+    σsErr := buildErrors(σs[set])
+
+    stokes := errorPoints {
+      XYs: sPts,
+      YErrors: plotter.YErrors(σsErr),
+    }
 
     // Make a scatter plotter and set its style.
-    plotSet, err := plotter.NewScatter(sPts)
+    plotSet, err := plotter.NewScatter(stokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -1616,10 +1642,18 @@ func goPlotSubGrpd(
     }
     plotSet.Shape = draw.CircleGlyph{}
 
-    p.Add(plotSet, t, r)
+    // Error bars
+    e, err := plotter.NewYErrorBars(stokes)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    e.LineStyle.Color = palette(set, false, coolingExperiment)
+
+    p.Add(t, r, e) // plotSet,
 
     // Legend
-    l, err := plotter.NewScatter(sPts)
+    l, err := plotter.NewScatter(stokes)
     if err != nil {
       fmt.Println(err)
       os.Exit(1)
@@ -1830,6 +1864,11 @@ func σ(
 ) (
   float64,
 ) {
+
+  // dBm -> uV
+  for i, v := range values {
+    values[i] = math.Pow(10, 6)*math.Pow(10, v/10.)
+  }
 
   // Standard deviation of the mean
   dev := 0.
