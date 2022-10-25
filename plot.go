@@ -535,6 +535,10 @@ func avgCSVs(
     os.Exit(1)
   }
   peek, err := readCSV(f)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
 
   σbs, σrs, σras, σbas, σas, σs := make([][]float64, len(powers)),
   make([][]float64, len(powers)), make([][]float64, len(powers)),
@@ -689,18 +693,51 @@ func avgCSVs(
       os.Exit(1)
     }
 
-  }/* else {
+  } else {
 
-    for _, name := range []string{"bs", "rs", "ras", "bas"} {
+    fσs, err := os.Open("Data/σs.csv")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
 
-      for _, powFloat := range powers {
+    σsReader := csv.NewReader(fσs)
+    σsString, err := σsReader.ReadAll()
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
 
-        pow := fmt.Sprint(powFloat)
+    fσas, err := os.Open("Data/σas.csv")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
 
+    σasReader := csv.NewReader(fσas)
+    σasString, err := σasReader.ReadAll()
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
 
+    for pow := range σsString {
+      for i := range σsString[pow] {
+        σs[pow][i], err = strconv.ParseFloat(σsString[pow][i], 64)
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
+
+        σas[pow][i], err = strconv.ParseFloat(σasString[pow][i], 64)
+        if err != nil {
+          fmt.Println(err)
+          os.Exit(1)
+        }
       }
     }
-  }*/
+
+  }
 
   return σas, σs
 }
