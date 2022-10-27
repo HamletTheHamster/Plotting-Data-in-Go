@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, σs, σas, sLabel, asLabel, logpath, sample,
@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitAntiStokes := []int{14}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
+      fitStokes := []int{}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -1886,13 +1886,14 @@ func σ(
     values[i] = math.Pow(10, 6)*math.Pow(10, v/10.)
   }
 
-  // Standard deviation of the mean
+  // Sum of squares of the difference
   dev := 0.
   for _, v := range values {
     dev += math.Pow(v - avg(values), 2)
   }
   n := float64(len(values))
 
+  // Standard deviation of the mean
   return math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
 }
 
