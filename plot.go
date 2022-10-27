@@ -109,7 +109,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{14}
+      fitAntiStokes := []int{0,1,2}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -131,7 +131,7 @@ func main() {
             for i := range as[set][0] {
               x := as[set][0][i]
               y := as[set][1][i]
-              dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
+              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σas[set][i])
             }
           }
 
@@ -189,7 +189,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{}
+      fitStokes := []int{0,1,2}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -212,7 +212,7 @@ func main() {
             for i := range s[set][0] {
               x := s[set][0][i]
               y := s[set][1][i]
-              dst[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y
+              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σs[set][i])
             }
           }
 
