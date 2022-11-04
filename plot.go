@@ -84,12 +84,13 @@ func main() {
     fitSets := true
     if fitSets {
 
-      var amp, wid, cen, gb, Γ float64
+      var amp, wid, cen, c, gb, Γ float64
 
       if sample == "LCOF" {
-        amp = 25.
+        amp = 2.
         wid = 0.1
         cen = 2.275
+        c = .01
         gb = 6 // W^{-1}m^{-1}
         Γ = 98.65 //*2*math.Pi // MHz
       } else if sample == "UHNA3" {
@@ -126,12 +127,12 @@ func main() {
 
           f := func(dst, guess []float64) {
 
-            amp, wid, cen := guess[0], guess[1], guess[2]
+            amp, wid, cen, c := guess[0], guess[1], guess[2], guess[3]
 
             for i := range as[set][0] {
               x := as[set][0][i]
               y := as[set][1][i]
-              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σas[set][i])
+              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σas[set][i]) + c
             }
           }
 
@@ -139,11 +140,11 @@ func main() {
 
           // Solve for fit
           toBeSolved := lm.LMProblem{
-            Dim:        3,
+            Dim:        4,
             Size:       len(as[set][0]),
             Func:       f,
             Jac:        jacobian.Jac,
-            InitParams: []float64{amp, wid, cen},
+            InitParams: []float64{amp, wid, cen, c},
             Tau:        1e-6,
             Eps1:       1e-8,
             Eps2:       1e-8,
@@ -151,7 +152,7 @@ func main() {
 
           results, _ := lm.LM(toBeSolved, &lm.Settings{Iterations: 100, ObjectiveTol: 1e-16})
 
-          amp, wid, cen := results.X[0], math.Abs(results.X[1]), results.X[2]
+          amp, wid, cen, c := results.X[0], math.Abs(results.X[1]), results.X[2], results.X[3]
 
           asfwhm = append(asfwhm, wid*1000)
 
@@ -163,7 +164,7 @@ func main() {
           df := .001
           f0 := as[set][0][0]
           fitPts := int((as[set][0][len(as[set][0]) - 1] - f0)/df) + 1
-          asFits = append(asFits, generateFitData(amp, wid, cen, f0, df, fitPts))
+          asFits = append(asFits, generateFitData(amp, wid, cen, c, f0, df, fitPts))
 
           // Width lines
           asWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
@@ -212,7 +213,7 @@ func main() {
             for i := range s[set][0] {
               x := s[set][0][i]
               y := s[set][1][i]
-              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σs[set][i])
+              dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σs[set][i]) + c
             }
           }
 
@@ -224,7 +225,7 @@ func main() {
          	  Size:       len(s[set][0]),
          	  Func:       f,
          	  Jac:        jacobian.Jac,
-         	  InitParams: []float64{amp, wid, cen},
+         	  InitParams: []float64{amp, wid, cen, c},
          	  Tau:        1e-6,
          	  Eps1:       1e-8,
          	  Eps2:       1e-8,
@@ -244,7 +245,7 @@ func main() {
           df := .001
           f0 := s[set][0][0]
           fitPts := int((s[set][0][len(s[set][0]) - 1] - f0)/df) + 1
-          sFits = append(sFits, generateFitData(amp, wid, cen, f0, df, fitPts))
+          sFits = append(sFits, generateFitData(amp, wid, cen, c, f0, df, fitPts))
 
           // Width lines
           sWidthLine = [][]float64{{cen - wid/2, cen + wid/2},{amp/2, amp/2}}
@@ -1666,7 +1667,7 @@ func goPlotSubGrpd(
 }
 
 func generateFitData(
-  amp, wid, cen, f0, df float64,
+  amp, wid, cen, c, f0, df float64,
   fitPts int,
 ) (
   [][]float64,
@@ -1680,7 +1681,7 @@ func generateFitData(
   y := make([]float64, fitPts)
   for i := range x {
     // (amp*wid^2/((x-cen)^2+wid^2))
-    y[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x[i] - cen, 2) + (.25 * math.Pow(wid, 2)))
+    y[i] = .25 * amp * math.Pow(wid, 2) / (math.Pow(x[i] - cen, 2) + (.25 * math.Pow(wid, 2))) + c
   }
 
   return [][]float64{x, y}
