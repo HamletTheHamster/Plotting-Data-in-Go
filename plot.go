@@ -73,7 +73,7 @@ func main() {
       as, s = bin(binSets, as, s, binMHz)
     }
 
-    subtractedGrouped := []int{0,1,2,3}
+    subtractedGrouped := []int{}
     if len(subtractedGrouped) > 0 {
       goPlotSubGrpd(
         subtractedGrouped, s, as, σs, σas, sLabel, asLabel, logpath, sample,
@@ -312,7 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    setsToPlotCABS := []int{}
+    binCabsSets := []int{}
+    if len(binCabsSets) > 0 {
+      binMHz := 10.
+      cabsData = binCabs(binCabsSets, cabsData, binMHz)
+    }
+
+    setsToPlotCABS := []int{2}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -986,15 +992,15 @@ func getLockData(
     }
   }
 
-  // Convert to uV
+  /* Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }
+  }*/
 
-  /* OR Convert to pV
+  // OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }*/
+  }
 
   return [][]float64{frequency, signal}
 }
@@ -1177,7 +1183,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (uV)"
+  ylabel := "Spectral Density (pV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
@@ -1259,6 +1265,15 @@ func axes(
       ytick := []float64{0, 3, 6, 9, 12, 15}
       xtickLabel := []string{"10.5", "", "10.7", "", "10.9", "", "11.1", "", "11.3", "", "11.5"}
       ytickLabel := []string{"0", "3", "6", "9", "12", "15"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "Tapered Fiber":
+      xrange := []float64{8.78, 9.48}
+      yrange := []float64{0, 150}
+      xtick := []float64{8.78, 8.88, 8.98, 9.08, 9.18, 9.28, 9.38, 9.48}
+      ytick := []float64{0, 25, 50, 75, 100, 125, 150}
+      xtickLabel := []string{"8.78", "", "8.98", "", "9.18", "", "9.38", ""}
+      ytickLabel := []string{"0", "25", "50", "75", "100", "125", "150"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }
@@ -1874,6 +1889,49 @@ func bin(
     }
   }
   return asBinned, sBinned
+}
+
+func binCabs(
+  sets []int,
+  cabsData [][][]float64,
+  binMHz float64,
+) (
+  [][][]float64,
+) {
+  binGHz := binMHz/1000
+  nBins := int((cabsData[sets[0]][0][len(cabsData[sets[0]][0]) - 1] - cabsData[sets[0]][0][0])/binGHz + 1)
+
+  // [set][0: feq, 1: sig, 2: err][values]
+  cabsBinned := make([][][]float64, len(cabsData))
+  for i := range cabsBinned {
+    cabsBinned[i] = make([][]float64, 3)
+    for j := range cabsBinned[i] {
+      cabsBinned[i][j] = make([]float64, nBins)
+    }
+  }
+
+  for _, set := range sets {
+
+    cabsBound := cabsData[set][0][0]
+
+    for i := 0; i < nBins; i++ {
+      cabsBound += binGHz
+
+      var cabsSigsInBin []float64
+
+      for j, f := range cabsData[set][0] {
+        if f < cabsBound && f > cabsBound - binGHz {
+          cabsSigsInBin = append(cabsSigsInBin, cabsData[set][1][j])
+        }
+      }
+      cabsBinned[set][0][i] = cabsBound - (binGHz/2)
+      cabsBinned[set][1][i] = avg(cabsSigsInBin)
+
+      // Error for each binned point
+      cabsBinned[set][2][i] = σ(cabsSigsInBin)
+    }
+  }
+  return cabsBinned
 }
 
 func σ(

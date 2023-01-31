@@ -1,0 +1,8 @@
+Data taken: 23-1-30
+Run: 1
+Sample: Tapered Fiber
+Runtime note: 5 MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
