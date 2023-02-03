@@ -1179,6 +1179,10 @@ func plotCABS(
     len = "1 cm"
   case 0.004:
     len = "4 mm"
+  case 0.0000005:
+    len = "500 nm"
+  default:
+    len = strconv.FormatFloat(length, 'f', 1, 64)
   }
 
   title := len + " " + sample + " CABS"
@@ -1225,7 +1229,7 @@ func plotCABS(
     l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
-    p.Legend.Add(label[set], l)
+    //p.Legend.Add(label[set], l)
   }
 
   savePlot(p, "CABS", logpath)
