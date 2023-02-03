@@ -1,0 +1,4 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-1-30,Tapered Fiber,1,16.96,5.81,2.56,1/frequency.csv,1/signal.csv,probe 1549.08 filter 1549.154 spotted
+23-1-30,Tapered Fiber,2,16.96,5.81,2.56,2/frequency.csv,2/signal.csv,probe 1549.08 filter 1549.154 centered
+23-1-30,Tapered Fiber,3,16.96,5.81,2.56,3 - 1 MHz step/frequency.csv,3 - 1 MHz step/signal.csv,probe 1549.08 filter 1549.154 long run
