@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{}
+    binCabsSets := []int{1}
     if len(binCabsSets) > 0 {
-      binMHz := 10.
+      binMHz := 20.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{2}
+    setsToPlotCABS := []int{1}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -340,7 +340,7 @@ func flags() (
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
-  flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, TeO2, glass slide")
+  flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
@@ -1274,6 +1274,15 @@ func axes(
       ytick := []float64{0, 25, 50, 75, 100, 125, 150}
       xtickLabel := []string{"8.78", "", "8.98", "", "9.18", "", "9.38", ""}
       ytickLabel := []string{"0", "25", "50", "75", "100", "125", "150"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "Te":
+      xrange := []float64{2.4, 2.8}
+      yrange := []float64{60, 110}
+      xtick := []float64{2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
+      ytick := []float64{60, 70, 80, 90, 100, 110}
+      xtickLabel := []string{"2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
+      ytickLabel := []string{"", "70", "", "90", "", "110"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }

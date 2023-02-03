@@ -1,3 +1,3 @@
-Date, Label, Run, Pump, Stokes, Probe, Frequency, Signal, Notes
-23-2-2, 500 nm Te, 1, 270.1, 179.3, 125.1, 1/frequency.csv, 1/signal.csv, powers in uW - notes on ipad
-23-2-2, 500 nm Te, 2, 270.1, 179.3, 125.1, 2/frequency.csv, 2/signal.csv, LO maxed using uhna3 - 1 MHz step 5s dwell - long run
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-2-2,500 nm Te,1,270.1,179.3,125.1,1/frequency.csv,1/signal.csv,powers in uW - notes on ipad
+23-2-2,500 nm Te,2,270.1,179.3,125.1,2/frequency.csv,2/signal.csv,LO maxed using uhna3 - 1 MHz step 5s dwell - long run
