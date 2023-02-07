@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{1}
+    binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
-      binMHz := 20.
+      binMHz := 15.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -1282,11 +1282,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Te":
       xrange := []float64{2.4, 2.8}
-      yrange := []float64{60, 110}
+      yrange := []float64{180, 250}
       xtick := []float64{2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{60, 70, 80, 90, 100, 110}
+      ytick := []float64{180, 190, 200, 210, 220, 230, 240, 250}
       xtickLabel := []string{"2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"", "70", "", "90", "", "110"}
+      ytickLabel := []string{"", "190", "", "210", "", "230", "", "250"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }
