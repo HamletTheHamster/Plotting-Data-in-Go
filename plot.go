@@ -1289,7 +1289,16 @@ func axes(
       ytickLabel := []string{"", "190", "", "210", "", "230", "", "250"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
-    }
+    case "Te13":
+      xrange := []float64{12.8, 13.2}
+      yrange := []float64{-100, 100}
+      xtick := []float64{12.8, 12.9, 13, 13.1, 13.2}
+      ytick := []float64{-100, -50, 0, 50, 100}
+      xtickLabel := []string{"12.8", "", "13", "", "13.2"}
+      ytickLabel := []string{"", "-5", "", "5", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+  }
   case "fits":
     switch sample {
     case "LCOF":

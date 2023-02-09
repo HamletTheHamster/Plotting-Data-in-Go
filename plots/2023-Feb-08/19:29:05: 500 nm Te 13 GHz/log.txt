@@ -1,0 +1,9 @@
+Data taken: 23-2-8
+Run: 1
+Sample: Te13
+Runtime note: 500 nm Te 13 GHz
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*
