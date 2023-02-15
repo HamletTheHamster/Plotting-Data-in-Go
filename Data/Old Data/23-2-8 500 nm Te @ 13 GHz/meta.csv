@@ -1,0 +1,2 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-2-8,500 nm Te,1,1,1,1,1/frequency.csv,1/signal.csv,powers in uW - notes on ipad - LO maxed using uhna3 - 1 MHz step 5s dwell - long run
