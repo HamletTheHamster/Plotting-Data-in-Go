@@ -1,0 +1,9 @@
+Data taken: 23-2-6
+Run: 1
+Sample: Te
+Runtime note: fundamental mode 15 MHz bin
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*

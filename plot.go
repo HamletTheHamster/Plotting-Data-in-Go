@@ -314,7 +314,7 @@ func main() {
 
     binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
-      binMHz := 15.
+      binMHz := 10.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
