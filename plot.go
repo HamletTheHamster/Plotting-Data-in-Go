@@ -312,9 +312,9 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{0}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 10.
+      binMHz := 15.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
@@ -992,15 +992,15 @@ func getLockData(
     }
   }
 
-  /* Convert to uV
+  // Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }*/
+  }
 
-  // OR Convert to pV
+  /* OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }
+  }*/
 
   return [][]float64{frequency, signal}
 }
@@ -1187,7 +1187,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (pV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
@@ -1282,11 +1282,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Te":
       xrange := []float64{2.4, 2.8}
-      yrange := []float64{180, 250}
+      yrange := []float64{0, 2}
       xtick := []float64{2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{180, 190, 200, 210, 220, 230, 240, 250}
+      ytick := []float64{0, .2, .4, .6, .8, 1, 1.2, 1.4, 1.6, 1.8, 2}
       xtickLabel := []string{"2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"", "190", "", "210", "", "230", "", "250"}
+      ytickLabel := []string{"", ".2", "", ".6", "", "1", "", "1.4", "", "1.8", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Te13":
