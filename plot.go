@@ -312,7 +312,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{}
+    binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
       binMHz := 15.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
@@ -1284,9 +1284,9 @@ func axes(
       xrange := []float64{2.4, 2.8}
       yrange := []float64{0, 2}
       xtick := []float64{2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{0, .2, .4, .6, .8, 1, 1.2, 1.4, 1.6, 1.8, 2}
+      ytick := []float64{0, .2, .4, .6, .8, 1, 1.2, 1.4, 1.6}
       xtickLabel := []string{"2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"", ".2", "", ".6", "", "1", "", "1.4", "", "1.8", ""}
+      ytickLabel := []string{"", ".2", "", ".6", "", "1", "", "1.4", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Te13":
