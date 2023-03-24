@@ -1,0 +1,8 @@
+Data taken: 23-3-23
+Run: 1
+Sample: Te
+Runtime note: 3p2-5GHz 10MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
