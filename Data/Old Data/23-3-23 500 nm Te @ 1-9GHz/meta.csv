@@ -1,0 +1,6 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-3-23,500 nm Te,1,53.7,15,20,1/frequency.csv,1/signal.csv,all powers in mW @ taps - 10GHz p-pr separation 5 MHz step 1s dwell 1x avg - 1.5-3 GHz
+23-3-23,500 nm Te,2,53.7,15,20,2/frequency.csv,2/signal.csv,5 MHz step 1s dwell 5x avg - 1.5-3GHz - rough periodic peaks
+23-3-23,500 nm Te,3,53.7,15,20,3/frequency.csv,3/signal.csv,5 MHz step 1s dwell 5x avg - 3.2-5GHz - 500MHz periodic peaks ~250MHz wide
+23-3-23,500 nm Te,4,50,14,19,4/frequency.csv,4/signal.csv,5 MHz step 1s dwell 5x avg - 5-7GHz - 500MHz periodic peaks ~250MHz wide
+23-3-23,500 nm Te,5,53,15,19,5/frequency.csv,5/signal.csv,5 MHz step 1s dwell 5x avg - 7-9GHz - fuzzy to clear same periodic peaks
