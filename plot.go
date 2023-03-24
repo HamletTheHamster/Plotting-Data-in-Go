@@ -318,7 +318,7 @@ func main() {
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -1289,22 +1289,13 @@ func axes(
       ytickLabel := []string{"", "2", "", "6", "", "10", "", "14", "", "18", "", "22", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
-    case "Te13":
-      xrange := []float64{12.8, 13.2}
-      yrange := []float64{-100, 100}
-      xtick := []float64{12.8, 12.9, 13, 13.1, 13.2}
-      ytick := []float64{-100, -50, 0, 50, 100}
-      xtickLabel := []string{"12.8", "", "13", "", "13.2"}
-      ytickLabel := []string{"", "-5", "", "5", ""}
-
-      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
-    case "Te5":
-      xrange := []float64{4.97, 5.47}
-      yrange := []float64{15, 50}
-      xtick := []float64{5, 5.1, 5.2, 5.3, 5.4, 5.5}
-      ytick := []float64{15, 20, 25, 30, 35, 40, 45, 50}
-      xtickLabel := []string{"5", "", "5.2", "", "5.4", ""}
-      ytickLabel := []string{"", "20", "", "30", "", "40", "", "50"}
+    case "no sample":
+      xrange := []float64{1.5, 3}
+      yrange := []float64{0, 24}
+      xtick := []float64{1.5, 1.75, 2, 2.25, 2.5, 2.75, 3}
+      ytick := []float64{0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24}
+      xtickLabel := []string{"1.5", "", "2", "", "2.5", "", "3"}
+      ytickLabel := []string{"", "2", "", "6", "", "10", "", "14", "", "18", "", "22", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
