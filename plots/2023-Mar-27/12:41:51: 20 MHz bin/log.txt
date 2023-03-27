@@ -1,0 +1,8 @@
+Data taken: 23-3-27
+Run: 1
+Sample: no sample
+Runtime note: 20 MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*

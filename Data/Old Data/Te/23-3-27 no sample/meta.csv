@@ -1,0 +1,2 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-3-27,no sample,1,147,41,65,1/frequency.csv,1/signal.csv,no RF amp - all powers in mW @ taps - 10GHz p-pr separation 5 MHz step 1s dwell 5x avg - 1-3.2GHz

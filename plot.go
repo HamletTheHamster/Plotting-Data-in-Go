@@ -992,15 +992,15 @@ func getLockData(
     }
   }
 
-  // Convert to uV
+  /* Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }
+  }*/
 
-  /* OR Convert to pV
+  // OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }*/
+  }
 
   return [][]float64{frequency, signal}
 }
@@ -1187,7 +1187,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (uV)"
+  ylabel := "Spectral Density (pV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
@@ -1289,13 +1289,13 @@ func axes(
       ytickLabel := []string{"", "2", "", "6", "", "10", "", "14", "", "18", "", "22", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
-    case "no sample":
-      xrange := []float64{1.5, 3}
-      yrange := []float64{0, 24}
-      xtick := []float64{1.5, 1.75, 2, 2.25, 2.5, 2.75, 3}
-      ytick := []float64{0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24}
-      xtickLabel := []string{"1.5", "", "2", "", "2.5", "", "3"}
-      ytickLabel := []string{"", "2", "", "6", "", "10", "", "14", "", "18", "", "22", ""}
+    case "no sample, no RF amp":
+      xrange := []float64{1, 3.2}
+      yrange := []float64{0, 160}
+      xtick := []float64{1, 1.5, 2, 2.5, 3, 3.25}
+      ytick := []float64{0, 20, 40, 60, 80, 100, 120, 140, 160}
+      xtickLabel := []string{"1", "", "2", "", "3", ""}
+      ytickLabel := []string{"", "20", "", "60", "", "100", "", "140", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
@@ -1306,7 +1306,7 @@ func axes(
         xrange := []float64{2.0, 2.5}
         yrange := []float64{0, 110}
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
-        ytick := []float64{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110}
+        ytick := []float64{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
         ytickLabel := []string{"0", "", "20", "", "40", "", "60", "", "80", "", "100", ""}
 
