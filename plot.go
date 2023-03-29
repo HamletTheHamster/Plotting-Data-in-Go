@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{}
+    binCabsSets := []int{3}
     if len(binCabsSets) > 0 {
-      binMHz := 10.
+      binMHz := 21.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{3}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -1229,7 +1229,7 @@ func plotCABS(
     l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
-    //p.Legend.Add(label[set], l)
+    p.Legend.Add(label[set], l)
   }
 
   savePlot(p, "CABS", logpath)
@@ -1245,12 +1245,12 @@ func axes(
   case "CABS":
     switch sample {
     case "UHNA3":
-      xrange := []float64{1, 1.36}
-      yrange := []float64{0, 17.5}
-      xtick := []float64{1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4}
-      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5}
-      xtickLabel := []string{"1", "", "1.1", "", "1.2", "", "1.3", "", "1.4"}
-      ytickLabel := []string{"0", "", "5", "", "10", "", "15", ""}
+      xrange := []float64{9, 9.3}
+      yrange := []float64{-10, 150}
+      xtick := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
+      ytick := []float64{0, 50, 100, 150}
+      xtickLabel := []string{"9", "", "9.1", "", "9.2", "", "9.3"}
+      ytickLabel := []string{"0", "", "100", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
