@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{3}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 21.
+      binMHz := 10.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{3}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -992,15 +992,15 @@ func getLockData(
     }
   }
 
-  /* Convert to uV
+  // Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }*/
+  }
 
-  // OR Convert to pV
+  /* OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }
+  }*/
 
   return [][]float64{frequency, signal}
 }
@@ -1187,7 +1187,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (pV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
