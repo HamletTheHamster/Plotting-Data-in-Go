@@ -1,0 +1,4 @@
+Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
+23-4-4,Forward Sapphire,1,30,30,1,1/frequency.csv,1/signal.csv,all powers in mW @ taps - probe power at detector - 1549 pump & probe - no filter - 1 MHz step 1s dwell 5x avg 40 uV range - 100-300 MHz
+23-4-4,Forward Sapphire,2,30,30,1,2/frequency.csv,2/signal.csv,0.5 MHz step 1s dwell 5x avg  80 uV range - 100-175 MHz
+23-4-4,Forward Sapphire,3,30,30,1,3/frequency.csv,3/signal.csv,0.1 MHz step 1s dwell 5x avg  80 uV range - 100-150 MHz
