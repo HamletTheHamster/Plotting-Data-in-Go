@@ -1173,6 +1173,8 @@ func plotCABS(
   var len string
 
   switch length {
+  case 0.0:
+    len = ""
   case 0.001:
     len = "1 mm"
   case 0.01:
