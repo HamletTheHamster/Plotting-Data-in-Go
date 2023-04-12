@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{2}
+    binCabsSets := []int{1}
     if len(binCabsSets) > 0 {
       binMHz := 1.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{2}
+    setsToPlotCABS := []int{1}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -992,15 +992,15 @@ func getLockData(
     }
   }
 
-  // Convert to uV
+  /* Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }
+  }*/
 
-  /* OR Convert to pV
+  // OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }*/
+  }
 
   return [][]float64{frequency, signal}
 }
@@ -1189,7 +1189,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (uV)"
+  ylabel := "Spectral Density (pV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
@@ -1292,12 +1292,12 @@ func axes(
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Sapphire":
-      xrange := []float64{.100, .150}
-      yrange := []float64{0, 140}
-      xtick := []float64{.100, .110, .120, .130, .140, .150}
-      ytick := []float64{0, 20, 40, 60, 80, 100, 120, 140}
-      xtickLabel := []string{".100", "", ".120", "", ".140", ""}
-      ytickLabel := []string{"", "20", "", "60", "", "100", "", "140"}
+      xrange := []float64{.100, .140}
+      yrange := []float64{-7, 6}
+      xtick := []float64{.100, .110, .120, .130, .140}
+      ytick := []float64{-6, -4, -2, 0, 2, 4, 6}
+      xtickLabel := []string{".100", "", ".120", "", ".140"}
+      ytickLabel := []string{"", "-4", "", "0", "", "4", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
@@ -2757,8 +2757,8 @@ func prepPlot(
 
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
-  p.Legend.XOffs = vg.Points(-25)
-  p.Legend.YOffs = vg.Points(-25)
+  p.Legend.XOffs = vg.Points(-75)
+  p.Legend.YOffs = vg.Points(25)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)
