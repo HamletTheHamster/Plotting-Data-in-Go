@@ -312,7 +312,7 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{1}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
       binMHz := 1.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
@@ -1293,11 +1293,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Sapphire":
       xrange := []float64{.100, .140}
-      yrange := []float64{-7, 6}
+      yrange := []float64{-50, 50}
       xtick := []float64{.100, .110, .120, .130, .140}
-      ytick := []float64{-6, -4, -2, 0, 2, 4, 6}
+      ytick := []float64{-50, -25, 0, 25, 50}
       xtickLabel := []string{".100", "", ".120", "", ".140"}
-      ytickLabel := []string{"", "-4", "", "0", "", "4", ""}
+      ytickLabel := []string{"-50", "", "0", "", "50"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
