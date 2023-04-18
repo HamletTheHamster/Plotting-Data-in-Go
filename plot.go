@@ -314,11 +314,11 @@ func main() {
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 1.
+      binMHz := 2.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -1289,6 +1289,15 @@ func axes(
       ytick := []float64{0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24}
       xtickLabel := []string{"3.2", "", "3.6", "", "4", "", "4.4", "", "4.8", ""}
       ytickLabel := []string{"", "2", "", "6", "", "10", "", "14", "", "18", "", "22", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "TeO2":
+      xrange := []float64{11.5, 12.5}
+      yrange := []float64{0, 700}
+      xtick := []float64{11.5, 11.6, 11.7, 11.8, 11.9, 12.0, 12.1, 12.2, 12.3, 12.4, 12.5}
+      ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700}
+      xtickLabel := []string{"11.5", "", "11.7", "", "11.9", "", "12.1", "", "12.3", "", "12.5"}
+      ytickLabel := []string{"", "100", "", "300", "", "500", "", "700"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Sapphire":
