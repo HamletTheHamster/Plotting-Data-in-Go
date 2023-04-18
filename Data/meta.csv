@@ -1,2 +1,2 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-23-4-17,500 nm TeO2,1,30,8,1,1/frequency.csv,1/signal.csv,feature at 12p15! - LO maxed using uhna3 - 1 MHz step 1s dwell
+23-4-18,no sample,1,140,40,1,1/frequency.csv,1/signal.csv,TeO2 candidate feature gone!!! - 5 MHz step 1s dwell

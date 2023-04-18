@@ -314,7 +314,7 @@ func main() {
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 2.
+      binMHz := 5.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
@@ -1298,6 +1298,15 @@ func axes(
       ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700}
       xtickLabel := []string{"11.5", "", "11.7", "", "11.9", "", "12.1", "", "12.3", "", "12.5"}
       ytickLabel := []string{"", "100", "", "300", "", "500", "", "700"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "no sample":
+      xrange := []float64{11.5, 12.5}
+      yrange := []float64{0, 2100}
+      xtick := []float64{11.5, 11.6, 11.7, 11.8, 11.9, 12.0, 12.1, 12.2, 12.3, 12.4, 12.5}
+      ytick := []float64{0, 300, 600, 900, 1200, 1500, 1800, 2100}
+      xtickLabel := []string{"11.5", "", "11.7", "", "11.9", "", "12.1", "", "12.3", "", "12.5"}
+      ytickLabel := []string{"", "300", "", "900", "", "1500", "", "2100"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "Sapphire":
