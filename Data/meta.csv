@@ -1,2 +1,3 @@
 Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-23-4-18,no sample,1,140,40,1,1/frequency.csv,1/signal.csv,TeO2 candidate feature gone!!! - 5 MHz step 1s dwell
+23-4-18,no sample,1,140,40,76.5,1/frequency.csv,1/signal.csv,TeO2 candidate feature gone!!! - 5 MHz step 1s dwell
+23-4-18,no sample,2,140,40,76.5,2/frequency.csv,2/signal.csv,feature definitely gone!!! - 1 MHz step 1s dwell
