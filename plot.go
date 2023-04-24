@@ -27,12 +27,15 @@ func main() {
 
   logpath := logpath(note)
 
-  date, run, label, asPowers, sPowers, file, asNotes, sNotes := readMeta(
+  date, label, run, startTime, endTime, asPowers, sPowers,
+  pumpPowers, stokesPowers, probePowers, file,
+  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step,
+  asNotes, sNotes, notes := readMeta(
     cabs, lock, temp, coolingExperiment,
   )
 
-  log := header(
-    cabs, lock, temp, slide, date, run, sample, coolingExperiment, note,
+  log := logHeader(
+    cabs, lock, temp, slide, sample, coolingExperiment, note,
     length,
   )
 
@@ -312,13 +315,22 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{0}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
       binMHz := 3.
+      log = logBinning(
+        log, binCabsSets, binMHz,
+        )
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
     setsToPlotCABS := []int{0}
+    log = logPlots(
+      log, setsToPlotCABS, date, label, run, startTime, endTime,
+      pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
+      dataRate, order, startFrequency, stopFrequency, step, notes,
+    )
+
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -340,7 +352,7 @@ func flags() (
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
-  flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, glass slide")
+  flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append log folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
@@ -372,7 +384,10 @@ func readMeta(
   cabs, lock, temp bool,
   coolingExperiment string,
 ) (
-  string, string, []string, []float64, []float64, []string, []float64, []float64,
+  []string, []string, []string, []string, []string, []float64, []float64,
+  []float64, []float64, []float64, []string,
+  []float64, []float64, []float64, []float64, []float64, []float64, []float64, []float64,
+  []float64, []float64, []string,
 ) {
 
   // Read
@@ -389,21 +404,27 @@ func readMeta(
     os.Exit(1)
   }
 
-  var date, run string
-  var label, filepath []string
+  var date, label, run, startTime, endTime, filepath, notes []string
   var asPowers, sPowers, asNotes, sNotes []float64
   var pumpPowers, stokesPowers, probePowers []float64
-  var dateCol, runCol, labelCol, filepathCol, sigFileCol, freqFileCol, notesCol int
-  var pumpCol, stokesCol, probeCol int
+  var lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64
+  var dateCol, labelCol, runCol, startTimeCol, endTimeCol int
+  var pumpCol, stokesCol, probeCol, filepathCol, sigFileCol, freqFileCol int
+  var lockinRangeCol, dwellCol, bandwidthCol, dataRateCol, orderCol int
+  var startFrequencyCol, stopFrequencyCol, stepCol, notesCol int
 
   for col, heading := range meta[0] {
     switch heading {
     case "Date":
       dateCol = col
-    case "Run":
-      runCol = col
     case "Label":
       labelCol = col
+    case "Run":
+      runCol = col
+    case "Start Time":
+      startTimeCol = col
+    case "End Time (hr:min:sec)":
+      endTimeCol = col
     case "Pump":
       pumpCol = col
     case "Stokes":
@@ -412,10 +433,22 @@ func readMeta(
       probeCol = col
     case "Filepath":
       filepathCol = col
-    case "Signal":
-      sigFileCol = col
-    case "Frequency":
-      freqFileCol = col
+    case "Range":
+      lockinRangeCol = col
+    case "Dwell":
+      dwellCol = col
+    case "Bandwidth":
+      bandwidthCol = col
+    case "Data Rate":
+      dataRateCol = col
+    case "Order":
+      orderCol = col
+    case "Start Frequency":
+      startFrequencyCol = col
+    case "Stop Frequency":
+      stopFrequencyCol = col
+    case "Step":
+      stepCol = col
     case "Notes":
       notesCol = col
     }
@@ -425,12 +458,10 @@ func readMeta(
 
     if row > 0 {
 
-      if row < 2 {
-        date = v[dateCol]
-        run = v[runCol]
-      }
-
+      date = append(date, v[dateCol])
       label = append(label, v[labelCol])
+      run = append(run, v[runCol])
+      notes = append(notes, v[notesCol])
 
       if coolingExperiment != "" {
         if strings.Contains(v[labelCol], "ras") {
@@ -474,6 +505,7 @@ func readMeta(
           }
         }
       } else if cabs {
+
         if v, err := strconv.ParseFloat(v[pumpCol], 64); err == nil {
           pumpPowers = append(pumpPowers, v)
         } else {
@@ -494,8 +526,70 @@ func readMeta(
         }
 
         if lock {
-          filepath = append(filepath, v[sigFileCol])
-          filepath = append(filepath, v[freqFileCol])
+
+          startTime = append(startTime, v[startTimeCol])
+          endTime = append(endTime, v[endTimeCol])
+
+          filepath = append(filepath, v[runCol] + "/signal.csv") //v[sigFileCol])
+          filepath = append(filepath, v[runCol] + "/frequency.csv") //v[freqFileCol])
+
+          if v, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
+            lockinRange = append(lockinRange, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta lockinRange string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[dwellCol], 64); err == nil {
+            dwell = append(dwell, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta dwell string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[bandwidthCol], 64); err == nil {
+            bandwidth = append(bandwidth, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta bandwidth string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[dataRateCol], 64); err == nil {
+            dataRate = append(dataRate, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta dataRate string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[orderCol], 64); err == nil {
+            order = append(order, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta order string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[startFrequencyCol], 64); err == nil {
+            startFrequency = append(startFrequency, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta startFrequency string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[stopFrequencyCol], 64); err == nil {
+            stopFrequency = append(stopFrequency, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta stopFrequency string -> float error")
+            os.Exit(1)
+          }
+          if v, err := strconv.ParseFloat(v[stepCol], 64); err == nil {
+            step = append(step, v)
+          } else {
+            fmt.Println(err)
+            fmt.Println("readMeta step string -> float error")
+            os.Exit(1)
+          }
+
         } else {
           filepath = append(filepath, v[filepathCol])
         }
@@ -521,7 +615,10 @@ func readMeta(
     }
   }
 
-  return date, run, label, asPowers, sPowers, filepath, asNotes, sNotes
+  return date, label, run, startTime, endTime, asPowers, sPowers,
+  pumpPowers, stokesPowers, probePowers, filepath,
+  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step,
+  asNotes, sNotes, notes
 }
 
 func avgCSVs(
@@ -1029,19 +1126,15 @@ func readCSV(
   return rows, nil
 }
 
-func header(
+func logHeader(
   cabs, lock, temp, slide bool,
-  date, run, sample, coolingExperiment, note string,
+  sample, coolingExperiment, note string,
   length float64,
 ) (
   []string,
 ) {
 
   log := []string{}
-  log = append(log, "Data taken: " + date + "\n")
-  if run != "" {
-    log = append(log, "Run: " + run  + "\n")
-  }
   if sample != "" {
     log = append(log, "Sample: " + sample + "\n")
   }
@@ -1071,13 +1164,62 @@ func header(
     fmt.Printf(str)
   }
   if lock {
-    str := fmt.Sprintf("\n*Data gathered from Lock-in*\n")
+    str := fmt.Sprintf("\n*Data gathered from Lock-in*\n\n")
     log = append(log, str)
     fmt.Printf(str)
   } else {
-    str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n")
+    str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n\n")
     log = append(log, str)
     fmt.Printf(str)
+  }
+
+  return log
+}
+
+func logBinning(
+  log []string,
+  binCabsSets []int,
+  binMHz float64,
+) (
+  []string,
+) {
+
+  for _, set := range binCabsSets {
+    log = append(log, fmt.Sprintf("Set %d binned to %.3f MHz\n", set, binMHz))
+  }
+
+  return log
+}
+
+func logPlots(
+  log []string,
+  setsToPlotCABS []int,
+  date, label, run, startTime, endTime []string,
+  pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
+  bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
+  notes []string,
+) (
+  []string,
+) {
+
+  for _, set := range setsToPlotCABS {
+    log = append(log, fmt.Sprintf("\nRun %s\n", run[set]))
+    log = append(log, fmt.Sprintf("\tData taken: %s\n", date[set]))
+    log = append(log, fmt.Sprintf("\tLabel: %s\n", label[set]))
+    log = append(log, fmt.Sprintf("\tStart Time (h:m:s): %s\n", startTime[set]))
+    log = append(log, fmt.Sprintf("\tEnd Time(h:m:s): %s\n", endTime[set]))
+    log = append(log, fmt.Sprintf("\tPump Power: %.3f\n", pumpPowers[set]))
+    log = append(log, fmt.Sprintf("\tStokes Power: %.3f\n", stokesPowers[set]))
+    log = append(log, fmt.Sprintf("\tProbe Power: %.3f\n", probePowers[set]))
+    log = append(log, fmt.Sprintf("\tLock-in Range: %.2f\n", lockinRange[set]))
+    log = append(log, fmt.Sprintf("\tDwell Time: %.9f\n", dwell[set]))
+    log = append(log, fmt.Sprintf("\tLock-in Bandwidth: %.2f\n", bandwidth[set]))
+    log = append(log, fmt.Sprintf("\tLock-in Bandwidth Order: %.0f\n", order[set]))
+    log = append(log, fmt.Sprintf("\tData Sampling Rate: %.2f\n", dataRate[set]))
+    log = append(log, fmt.Sprintf("\tStart Frequency: %.2f\n", startFrequency[set]))
+    log = append(log, fmt.Sprintf("\tStop Frequency: %.2f\n", stopFrequency[set]))
+    log = append(log, fmt.Sprintf("\tStep Size: %.2f\n", step[set]))
+    log = append(log, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
   }
 
   return log
