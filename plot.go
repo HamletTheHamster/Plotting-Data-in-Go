@@ -312,13 +312,13 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{1}
+    binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
       binMHz := 3.
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
     plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
   }
 
@@ -992,15 +992,15 @@ func getLockData(
     }
   }
 
-  /* Convert to uV
+  // Convert to uV
   for i, v := range signal {
     signal[i] = v*1e6
-  }*/
+  }
 
-  // OR Convert to pV
+  /* OR Convert to pV
   for i, v := range signal {
     signal[i] = v*1e9
-  }
+  }*/
 
   return [][]float64{frequency, signal}
 }
@@ -1189,7 +1189,7 @@ func plotCABS(
 
   title := len + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (pV)"
+  ylabel := "Spectral Density (uV)"
   legend := ""
 
   xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
@@ -1292,12 +1292,12 @@ func axes(
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "TeO2":
-      xrange := []float64{11.5, 12.5}
-      yrange := []float64{0, 700}
-      xtick := []float64{11.5, 11.6, 11.7, 11.8, 11.9, 12.0, 12.1, 12.2, 12.3, 12.4, 12.5}
-      ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700}
-      xtickLabel := []string{"11.5", "", "11.7", "", "11.9", "", "12.1", "", "12.3", "", "12.5"}
-      ytickLabel := []string{"", "100", "", "300", "", "500", "", "700"}
+      xrange := []float64{11.9, 12.4}
+      yrange := []float64{0, 2.5}
+      xtick := []float64{11.9, 12.0, 12.1, 12.2, 12.3, 12.4}
+      ytick := []float64{0, .25, .5, .75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
+      xtickLabel := []string{"11.9", "", "12.1", "", "12.3", ""}
+      ytickLabel := []string{"", "0.25", "", "0.75", "", "1.25", "", "1.75", "", "2.25", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "No Sample":
@@ -2775,7 +2775,7 @@ func prepPlot(
 
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
-  p.Legend.XOffs = vg.Points(-75)
+  p.Legend.XOffs = vg.Points(-25)
   p.Legend.YOffs = vg.Points(25)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
