@@ -29,8 +29,8 @@ func main() {
 
   date, label, run, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, file,
-  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step,
-  asNotes, sNotes, notes := readMeta(
+  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
+  step, asNotes, sNotes, notes := readMeta(
     cabs, lock, temp, coolingExperiment,
   )
 
@@ -1334,7 +1334,7 @@ func plotCABS(
   ylabel := "Spectral Density (uV)"
   legend := ""
 
-  xrange, yrange, xtick, ytick, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
+  _, _, _, _, _, _, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1350,10 +1350,21 @@ func plotCABS(
       xmax = cabsData[set][0][len(cabsData[set][0])-1]
     }
   }
-  xrange = []float64{xmin, xmax}
+  xrange := []float64{xmin, xmax}
+  xtick := ((xmax - xmin)/8)
+  xticks := []float64{}
+  xtickLabels := []string{}
+  for i := 0.; i < 9; i++ {
+    xticks = append(xticks, xtick*i + xmin)
+    if int(i)%2 != 0 {
+      xtickLabels = append(xtickLabels, strconv.FormatFloat(xtick*i + xmin, 'f', 2, 64))
+    } else {
+      xtickLabels = append(xtickLabels, "")
+    }
+  }
 
   ymax := 0.
-  ymin := 0.
+  ymin := 10000.
   for _, set := range sets {
     for _, v := range cabsData[set][1] {
       if v > ymax {
@@ -1364,11 +1375,24 @@ func plotCABS(
       }
     }
   }
-  yrange = []float64{ymin, ymax*1.25}
+  yrange := []float64{ymin, ymax*1.25}
+  ytick := ((ymax - ymin)/8)
+  yticks := []float64{}
+  ytickLabels := []string{}
+  for i := 0.; i < 11; i++ {
+    yticks = append(yticks, ytick*i + ymin)
+    if int(i)%2 != 0 {
+      ytickLabels = append(ytickLabels, strconv.FormatFloat(ytick*i + ymin, 'f', 2, 64))
+    } else {
+      ytickLabels = append(ytickLabels, "")
+    }
+  }
+  yticks = append(yticks, ymax)
+  ytickLabels = append(ytickLabels, "")
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
-    xrange, yrange, xtick, ytick,
+    xrange, yrange, xticks, yticks,
     xtickLabels, ytickLabels,
     slide,
   )
@@ -1464,7 +1488,7 @@ func axes(
       yrange := []float64{0, 2.5}
       xtick := []float64{11.9, 12.0, 12.1, 12.2, 12.3, 12.4}
       ytick := []float64{0, .25, .5, .75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5}
-      xtickLabel := []string{"11.9", "", "12.1", "", "12.3", ""}
+      xtickLabel := []string{"", "", "", "", "", "", "", ""}
       ytickLabel := []string{"", "0.25", "", "0.75", "", "1.25", "", "1.75", "", "2.25", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
