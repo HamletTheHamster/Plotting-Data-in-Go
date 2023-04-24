@@ -315,9 +315,9 @@ func main() {
 
     cabsData := getCABSData(lock, file)
 
-    binCabsSets := []int{}
+    binCabsSets := []int{1}
     if len(binCabsSets) > 0 {
-      binMHz := 3.
+      binMHz := 10.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
@@ -1334,12 +1334,14 @@ func plotCABS(
   ylabel := "Spectral Density (uV)"
   legend := ""
 
-  _, _, _, _, _, _, err := axes("CABS", sample, "")
+  /* Manual Axes
+  xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }
+  }*/
 
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1375,7 +1377,7 @@ func plotCABS(
       }
     }
   }
-  yrange := []float64{ymin, ymax*1.25}
+  yrange := []float64{ymin, ymax + (ymax - ymin)/4}
   ytick := ((ymax - ymin)/8)
   yticks := []float64{}
   ytickLabels := []string{}
@@ -1395,7 +1397,7 @@ func plotCABS(
     xrange, yrange, xticks, yticks,
     xtickLabels, ytickLabels,
     slide,
-  )
+  )//
 
   for _, set := range sets {
 
