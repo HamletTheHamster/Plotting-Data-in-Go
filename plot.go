@@ -324,7 +324,7 @@ func main() {
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{1}
     log = logPlots(
       log, setsToPlotCABS, date, label, run, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
@@ -1185,7 +1185,7 @@ func logBinning(
 ) {
 
   for _, set := range binCabsSets {
-    log = append(log, fmt.Sprintf("Set %d binned to %.3f MHz\n", set, binMHz))
+    log = append(log, fmt.Sprintf("Run %d binned to %.3f MHz\n", set+1, binMHz))
   }
 
   return log
@@ -1312,24 +1312,24 @@ func plotCABS(
   slide bool,
 ) {
 
-  var len string
+  var l string
 
   switch length {
   case 0.0:
-    len = ""
+    l = ""
   case 0.001:
-    len = "1 mm"
+    l = "1 mm"
   case 0.01:
-    len = "1 cm"
+    l = "1 cm"
   case 0.004:
-    len = "4 mm"
+    l = "4 mm"
   case 0.0000005:
-    len = "500 nm"
+    l = "500 nm"
   default:
-    len = strconv.FormatFloat(length, 'f', 1, 64)
+    l = strconv.FormatFloat(length, 'f', 1, 64)
   }
 
-  title := len + " " + sample + " CABS"
+  title := l + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (uV)"
   legend := ""
@@ -1339,6 +1339,32 @@ func plotCABS(
     fmt.Println(err)
     os.Exit(1)
   }
+
+  xmax := 0.
+  xmin := cabsData[0][0][0]
+  for _, set := range sets {
+    if cabsData[set][0][0] < xmin {
+      xmin = cabsData[set][0][0]
+    }
+    if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
+      xmax = cabsData[set][0][len(cabsData[set][0])-1]
+    }
+  }
+  xrange = []float64{xmin, xmax}
+
+  ymax := 0.
+  ymin := 0.
+  for _, set := range sets {
+    for _, v := range cabsData[set][1] {
+      if v > ymax {
+        ymax = v
+      }
+      if v < ymin {
+        ymin = v
+      }
+    }
+  }
+  yrange = []float64{ymin, ymax*1.25}
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
