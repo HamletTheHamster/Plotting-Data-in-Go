@@ -313,40 +313,20 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,2}
+    setsToPlotCABS := []int{0,2,3}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    fmt.Printf("Before Binning Set 2:\n")
-    fmt.Printf("Set 0 Frequency Element 0 = %.2f\n", cabsData[0][0][0])
-    fmt.Printf("Set 0 Signal Element 0 = %.2f\n\n", cabsData[0][1][0])
-
-    fmt.Printf("Set 1 Frequency Element 0 = %.2f\n", cabsData[1][0][0])
-    fmt.Printf("Set 1 Signal Element 0 = %.2f\n\n", cabsData[1][1][0])
-
-    fmt.Printf("Set 2 Frequency Element 0 = %.2f\n", cabsData[2][0][0])
-    fmt.Printf("Set 2 Signal Element 0 = %.2f\n\n", cabsData[2][1][0])
-
-    binCabsSets := []int{0,1}
+    binCabsSets := []int{0,2,3}
     if len(binCabsSets) > 0 {
-      binMHz := 15.
+      binMHz := 10.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
-
-    fmt.Printf("After Binning Set 2:\n")
-    fmt.Printf("Set 0 Frequency Element 0 = %.2f\n", cabsData[0][0][0])
-    fmt.Printf("Set 0 Signal Element 0 = %.2f\n\n", cabsData[0][1][0])
-
-    fmt.Printf("Set 1 Frequency Element 0 = %.2f\n", cabsData[1][0][0])
-    fmt.Printf("Set 1 Signal Element 0 = %.2f\n\n", cabsData[1][1][0])
-
-    fmt.Printf("Set 2 Frequency Element 0 = %.2f\n", cabsData[2][0][0])
-    fmt.Printf("Set 2 Signal Element 0 = %.2f\n\n", cabsData[2][1][0])
 
     log = logPlots(
       log, setsToPlotCABS, date, label, run, startTime, endTime,
@@ -530,22 +510,31 @@ func readMeta(
         }
       } else if cabs {
 
-        if v, err := strconv.ParseFloat(v[pumpCol], 64); err == nil {
+        if v[pumpCol] == "" {
+          pumpPowers = append(pumpPowers, 0)
+        } else if v, err := strconv.ParseFloat(v[pumpCol], 64); err == nil {
           pumpPowers = append(pumpPowers, v)
         } else {
           fmt.Println(err)
+          fmt.Println("readMeta pump string -> float error")
           os.Exit(1)
         }
-        if v, err := strconv.ParseFloat(v[stokesCol], 64); err == nil {
+        if v[stokesCol] == "" {
+          stokesPowers = append(stokesPowers, 0)
+        } else if v, err := strconv.ParseFloat(v[stokesCol], 64); err == nil {
           stokesPowers = append(stokesPowers, v)
         } else {
           fmt.Println(err)
+          fmt.Println("readMeta stokes string -> float error")
           os.Exit(1)
         }
-        if v, err := strconv.ParseFloat(v[probeCol], 64); err == nil {
+        if v[probeCol] == "" {
+          probePowers = append(probePowers, 0)
+        } else if v, err := strconv.ParseFloat(v[probeCol], 64); err == nil {
           probePowers = append(probePowers, v)
         } else {
           fmt.Println(err)
+          fmt.Println("readMeta probe string -> float error")
           os.Exit(1)
         }
 
@@ -557,56 +546,72 @@ func readMeta(
           sigFilepath = append(sigFilepath, v[runCol] + "/signal.csv")
           freqFilepath = append(freqFilepath, v[runCol] + "/frequency.csv")
 
-          if v, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
+          if v[lockinRangeCol] == "" {
+            lockinRange = append(lockinRange, 0)
+          } else if v, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
             lockinRange = append(lockinRange, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta lockinRange string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[dwellCol], 64); err == nil {
+          if v[dwellCol] == "" {
+            dwell = append(dwell, 0)
+          } else if v, err := strconv.ParseFloat(v[dwellCol], 64); err == nil {
             dwell = append(dwell, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta dwell string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[bandwidthCol], 64); err == nil {
+          if v[bandwidthCol] == "" {
+            bandwidth = append(bandwidth, 0)
+          } else if v, err := strconv.ParseFloat(v[bandwidthCol], 64); err == nil {
             bandwidth = append(bandwidth, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta bandwidth string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[dataRateCol], 64); err == nil {
+          if v[dataRateCol] == "" {
+            dataRate = append(dataRate, 0)
+          } else if v, err := strconv.ParseFloat(v[dataRateCol], 64); err == nil {
             dataRate = append(dataRate, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta dataRate string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[orderCol], 64); err == nil {
+          if v[orderCol] == "" {
+            order = append(order, 0)
+          } else if v, err := strconv.ParseFloat(v[orderCol], 64); err == nil {
             order = append(order, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta order string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[startFrequencyCol], 64); err == nil {
+          if v[startFrequencyCol] == "" {
+            startFrequency = append(startFrequency, 0)
+          } else if v, err := strconv.ParseFloat(v[startFrequencyCol], 64); err == nil {
             startFrequency = append(startFrequency, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta startFrequency string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[stopFrequencyCol], 64); err == nil {
+          if v[stopFrequencyCol] == "" {
+            stopFrequency = append(stopFrequency, 0)
+          } else if v, err := strconv.ParseFloat(v[stopFrequencyCol], 64); err == nil {
             stopFrequency = append(stopFrequency, v)
           } else {
             fmt.Println(err)
             fmt.Println("readMeta stopFrequency string -> float error")
             os.Exit(1)
           }
-          if v, err := strconv.ParseFloat(v[stepCol], 64); err == nil {
+          if v[stepCol] == "" {
+            step = append(step, 0)
+          } else if v, err := strconv.ParseFloat(v[stepCol], 64); err == nil {
             step = append(step, v)
           } else {
             fmt.Println(err)

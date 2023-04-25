@@ -2,3 +2,4 @@ Date,Label,Run,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Range,Dwell,Ba
 23-04-21,500 KHz 12.16 feature,1,13:19:16,15:11:36,58.6,16.08,22.71,0.04,1,1000,1.842000e+09,8,1.190000e+10,1.240000e+10,5.004560e+05,note 40mV range could have been 20mV
 23-04-21,Sample Removed,2,16:12:15,16:34:38,146.1,40.4,59.59,0.02,1,1000,1.842000e+09,8,1.150000e+10,1.250000e+10,5.004560e+06,*only* sample removed
 23-04-21,Sample Removed,3,17:53:20,19:00:28,146.2,40.8,58.98,0.02,1,1000,1.842000e+09,8,1.180000e+10,1.240000e+10,1.004560e+06,*only* sample removed
+23-04-21,TeO2 - No-Sample,4,,,,,,,,,,,,,1.004560e+06,SYNTHETIC DATA

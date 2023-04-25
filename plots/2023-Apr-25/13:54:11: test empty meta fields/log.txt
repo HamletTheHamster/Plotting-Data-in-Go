@@ -1,0 +1,68 @@
+Sample: TeO2
+Runtime note: test empty meta fields
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 10.000 MHz
+Run 3 binned to 10.000 MHz
+Run 4 binned to 10.000 MHz
+
+Run 1
+	Data taken: 23-04-21
+	Label: 500 KHz 12.16 feature
+	Start Time (h:m:s): 13:19:16
+	End Time(h:m:s): 15:11:36
+	Pump Power: 58.600
+	Stokes Power: 16.080
+	Probe Power: 22.710
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 500456.00
+	Data Collection Note: note 40mV range could have been 20mV
+
+
+Run 3
+	Data taken: 23-04-21
+	Label: Sample Removed
+	Start Time (h:m:s): 17:53:20
+	End Time(h:m:s): 19:00:28
+	Pump Power: 146.200
+	Stokes Power: 40.800
+	Probe Power: 58.980
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11800000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 1004560.00
+	Data Collection Note: *only* sample removed
+
+
+Run 4
+	Data taken: 23-04-21
+	Label: TeO2 - No-Sample
+	Start Time (h:m:s): 
+	End Time(h:m:s): 
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.00
+	Dwell Time: 0.000000000
+	Lock-in Bandwidth: 0.00
+	Lock-in Bandwidth Order: 0
+	Data Sampling Rate: 0.00
+	Start Frequency: 0.00
+	Stop Frequency: 0.00
+	Step Size: 1004560.00
+	Data Collection Note: SYNTHETIC DATA
+
