@@ -313,7 +313,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1}
+    setsToPlotCABS := []int{0,2}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
@@ -331,7 +331,7 @@ func main() {
 
     binCabsSets := []int{0,1}
     if len(binCabsSets) > 0 {
-      binMHz := 6.
+      binMHz := 15.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
@@ -2205,47 +2205,90 @@ func bin(
 }
 
 func binCabs(
-  sets []int,
+  setsToBin []int,
   cabsData [][][]float64,
   binMHz float64,
 ) (
   [][][]float64,
 ) {
   binGHz := binMHz/1000
-  // for loop to create nBins appropriate for each set size
-  nBins := int((cabsData[sets[0]][0][len(cabsData[sets[0]][0]) - 1] - cabsData[sets[0]][0][0])/binGHz + 1)
+  nBins := make([]int, len(cabsData))
+  for set := range cabsData {
+    yesBin := false
+    for _, setToBin := range setsToBin {
+      if set == setToBin {
+        yesBin = true
+      }
+    }
 
-  //Initializing this weird, cause of all binning errors
+    if yesBin {
+      n := int((cabsData[set][0][len(cabsData[set][0]) - 1] - cabsData[set][0][0])/binGHz + 1)
+      nBins[set] = n
+    } else {
+      nBins[set] = len(cabsData[set][0])
+    }
+  }
+
   // [set][0: feq, 1: sig, 2: err][values]
   cabsBinned := make([][][]float64, len(cabsData))
-  for i := range cabsBinned {
-    cabsBinned[i] = make([][]float64, 3)
-    for j := range cabsBinned[i] {
-      cabsBinned[i][j] = make([]float64, nBins)
-    }
-  }
+  for set := range cabsBinned {
 
-  for _, set := range sets {
-
-    cabsBound := cabsData[set][0][0]
-
-    for i := 0; i < nBins; i++ {
-      cabsBound += binGHz
-
-      var cabsSigsInBin []float64
-
-      for j, f := range cabsData[set][0] {
-        if f < cabsBound && f > cabsBound - binGHz {
-          cabsSigsInBin = append(cabsSigsInBin, cabsData[set][1][j])
-        }
+    yesBin := false
+    for _, setToBin := range setsToBin {
+      if set == setToBin {
+        yesBin = true
       }
-      cabsBinned[set][0][i] = cabsBound - (binGHz/2)
-      cabsBinned[set][1][i] = avg(cabsSigsInBin)
+    }
 
-      // Error for each binned point
-      cabsBinned[set][2][i] = σ(cabsSigsInBin)
+    if yesBin {
+      cabsBinned[set] = make([][]float64, 3) // freq, sig, err
+      for i := range cabsBinned[set] {
+        cabsBinned[set][i] = make([]float64, nBins[set]) // len(cabsData[set][0])
+      }
+    } else {
+      cabsBinned[set] = make([][]float64, 2) // freq, sig, err
+      for i := range cabsBinned[set] {
+        cabsBinned[set][i] = make([]float64, nBins[set])
+      }
     }
   }
+
+  for set := range cabsData {
+
+    yesBin := false
+    for _, setToBin := range setsToBin {
+      if set == setToBin {
+        yesBin = true
+      }
+    }
+
+    if yesBin {
+      cabsBound := cabsData[set][0][0]
+
+      for i := 0; i < nBins[set]; i++ {
+        cabsBound += binGHz
+
+        var cabsSigsInBin []float64
+
+        for j, f := range cabsData[set][0] {
+          if f < cabsBound && f > cabsBound - binGHz {
+            cabsSigsInBin = append(cabsSigsInBin, cabsData[set][1][j])
+          }
+        }
+        cabsBinned[set][0][i] = cabsBound - (binGHz/2)
+        cabsBinned[set][1][i] = avg(cabsSigsInBin)
+
+        // Error for each binned point
+        cabsBinned[set][2][i] = σ(cabsSigsInBin)
+        }
+      } else {
+      for i, v := range cabsData[set][0] {
+        cabsBinned[set][0][i] = v
+        cabsBinned[set][1][i] = cabsData[set][1][i]
+      }
+    }
+  }
+
   return cabsBinned
 }
 
