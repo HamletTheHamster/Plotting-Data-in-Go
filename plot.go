@@ -28,7 +28,7 @@ func main() {
   logpath := logpath(note)
 
   date, label, run, startTime, endTime, asPowers, sPowers,
-  pumpPowers, stokesPowers, probePowers, file,
+  pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
   step, asNotes, sNotes, notes := readMeta(
     cabs, lock, temp, coolingExperiment,
@@ -43,7 +43,7 @@ func main() {
 
     σas, σs := avgCSVs(csvToAvg, asPowers)
 
-    ras, bas, rs, bs := getCoolingData(lock, file, label)
+    ras, bas, rs, bs := getCoolingData(lock, filepath, label)
 
     asLabel, basLabel, sLabel, bsLabel := getAllLabels(label)
 
@@ -313,25 +313,29 @@ func main() {
 
   } else if cabs {
 
-    cabsData := getCABSData(lock, file)
+    setsToPlotCABS := []int{0,2}
 
-    binCabsSets := []int{1}
+    cabsData, sigUnit := getCABSData(
+      setsToPlotCABS, lock, sigFilepath, freqFilepath,
+    )
+
+    binCabsSets := []int{0,2}
     if len(binCabsSets) > 0 {
-      binMHz := 10.
+      binMHz := 5.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
 
-    setsToPlotCABS := []int{1}
     log = logPlots(
       log, setsToPlotCABS, date, label, run, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
       dataRate, order, startFrequency, stopFrequency, step, notes,
     )
-
-    plotCABS(setsToPlotCABS, cabsData, label, sample, logpath, length, slide)
+    plotCABS(
+      setsToPlotCABS, cabsData, label, sample, sigUnit, logpath, length, slide,
+    )
   }
 
   writeLog(logpath, log)
@@ -385,7 +389,7 @@ func readMeta(
   coolingExperiment string,
 ) (
   []string, []string, []string, []string, []string, []float64, []float64,
-  []float64, []float64, []float64, []string,
+  []float64, []float64, []float64, []string, []string, []string,
   []float64, []float64, []float64, []float64, []float64, []float64, []float64, []float64,
   []float64, []float64, []string,
 ) {
@@ -404,12 +408,12 @@ func readMeta(
     os.Exit(1)
   }
 
-  var date, label, run, startTime, endTime, filepath, notes []string
+  var date, label, run, startTime, endTime, filepath, sigFilepath, freqFilepath, notes []string
   var asPowers, sPowers, asNotes, sNotes []float64
   var pumpPowers, stokesPowers, probePowers []float64
   var lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64
   var dateCol, labelCol, runCol, startTimeCol, endTimeCol int
-  var pumpCol, stokesCol, probeCol, filepathCol, sigFileCol, freqFileCol int
+  var pumpCol, stokesCol, probeCol, filepathCol int
   var lockinRangeCol, dwellCol, bandwidthCol, dataRateCol, orderCol int
   var startFrequencyCol, stopFrequencyCol, stepCol, notesCol int
 
@@ -481,8 +485,8 @@ func readMeta(
         }
 
         if lock {
-          filepath = append(filepath, v[sigFileCol])
-          filepath = append(filepath, v[freqFileCol])
+          sigFilepath = append(sigFilepath, v[runCol] + "/signal.csv")
+          freqFilepath = append(freqFilepath, v[runCol] + "/signal.csv")
         } else {
           filepath = append(filepath, v[filepathCol])
         }
@@ -530,8 +534,8 @@ func readMeta(
           startTime = append(startTime, v[startTimeCol])
           endTime = append(endTime, v[endTimeCol])
 
-          filepath = append(filepath, v[runCol] + "/signal.csv") //v[sigFileCol])
-          filepath = append(filepath, v[runCol] + "/frequency.csv") //v[freqFileCol])
+          sigFilepath = append(sigFilepath, v[runCol] + "/signal.csv")
+          freqFilepath = append(freqFilepath, v[runCol] + "/frequency.csv")
 
           if v, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
             lockinRange = append(lockinRange, v)
@@ -616,7 +620,7 @@ func readMeta(
   }
 
   return date, label, run, startTime, endTime, asPowers, sPowers,
-  pumpPowers, stokesPowers, probePowers, filepath,
+  pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step,
   asNotes, sNotes, notes
 }
@@ -896,31 +900,74 @@ func getCoolingData(
 }
 
 func getCABSData(
+  sets []int,
   lock bool,
-  fileNames []string,
+  sigFileNames, freqFileNames []string,
 ) (
-  [][][]float64,
+  [][][]float64, string,
 ) {
 
   var cabsData [][][]float64
-  var cabsSigFileNames, cabsFreqFileNames []string
+  var sigUnit string
 
   if lock {
-    for _, v := range fileNames {
 
-      if strings.Contains(v, "signal.csv") {
-        cabsSigFileNames = append(cabsSigFileNames, v)
-      } else if strings.Contains(v, "frequency.csv") {
-        cabsFreqFileNames = append(cabsFreqFileNames, v)
-      }
+    var cabsDataPreUnit [][][]float64
+    for i, v := range sigFileNames {
+      lockData := getLockData(v, freqFileNames[i])
+      cabsDataPreUnit = append(cabsDataPreUnit, lockData)
     }
 
-    for i, v := range cabsSigFileNames {
-      cabsData = append(cabsData, getLockData(v, cabsFreqFileNames[i]))
+    // Check for most appropriate signal unit (preference of larger)
+    largestSig := 0.
+    for set := range cabsDataPreUnit {
+      for _, s := range sets {
+        if set == s {
+          for _, v := range cabsDataPreUnit[set][1] {
+            if v > largestSig {
+              largestSig = v
+            }
+          }
+        }
+      }
+
+    }
+    if largestSig > 1e-3 {
+      for set := range cabsDataPreUnit {
+        for i, v := range cabsDataPreUnit[set][1] {
+          cabsDataPreUnit[set][1][i] = v*1e3
+          sigUnit = "mV"
+        }
+        cabsData = append(cabsData, cabsDataPreUnit[set])
+      }
+    } else if largestSig > 1e-6 {
+      for set := range cabsDataPreUnit {
+        for i, v := range cabsDataPreUnit[set][1] {
+          cabsDataPreUnit[set][1][i] = v*1e6
+          sigUnit = "uV"
+        }
+        cabsData = append(cabsData, cabsDataPreUnit[set])
+      }
+    } else if largestSig > 1e-9 {
+      for set := range cabsDataPreUnit {
+        for i, v := range cabsDataPreUnit[set][1] {
+          cabsDataPreUnit[set][1][i] = v*1e9
+          sigUnit = "nV"
+        }
+        cabsData = append(cabsData, cabsDataPreUnit[set])
+      }
+    } else if largestSig > 1e-12 {
+      for set := range cabsDataPreUnit {
+        for i, v := range cabsDataPreUnit[set][1] {
+          cabsDataPreUnit[set][1][i] = v*1e12
+          sigUnit = "pV"
+        }
+        cabsData = append(cabsData, cabsDataPreUnit[set])
+      }
     }
   }
 
-  return cabsData
+  return cabsData, sigUnit
 }
 
 func getData(
@@ -1089,15 +1136,24 @@ func getLockData(
     }
   }
 
-  // Convert to uV
-  for i, v := range signal {
-    signal[i] = v*1e6
-  }
-
-  /* OR Convert to pV
+  /* Convert to pV
+  maxSig := 0.
+  sigUnit := "pV"
   for i, v := range signal {
     signal[i] = v*1e9
+    if signal[i] > maxSig {
+      maxSig = signal[i]
+    }
+  }
+
+  if maxSig > 1000. {
+    // Convert to uV
+    for i, v := range signal {
+      signal[i] = v*1e-3
+    }
+    sigUnit = "uV"
   }*/
+
 
   return [][]float64{frequency, signal}
 }
@@ -1307,7 +1363,7 @@ func plotCABS(
   sets []int,
   cabsData [][][]float64,
   label []string,
-  sample, logpath string,
+  sample, sigUnit, logpath string,
   length float64,
   slide bool,
 ) {
@@ -1331,7 +1387,7 @@ func plotCABS(
 
   title := l + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (uV)"
+  ylabel := "Spectral Density (" + sigUnit + ")"
   legend := ""
 
   /* Manual Axes
@@ -1377,7 +1433,8 @@ func plotCABS(
       }
     }
   }
-  yrange := []float64{ymin, ymax + (ymax - ymin)/4}
+  ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/16
+  yrange := []float64{ymin, ymax}
   ytick := ((ymax - ymin)/8)
   yticks := []float64{}
   ytickLabels := []string{}
