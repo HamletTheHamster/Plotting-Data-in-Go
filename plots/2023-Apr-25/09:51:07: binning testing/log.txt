@@ -1,0 +1,28 @@
+Sample: TeO2
+Runtime note: binning testing
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 3 binned to 5.000 MHz
+
+Run 3
+	Data taken: 23-04-21
+	Label: Sample Removed
+	Start Time (h:m:s): 17:53:20
+	End Time(h:m:s): 19:00:28
+	Pump Power: 146.200
+	Stokes Power: 40.800
+	Probe Power: 58.980
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11800000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 1004560.00
+	Data Collection Note: *only* sample removed
+

@@ -313,20 +313,40 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,2}
+    setsToPlotCABS := []int{0,1}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{0,2}
+    fmt.Printf("Before Binning Set 2:\n")
+    fmt.Printf("Set 0 Frequency Element 0 = %.2f\n", cabsData[0][0][0])
+    fmt.Printf("Set 0 Signal Element 0 = %.2f\n\n", cabsData[0][1][0])
+
+    fmt.Printf("Set 1 Frequency Element 0 = %.2f\n", cabsData[1][0][0])
+    fmt.Printf("Set 1 Signal Element 0 = %.2f\n\n", cabsData[1][1][0])
+
+    fmt.Printf("Set 2 Frequency Element 0 = %.2f\n", cabsData[2][0][0])
+    fmt.Printf("Set 2 Signal Element 0 = %.2f\n\n", cabsData[2][1][0])
+
+    binCabsSets := []int{0,1}
     if len(binCabsSets) > 0 {
-      binMHz := 5.
+      binMHz := 6.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
       cabsData = binCabs(binCabsSets, cabsData, binMHz)
     }
+
+    fmt.Printf("After Binning Set 2:\n")
+    fmt.Printf("Set 0 Frequency Element 0 = %.2f\n", cabsData[0][0][0])
+    fmt.Printf("Set 0 Signal Element 0 = %.2f\n\n", cabsData[0][1][0])
+
+    fmt.Printf("Set 1 Frequency Element 0 = %.2f\n", cabsData[1][0][0])
+    fmt.Printf("Set 1 Signal Element 0 = %.2f\n\n", cabsData[1][1][0])
+
+    fmt.Printf("Set 2 Frequency Element 0 = %.2f\n", cabsData[2][0][0])
+    fmt.Printf("Set 2 Signal Element 0 = %.2f\n\n", cabsData[2][1][0])
 
     log = logPlots(
       log, setsToPlotCABS, date, label, run, startTime, endTime,
@@ -2192,8 +2212,10 @@ func binCabs(
   [][][]float64,
 ) {
   binGHz := binMHz/1000
+  // for loop to create nBins appropriate for each set size
   nBins := int((cabsData[sets[0]][0][len(cabsData[sets[0]][0]) - 1] - cabsData[sets[0]][0][0])/binGHz + 1)
 
+  //Initializing this weird, cause of all binning errors
   // [set][0: feq, 1: sig, 2: err][values]
   cabsBinned := make([][][]float64, len(cabsData))
   for i := range cabsBinned {
