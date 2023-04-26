@@ -313,15 +313,15 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,2,3}
+    setsToPlotCABS := []int{1}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{0,2,3}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 10.
+      binMHz := 3.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
@@ -1410,6 +1410,11 @@ func plotCABS(
     l = strconv.FormatFloat(length, 'f', 1, 64)
   }
 
+  type errorPoints struct {
+    plotter.XYs
+    plotter.YErrors
+  }
+
   title := l + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
   ylabel := "Spectral Density (" + sigUnit + ")"
@@ -1449,16 +1454,21 @@ func plotCABS(
   ymax := 0.
   ymin := 10000.
   for _, set := range sets {
-    for _, v := range cabsData[set][1] {
-      if v > ymax {
+    for i, v := range cabsData[set][1] {
+      if len(cabsData[set]) > 2 && v + cabsData[set][2][i]/2 > ymax {
+        ymax = v + cabsData[set][2][i]/2
+      } else if len(cabsData[set]) < 3 && v > ymax {
         ymax = v
       }
-      if v < ymin {
+      if len(cabsData[set]) > 2 && v - cabsData[set][2][i]/2 < ymin {
+        ymin = v - cabsData[set][2][i]/2
+      } else if len(cabsData[set]) < 3 && v < ymin {
         ymin = v
       }
     }
   }
   ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/16
+  ymin -= (ymax - ymin)/32
   yrange := []float64{ymin, ymax}
   ytick := ((ymax - ymin)/8)
   yticks := []float64{}
@@ -1485,17 +1495,48 @@ func plotCABS(
 
     pts := buildData(cabsData[set])
 
-    plotSet, err := plotter.NewScatter(pts)
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
+    if len(cabsData[set]) > 2 {
+      σErr := buildErrors(cabsData[set][2])
+
+      setPoints := errorPoints {
+        XYs: pts,
+        YErrors: plotter.YErrors(σErr),
+      }
+
+      plotSet, err := plotter.NewScatter(setPoints)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+
+      // Error bars
+      e, err := plotter.NewYErrorBars(setPoints)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+      e.LineStyle.Color = palette(set, false, "")
+
+      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Radius = vg.Points(5) //3
+      plotSet.Shape = draw.CircleGlyph{}
+
+      p.Add(e, plotSet, t, r)
+
+    } else {
+
+      plotSet, err := plotter.NewScatter(pts)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+
+      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Radius = vg.Points(5) //3
+      plotSet.Shape = draw.CircleGlyph{}
+
+      p.Add(plotSet, t, r)
     }
-
-    plotSet.GlyphStyle.Color = palette(set, false, "")
-    plotSet.GlyphStyle.Radius = vg.Points(5) //3
-    plotSet.Shape = draw.CircleGlyph{}
-
-    p.Add(plotSet, t, r)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1509,6 +1550,26 @@ func plotCABS(
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
   }
+
+  /* Guide Line
+  guideLine := make(plotter.XYs, 2)
+
+  guideLine[0].X = 12.1
+  guideLine[0].Y = yrange[0]
+  guideLine[1].X = 12.1
+  guideLine[1].Y = yrange[1]
+
+  plotGuideLine, err := plotter.NewLine(guideLine)
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  plotGuideLine.Color = color.RGBA{R: 128, G: 128, B: 128, A: 255}
+
+  p.Add(plotGuideLine)
+  p.Legend.Add("12.1 GHz", plotGuideLine)
+  */
 
   savePlot(p, "CABS", logpath)
 }
@@ -2284,7 +2345,7 @@ func binCabs(
         cabsBinned[set][1][i] = avg(cabsSigsInBin)
 
         // Error for each binned point
-        cabsBinned[set][2][i] = σ(cabsSigsInBin)
+        cabsBinned[set][2][i] = σCABS(cabsSigsInBin)
         }
       } else {
       for i, v := range cabsData[set][0] {
@@ -2307,6 +2368,23 @@ func σ(
   for i, v := range values {
     values[i] = math.Pow(10, 6)*math.Pow(10, v/10.)
   }
+
+  // Sum of squares of the difference
+  dev := 0.
+  for _, v := range values {
+    dev += math.Pow(v - avg(values), 2)
+  }
+  n := float64(len(values))
+
+  // Standard deviation of the mean
+  return math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
+}
+
+func σCABS(
+  values []float64,
+) (
+  float64,
+) {
 
   // Sum of squares of the difference
   dev := 0.
@@ -3076,7 +3154,7 @@ func prepPlot(
   }
 
   p.X.Tick.Marker = plot.ConstantTicks(xticks)
-  p.X.Padding = vg.Points(-12.5)
+  p.X.Padding = vg.Points(-8) // -12.5
 
   p.Y.Label.Text = ylabel
   p.Y.Label.TextStyle.Font.Variant = "Sans"
@@ -3092,7 +3170,7 @@ func prepPlot(
   }
 
   p.Y.Tick.Marker = plot.ConstantTicks(yticks)
-  p.Y.Padding = vg.Points(-0.5)
+  p.Y.Padding = vg.Points(-6) // -0.5
 
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true

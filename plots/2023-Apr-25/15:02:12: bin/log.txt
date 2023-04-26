@@ -1,0 +1,27 @@
+Sample: TeO2
+Runtime note: bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 3.000 MHz
+
+Run 1
+	Data taken: 23-04-17
+	Label: 500 nm TeO2
+	Start Time (h:m:s): 
+	End Time(h:m:s): 
+	Pump Power: 30.000
+	Stokes Power: 8.000
+	Probe Power: 1.000
+	Lock-in Range: 0.00
+	Dwell Time: 0.000000000
+	Lock-in Bandwidth: 0.00
+	Lock-in Bandwidth Order: 0
+	Data Sampling Rate: 0.00
+	Start Frequency: 0.00
+	Stop Frequency: 0.00
+	Step Size: 0.00
+	Data Collection Note: feature at 12p15! - LO maxed using uhna3 - 1 MHz step 1s dwell
+
