@@ -1,0 +1,27 @@
+Sample: Te
+Runtime note: Run 2 without sample garbage data removed
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 23-05-02
+	Label: 
+	Start Time (h:m:s): 16:17:55
+	End Time(h:m:s): 16:51:33
+	Pump Power: 31.000
+	Stokes Power: 0.700
+	Probe Power: 12.070
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 14500000000.00
+	Stop Frequency: 15956320000.00
+	Step Size: 5004560.00
+	Data Collection Note: No Sample - sig gen overheated on final avg causing dropped signal in data
+
