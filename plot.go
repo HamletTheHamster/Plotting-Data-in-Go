@@ -313,15 +313,15 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1}
+    setsToPlotCABS := []int{1}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{}
+    binCabsSets := []int{1}
     if len(binCabsSets) > 0 {
-      binMHz := 3.
+      binMHz := 1.5
       log = logBinning(
         log, binCabsSets, binMHz,
         )
@@ -1406,6 +1406,8 @@ func plotCABS(
     l = "4 mm"
   case 0.0000005:
     l = "500 nm"
+  case 0.000001:
+    l = "1 μm"
   default:
     l = strconv.FormatFloat(length, 'f', 1, 64)
   }
