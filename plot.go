@@ -313,15 +313,15 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{2}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{1}
+    binCabsSets := []int{2}
     if len(binCabsSets) > 0 {
-      binMHz := 1.5
+      binMHz := 20.
       log = logBinning(
         log, binCabsSets, binMHz,
         )

@@ -1,0 +1,47 @@
+Sample: TeO2
+Runtime note: 1 um Te Oxide Re-Annealed 20MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 2 binned to 20.000 MHz
+Run 3 binned to 20.000 MHz
+
+Run 2
+	Data taken: 23-06-20
+	Label: 1um Te Oxide
+	Start Time (h:m:s): 14:22:51
+	End Time(h:m:s): 14:56:17
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11300000000.00
+	Stop Frequency: 12800000000.00
+	Step Size: 5045600.00
+	Data Collection Note: 
+
+
+Run 3
+	Data taken: 23-06-20
+	Label: No Sample
+	Start Time (h:m:s): 15:42:31
+	End Time(h:m:s): 16:15:56
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11300000000.00
+	Stop Frequency: 12800000000.00
+	Step Size: 5045600.00
+	Data Collection Note: ***Sample Removed*** (23-06-20 sample removed data copied over)
+

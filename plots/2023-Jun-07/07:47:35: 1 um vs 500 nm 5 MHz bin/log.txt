@@ -1,0 +1,48 @@
+Sample: TeO2
+Runtime note: 1 um vs 500 nm 4 MHz bin
+Figures formatted for slide presentation
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 2 binned to 5.000 MHz
+Run 3 binned to 5.000 MHz
+
+Run 2
+	Data taken: 23-06-05
+	Label: 1 um TeO2
+	Start Time (h:m:s): 14:13:58
+	End Time(h:m:s): 16:50:53
+	Pump Power: 69.500
+	Stokes Power: 25.100
+	Probe Power: 40.520
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11800000000.00
+	Stop Frequency: 12500000000.00
+	Step Size: 504560.00
+	Data Collection Note:  WOOO looks so sharp and centered
+
+
+Run 1
+	Data taken: 23-04-21
+	Label: 500 nm TeO2
+	Start Time (h:m:s): 13:19:16
+	End Time(h:m:s): 15:11:36
+	Pump Power: 58.600
+	Stokes Power: 16.080
+	Probe Power: 22.710
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 500456.00
+	Data Collection Note: note 40mV range could have been 20mV
+
