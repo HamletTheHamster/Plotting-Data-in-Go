@@ -1,0 +1,47 @@
+Sample: TeO2
+Runtime note: 23-06-21 1 um re-re-annealed 27MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 27.000 MHz
+Run 2 binned to 27.000 MHz
+
+Run 1
+	Data taken: 23-06-21
+	Label: 1um TeO2
+	Start Time (h:m:s): 15:35:52
+	End Time(h:m:s): 16:03:13
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 2045600.00
+	Data Collection Note: 
+
+
+Run 2
+	Data taken: 23-06-21
+	Label: no sample
+	Start Time (h:m:s): 17:12:59
+	End Time(h:m:s): 17:40:21
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 2045600.00
+	Data Collection Note: 
+

@@ -313,15 +313,15 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{2}
+    setsToPlotCABS := []int{0}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{2}
+    binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
-      binMHz := 20.
+      binMHz := 22.25
       log = logBinning(
         log, binCabsSets, binMHz,
         )
@@ -1441,13 +1441,29 @@ func plotCABS(
     }
   }
   xrange := []float64{xmin, xmax}
-  xtick := ((xmax - xmin)/8)
+  xtick := 0.
+  displayDigits := 1
+  if (xmax - xmin)/8 > 0.25 {
+    xtick = 0.5
+  } else if (xmax - xmin)/8 > 0.1 {
+    xtick = 0.25
+    displayDigits = 2
+  } else if (xmax - xmin)/8 > 0.05 {
+    xtick = 0.05
+  } else if (xmax - xmin)/8 > 0.01 {
+    xtick = 0.01
+  }
+  firstTick := 0.
+  for m := float64(int(xmin)); m <= xmin; m += xtick {
+    firstTick = m
+  }
+
   xticks := []float64{}
   xtickLabels := []string{}
-  for i := 0.; i < 9; i++ {
-    xticks = append(xticks, xtick*i + xmin)
+  for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
+    xticks = append(xticks, firstTick + xtick*i)
     if int(i)%2 != 0 {
-      xtickLabels = append(xtickLabels, strconv.FormatFloat(xtick*i + xmin, 'f', 2, 64))
+      xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
     } else {
       xtickLabels = append(xtickLabels, "")
     }

@@ -1,0 +1,27 @@
+Sample: TeO2
+Runtime note: natural tick test
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 22.250 MHz
+
+Run 1
+	Data taken: 23-05-02
+	Label: With Sample
+	Start Time (h:m:s): 14:37:26
+	End Time(h:m:s): 15:11:05
+	Pump Power: 31.000
+	Stokes Power: 9.500
+	Probe Power: 12.100
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 14500000000.00
+	Stop Frequency: 16000000000.00
+	Step Size: 5004560.00
+	Data Collection Note: Periodic features 150 MHz width every 0.4 GHz
+
