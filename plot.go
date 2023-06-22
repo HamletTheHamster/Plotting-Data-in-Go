@@ -1442,12 +1442,12 @@ func plotCABS(
   }
   xrange := []float64{xmin, xmax}
   xtick := 0.
-  displayDigits := 1
+  displayDigits := 2
   if (xmax - xmin)/8 > 0.25 {
     xtick = 0.5
+    displayDigits = 1
   } else if (xmax - xmin)/8 > 0.1 {
     xtick = 0.25
-    displayDigits = 2
   } else if (xmax - xmin)/8 > 0.05 {
     xtick = 0.05
   } else if (xmax - xmin)/8 > 0.01 {
@@ -1457,6 +1457,8 @@ func plotCABS(
   for m := float64(int(xmin)); m <= xmin; m += xtick {
     firstTick = m
   }
+  //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
+  //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
 
   xticks := []float64{}
   xtickLabels := []string{}
