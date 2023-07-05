@@ -1,0 +1,26 @@
+Sample: TeO2
+Runtime note: 1 um new bg method 24hrs
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-07-04
+	Label: 
+	Start Time (h:m:s): 16:23:20
+	End Time(h:m:s): 11:04:23
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.04
+	Dwell Time: 5.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 1045600.00
+	Data Collection Note: 
+

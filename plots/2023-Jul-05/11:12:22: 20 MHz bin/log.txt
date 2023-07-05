@@ -1,0 +1,27 @@
+Sample: TeO2
+Runtime note: 20 MHz bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 20.000 MHz
+
+Run 1
+	Data taken: 23-07-04
+	Label: 1 um TeO2
+	Start Time (h:m:s): 16:23:20
+	End Time(h:m:s): 11:04:23
+	Pump Power: 60.000
+	Stokes Power: 20.000
+	Probe Power: 31.000
+	Lock-in Range: 0.04
+	Dwell Time: 5.000000000
+	Lock-in Bandwidth: 1000.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 11900000000.00
+	Stop Frequency: 12400000000.00
+	Step Size: 1045600.00
+	Data Collection Note: 
+
