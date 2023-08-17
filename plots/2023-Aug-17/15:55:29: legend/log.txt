@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: legend
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 11.000 MHz
+
+Run 1
+	Data taken: 23-08-17
+	Label: 10um Physically Simulated with 1mm & low powers
+	Start Time (h:m:s): 15:20:48
+	End Time(h:m:s): 15:30:52
+	Pump Power: 23.600
+	Stokes Power: 7.010
+	Probe Power: 12.970
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 300.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2750000000.00
+	Step Size: 5045600.00
+	Data Collection Note: 10um CS2 simulated with 1mm CS2 by turning each power 4.64x lower - note 300 Hz RBW I found to be ideal
+

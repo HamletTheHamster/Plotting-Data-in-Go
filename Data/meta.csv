@@ -1,2 +1,2 @@
 Date,Label,Run,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Notes
-23-08-17,10um Simulated,1,15:20:48,15:30:52,23.6,7.01,12.97,1/frequency.csv,1/signal.csv,0.04,1,300,1.842000e+09,8,2.300000e+09,2.750000e+09,5.045600e+06,10um CS2 simulated with 1mm CS2 by turning each power 4.64x lower - note 300 Hz RBW I found to be ideal
+23-08-17,10um sim with 1mm & low powers,1,15:20:48,15:30:52,23.6,7.01,12.97,1/frequency.csv,1/signal.csv,0.04,1,300,1.842000e+09,8,2.300000e+09,2.750000e+09,5.045600e+06,10um CS2 simulated with 1mm CS2 by turning each power 4.64x lower - note 300 Hz RBW I found to be ideal
