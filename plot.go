@@ -319,7 +319,7 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{}
+    binCabsSets := []int{0}
     if len(binCabsSets) > 0 {
       binMHz := 11.
       log = logBinning(
