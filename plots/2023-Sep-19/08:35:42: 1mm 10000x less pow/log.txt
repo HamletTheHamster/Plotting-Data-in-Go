@@ -1,0 +1,26 @@
+Sample: CS2
+Runtime note: 1mm 10000x less pow
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 3
+	Data taken: 23-09-18
+	Label: 10000x less power
+	Start Time (h:m:s): 11:17:03
+	End Time(h:m:s): 11:28:13
+	Pump Power: 3.760
+	Stokes Power: 1.720
+	Probe Power: 2.550
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 200.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5045600.00
+	Data Collection Note: 
+

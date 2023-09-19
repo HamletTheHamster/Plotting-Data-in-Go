@@ -1,0 +1,4 @@
+Date,Label,Run,Data,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency, Stop Frequency,Step,Notes
+23-09-18,,1,Background,09:38:06,09:49:14,,,,,,0.04,1,20,1.842000e+09,8,2.300000e+09,2.800000e+09,5.045600e+06,
+23-09-18,,1,Background,09:59:11,10:10:19,,,,,,0.04,1,20,1.842000e+09,8,2.300000e+09,2.800000e+09,5.045600e+06,
+23-09-18,,1,Signal,10:10:46,10:21:55,,,,1/frequency.csv,1/signal.csv,0.04,1,20,1.842000e+09,8,2.300000e+09,2.800000e+09,5.045600e+06,

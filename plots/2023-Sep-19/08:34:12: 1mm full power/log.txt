@@ -1,0 +1,26 @@
+Sample: CS2
+Runtime note: 1mm full power
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-09-18
+	Label: 20 RBW
+	Start Time (h:m:s): 10:10:46
+	End Time(h:m:s): 10:21:55
+	Pump Power: 80.100
+	Stokes Power: 27.300
+	Probe Power: 55.100
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 20.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5045600.00
+	Data Collection Note: RBW test between run 1 and 2
+

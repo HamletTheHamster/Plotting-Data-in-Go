@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: 10um 5MHz bin fix title
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 2 binned to 5.000 MHz
+
+Run 2
+	Data taken: 23-09-18
+	Label: 1 MHz step
+	Start Time (h:m:s): 15:57:47
+	End Time(h:m:s): 19:42:02
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.04
+	Dwell Time: 5.000000000
+	Lock-in Bandwidth: 200.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 1045600.00
+	Data Collection Note: check higher freq (heated liquid?)
+
