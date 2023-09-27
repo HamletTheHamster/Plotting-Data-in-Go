@@ -27,12 +27,14 @@ func main() {
 
   logpath := logpath(note)
 
-  date, label, run, startTime, endTime, asPowers, sPowers,
+  date, label, setNums, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
-  step, asNotes, sNotes, notes := readMeta(
+  step, numAvgs, asNotes, sNotes, notes := readMeta(
     cabs, lock, temp, coolingExperiment,
   )
+
+  fmt.Printf(sigFilepath[0])
 
   log := logHeader(
     cabs, lock, temp, slide, sample, coolingExperiment, note,
@@ -313,13 +315,13 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    binCabsSets := []int{1}
+    binCabsSets := []int{}
     if len(binCabsSets) > 0 {
       binMHz := 5.
       log = logBinning(
@@ -329,9 +331,9 @@ func main() {
     }
 
     log = logPlots(
-      log, setsToPlotCABS, date, label, run, startTime, endTime,
+      log, setsToPlotCABS, date, label, setNums, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
-      dataRate, order, startFrequency, stopFrequency, step, notes,
+      dataRate, order, startFrequency, stopFrequency, step, numAvgs, notes,
     )
     plotCABS(
       setsToPlotCABS, cabsData, label, sample, sigUnit, logpath, length, slide,
@@ -391,7 +393,7 @@ func readMeta(
   []string, []string, []string, []string, []string, []float64, []float64,
   []float64, []float64, []float64, []string, []string, []string,
   []float64, []float64, []float64, []float64, []float64, []float64, []float64, []float64,
-  []float64, []float64, []string,
+  []float64, []float64, []float64, []string,
 ) {
 
   // Read
@@ -408,14 +410,15 @@ func readMeta(
     os.Exit(1)
   }
 
-  var date, label, run, startTime, endTime, filepath, sigFilepath, freqFilepath, notes []string
+  var date, label, set, startTime, endTime, filepath, sigFilepath, freqFilepath, notes []string
   var asPowers, sPowers, asNotes, sNotes []float64
   var pumpPowers, stokesPowers, probePowers []float64
-  var lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64
-  var dateCol, labelCol, runCol, startTimeCol, endTimeCol int
+  var lockinRange, dwell, bandwidth, dataRate, order []float64
+  var startFrequency, stopFrequency, step, numAvgs []float64
+  var dateCol, labelCol, setCol, startTimeCol, endTimeCol int
   var pumpCol, stokesCol, probeCol, filepathCol int
   var lockinRangeCol, dwellCol, bandwidthCol, dataRateCol, orderCol int
-  var startFrequencyCol, stopFrequencyCol, stepCol, notesCol int
+  var startFrequencyCol, stopFrequencyCol, stepCol, numAvgsCol, notesCol int
 
   for col, heading := range meta[0] {
     switch heading {
@@ -423,8 +426,8 @@ func readMeta(
       dateCol = col
     case "Label":
       labelCol = col
-    case "Run":
-      runCol = col
+    case "Sets":
+      setCol = col
     case "Start Time":
       startTimeCol = col
     case "End Time (hr:min:sec)":
@@ -453,6 +456,8 @@ func readMeta(
       stopFrequencyCol = col
     case "Step":
       stepCol = col
+    case "Num Avgs":
+      numAvgsCol = col
     case "Notes":
       notesCol = col
     }
@@ -464,8 +469,15 @@ func readMeta(
 
       date = append(date, v[dateCol])
       label = append(label, v[labelCol])
-      run = append(run, v[runCol])
+      set = append(set, v[setCol])
       notes = append(notes, v[notesCol])
+
+      if numAvg, err := strconv.ParseFloat(v[numAvgsCol], 64); err == nil {
+        numAvgs = append(numAvgs, numAvg)
+      } else {
+        fmt.Println(err)
+        os.Exit(1)
+      }
 
       if coolingExperiment != "" {
         if strings.Contains(v[labelCol], "ras") {
@@ -485,8 +497,8 @@ func readMeta(
         }
 
         if lock {
-          sigFilepath = append(sigFilepath, v[runCol] + "/signal.csv")
-          freqFilepath = append(freqFilepath, v[runCol] + "/signal.csv")
+          sigFilepath = append(sigFilepath, v[setCol] + "/signal.csv")
+          freqFilepath = append(freqFilepath, v[setCol] + "/signal.csv")
         } else {
           filepath = append(filepath, v[filepathCol])
         }
@@ -543,8 +555,8 @@ func readMeta(
           startTime = append(startTime, v[startTimeCol])
           endTime = append(endTime, v[endTimeCol])
 
-          sigFilepath = append(sigFilepath, v[runCol] + "/signal.csv")
-          freqFilepath = append(freqFilepath, v[runCol] + "/frequency.csv")
+          sigFilepath = append(sigFilepath, v[setCol] + "/signal.csv")
+          freqFilepath = append(freqFilepath, v[setCol] + "/frequency.csv")
 
           if v[lockinRangeCol] == "" {
             lockinRange = append(lockinRange, 0)
@@ -644,10 +656,10 @@ func readMeta(
     }
   }
 
-  return date, label, run, startTime, endTime, asPowers, sPowers,
+  return date, label, set, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
-  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency, step,
-  asNotes, sNotes, notes
+  lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
+  step, numAvgs, asNotes, sNotes, notes
 }
 
 func avgCSVs(
@@ -1277,7 +1289,7 @@ func logPlots(
   setsToPlotCABS []int,
   date, label, run, startTime, endTime []string,
   pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
-  bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
+  bandwidth, dataRate, order, startFrequency, stopFrequency, step, numAvgs []float64,
   notes []string,
 ) (
   []string,
@@ -1300,6 +1312,7 @@ func logPlots(
     log = append(log, fmt.Sprintf("\tStart Frequency: %.2f\n", startFrequency[set]))
     log = append(log, fmt.Sprintf("\tStop Frequency: %.2f\n", stopFrequency[set]))
     log = append(log, fmt.Sprintf("\tStep Size: %.2f\n", step[set]))
+    log = append(log, fmt.Sprintf("\tNumber of Averages: %.2f\n", numAvgs[set]))
     log = append(log, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
   }
 
