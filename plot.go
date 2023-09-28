@@ -2312,6 +2312,10 @@ func σCABS(
   [][][]cabsData
 ) {
 
+  // 1. figure errors from CSVs
+
+
+  // 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
 }
 */
 func binCabs(
