@@ -319,7 +319,7 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    // cabsData = σCABS(setsToPlotCABS, numAvgs) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
@@ -331,9 +331,9 @@ func main() {
     }
 
     log = logPlots(
-      log, setsToPlotCABS, date, label, setNums, startTime, endTime,
+      log, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
-      dataRate, order, startFrequency, stopFrequency, step, numAvgs, notes,
+      dataRate, order, startFrequency, stopFrequency, step, notes,
     )
     plotCABS(
       setsToPlotCABS, cabsData, label, sample, sigUnit, logpath, length, slide,
@@ -393,7 +393,7 @@ func readMeta(
   []string, []string, []string, []string, []string, []float64, []float64,
   []float64, []float64, []float64, []string, []string, []string,
   []float64, []float64, []float64, []float64, []float64, []float64, []float64, []float64,
-  []float64, []float64, []float64, []string,
+  []int, []float64, []float64, []string,
 ) {
 
   // Read
@@ -414,7 +414,8 @@ func readMeta(
   var asPowers, sPowers, asNotes, sNotes []float64
   var pumpPowers, stokesPowers, probePowers []float64
   var lockinRange, dwell, bandwidth, dataRate, order []float64
-  var startFrequency, stopFrequency, step, numAvgs []float64
+  var startFrequency, stopFrequency, step []float64
+  var numAvgs []int
   var dateCol, labelCol, setCol, startTimeCol, endTimeCol int
   var pumpCol, stokesCol, probeCol, filepathCol int
   var lockinRangeCol, dwellCol, bandwidthCol, dataRateCol, orderCol int
@@ -472,7 +473,7 @@ func readMeta(
       set = append(set, v[setCol])
       notes = append(notes, v[notesCol])
 
-      if numAvg, err := strconv.ParseFloat(v[numAvgsCol], 64); err == nil {
+      if numAvg, err := strconv.Atoi(v[numAvgsCol]); err == nil {
         numAvgs = append(numAvgs, numAvg)
       } else {
         fmt.Println(err)
@@ -1287,10 +1288,10 @@ func logBinning(
 
 func logPlots(
   log []string,
-  setsToPlotCABS []int,
+  setsToPlotCABS, numAvgs []int,
   date, label, run, startTime, endTime []string,
   pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
-  bandwidth, dataRate, order, startFrequency, stopFrequency, step, numAvgs []float64,
+  bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
   notes []string,
 ) (
   []string,
@@ -2303,21 +2304,138 @@ func bin(
   }
   return asBinned, sBinned
 }
-/*
+
 func σCABS(
-  setsToPlotCABS []int,
+  setsToPlotCABS, numAvgs []int,
   cabsData [][][]float64,
-  numAvgs int,
 ) (
-  [][][]cabsData
+  [][][]float64,
 ) {
 
-  // 1. figure errors from CSVs
+  // 1. figure σ from CSVs
+    // bg σ
+      // read bg CSVs
 
+  largestSet := setsToPlotCABS[0]
+  for _, v := range setsToPlotCABS {
+    if v > largestSet {
+      largestSet = v
+    }
+  }
+
+  stdDevBg := make([][][]float64, largestSet+1)
+  stdDevSig := make([][][]float64, largestSet+1)
+
+  for _, set := range setsToPlotCABS {
+
+    stdDevBg[set] = make([][]float64, numAvgs[set])
+    stdDevSig[set] = make([][]float64, numAvgs[set])
+
+    for run := 0; run < numAvgs[set]; run++ {
+
+      // Background
+      // Open the CSV file for reading
+      csvPath := "Data/" + fmt.Sprint(set+1) + "/Runs/Background/Run " + fmt.Sprint(run) + ".csv"
+    	file, err := os.Open(csvPath)
+    	if err != nil {
+    		fmt.Println("Error:", err)
+    		return cabsData
+    	}
+    	defer file.Close()
+
+    	// Create a CSV reader
+    	reader := csv.NewReader(file)
+
+    	// Read all CSV records
+    	records, err := reader.ReadAll()
+    	if err != nil {
+    		fmt.Println("Error:", err)
+    		return cabsData
+    	}
+
+    	// Iterate through the records (skip the first header row)
+    	for row, record := range records {
+    		if row == 0 {
+    			// Skip the header row
+    			continue
+    		}
+
+    		// Ensure there are at least 2 columns in the record
+    		if len(record) >= 2 {
+
+          record[1] = strings.TrimSpace(record[1])
+    			// Convert the second column to a float64 and append to the slice
+    			values, err := strconv.ParseFloat(record[1], 64)
+    			if err != nil {
+    				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
+    			} else {
+    				stdDevBg[set][run] = append(stdDevBg[set][run], values)
+    			}
+    		} else {
+    			fmt.Printf("Row %d does not have enough columns\n", row+1)
+    		}
+    	}
+
+      // Signal
+      // Open the CSV file for reading
+      csvPath = "Data/" + fmt.Sprint(set+1) + "/Runs/Signal/Run " + fmt.Sprint(run) + ".csv"
+    	file, err = os.Open(csvPath)
+    	if err != nil {
+    		fmt.Println("Error:", err)
+    		return cabsData
+    	}
+    	defer file.Close()
+
+    	// Create a CSV reader
+    	reader = csv.NewReader(file)
+
+    	// Read all CSV records
+    	records, err = reader.ReadAll()
+    	if err != nil {
+    		fmt.Println("Error:", err)
+    		return cabsData
+    	}
+
+    	// Iterate through the records (skip the first header row)
+    	for row, record := range records {
+    		if row == 0 {
+    			// Skip the header row
+    			continue
+    		}
+
+    		// Ensure there are at least 2 columns in the record
+    		if len(record) >= 2 {
+
+          record[1] = strings.TrimSpace(record[1])
+    			// Convert the second column to a float64 and append to the slice
+    			values, err := strconv.ParseFloat(record[1], 64)
+    			if err != nil {
+    				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
+    			} else {
+    				stdDevSig[set][run] = append(stdDevSig[set][run], values)
+    			}
+    		} else {
+    			fmt.Printf("Row %d does not have enough columns\n", row+1)
+    		}
+    	}
+    }
+  }
+
+  fmt.Println(stdDevBg)
+  fmt.Println(stdDevSig)
+
+      // combine σ for each freq across runs
+
+
+    // signal σ
+      // read bg CSVs
+      // combine σ for each freq across runs
 
   // 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+
+  return cabsData
 }
-*/
+
 func binCabs(
   setsToBin []int,
   cabsData [][][]float64,

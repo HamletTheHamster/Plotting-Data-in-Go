@@ -1,0 +1,47 @@
+Sample: CS2
+Runtime note: read csv
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-09-28
+	Label: 
+	Start Time (h:m:s): 12:39:13
+	End Time(h:m:s): 12:39:26
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.08
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 200.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2400000000.00
+	Stop Frequency: 2420000000.00
+	Step Size: 5004560.00
+	Number of Averages: %!f(int=03)
+	Data Collection Note: 
+
+
+Run 2
+	Data taken: 23-09-28
+	Label: 
+	Start Time (h:m:s): 13:24:31
+	End Time(h:m:s): 13:27:19
+	Pump Power: 0.000
+	Stokes Power: 0.000
+	Probe Power: 0.000
+	Lock-in Range: 0.08
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 200.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2400000000.00
+	Stop Frequency: 2600000000.00
+	Step Size: 5004560.00
+	Number of Averages: %!f(int=03)
+	Data Collection Note: 
+
