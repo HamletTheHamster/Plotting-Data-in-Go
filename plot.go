@@ -34,8 +34,6 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
-  fmt.Printf(sigFilepath[0])
-
   log := logHeader(
     cabs, lock, temp, slide, sample, coolingExperiment, note,
     length,
@@ -321,13 +319,15 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
+    // cabsData = σCABS(setsToPlotCABS, numAvgs) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
-      binMHz := 5.
+      binMHz := 11.
       log = logBinning(
         log, binCabsSets, binMHz,
         )
-      cabsData = binCabs(binCabsSets, cabsData, binMHz)
+      cabsData = binCabs(binCabsSets, cabsData, binMHz) // 3. combine above-calculated σ (cabsData[set][2]) with binned σ. (only relevant if binned)
     }
 
     log = logPlots(
@@ -944,6 +944,7 @@ func getCABSData(
   [][][]float64, string,
 ) {
 
+  // final form: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
   var cabsData [][][]float64
   var sigUnit string
 
@@ -2302,7 +2303,17 @@ func bin(
   }
   return asBinned, sBinned
 }
+/*
+func σCABS(
+  setsToPlotCABS []int,
+  cabsData [][][]float64,
+  numAvgs int,
+) (
+  [][][]cabsData
+) {
 
+}
+*/
 func binCabs(
   setsToBin []int,
   cabsData [][][]float64,
@@ -2378,7 +2389,7 @@ func binCabs(
         cabsBinned[set][1][i] = avg(cabsSigsInBin)
 
         // Error for each binned point
-        cabsBinned[set][2][i] = σCABS(cabsSigsInBin)
+        cabsBinned[set][2][i] = σCABSBins(cabsSigsInBin)
         }
       } else {
       for i, v := range cabsData[set][0] {
@@ -2413,7 +2424,7 @@ func σ(
   return math.Sqrt((1/(n - 1) * dev))/math.Sqrt(n)
 }
 
-func σCABS(
+func σCABSBins(
   values []float64,
 ) (
   float64,
