@@ -2313,9 +2313,6 @@ func σCABS(
 ) {
 
   // 1. figure σ from CSVs
-    // bg σ
-      // read bg CSVs
-
   largestSet := setsToPlotCABS[0]
   for _, v := range setsToPlotCABS {
     if v > largestSet {
@@ -2421,15 +2418,39 @@ func σCABS(
     }
   }
 
-  fmt.Println(stdDevBg)
-  fmt.Println(stdDevSig)
+  // combine σ for each freq across runs
+  for _, set := range setsToPlotCABS {
 
-      // combine σ for each freq across runs
+    σCombinedAcrossRunsBg := make([]float64, len(stdDevBg[set][0]))
+    σCombinedAcrossRunsSig := make([]float64, len(stdDevBg[set][0]))
+
+    for i := range stdDevBg[set][0] {
+
+      for run := 0; run < numAvgs[set]; run++ {
+
+        // !assumes sig and background have same # of runs within a set
+        σCombinedAcrossRunsBg[i] += math.Pow(stdDevBg[set][run][i], 2)
+        σCombinedAcrossRunsSig[i] += math.Pow(stdDevSig[set][run][i], 2)
+      }
+    }
+
+    // square root of sum of squares, divided by number of runs
+    for i := range σCombinedAcrossRunsBg {
+
+      σCombinedAcrossRunsBg[i] = math.Sqrt(σCombinedAcrossRunsBg[i])/float64(numAvgs[set])
+      σCombinedAcrossRunsSig[i] = math.Sqrt(σCombinedAcrossRunsSig[i])/float64(numAvgs[set])
+    }
+
+    // propagate errors through signal - background
+
+    /*for i := range σCombinedAcrossRunsSig {
+
+      cabsData[set][2][i] = 0
+    }*/
+
+  }
 
 
-    // signal σ
-      // read bg CSVs
-      // combine σ for each freq across runs
 
   // 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
 
