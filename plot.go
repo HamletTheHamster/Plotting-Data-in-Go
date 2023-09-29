@@ -313,7 +313,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{1}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
@@ -2463,7 +2463,7 @@ func σCABS(
       }
 
       // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
-      σSigMinusBg[i] = σSigMinusBg[i]*1000
+      σSigMinusBg[i] = σSigMinusBg[i]*10
 
     }
 
