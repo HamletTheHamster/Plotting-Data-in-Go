@@ -313,13 +313,13 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit)
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
