@@ -2462,6 +2462,9 @@ func σCABS(
         σSigMinusBg[i] = σSigMinusBg[i]*1e12
       }
 
+      // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
+      σSigMinusBg[i] = σSigMinusBg[i]*1000
+
     }
 
     // 2. tack errors onto cabsData
