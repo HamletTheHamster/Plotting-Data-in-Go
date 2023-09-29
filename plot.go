@@ -2464,21 +2464,9 @@ func σCABS(
 
     }
 
-    if set == 1 {
-      fmt.Println("σCombinedAcrossRunsBg[0] = ", σCombinedAcrossRunsBg[0])
-      fmt.Println("σCombinedAcrossRunsSig[0] = ", σCombinedAcrossRunsSig[0])
-      fmt.Println("σSigMinusBg[0] = ", σSigMinusBg[0])
-    }
-
     // 2. tack errors onto cabsData
     // cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
     cabsData[set] = append(cabsData[set], σSigMinusBg)
-
-    if set == 1 {
-      fmt.Println("cabsData[1][0][0] = ", cabsData[1][0][0])
-      fmt.Println("cabsData[1][1][0] = ", cabsData[1][1][0])
-      fmt.Println("cabsData[1][2][0] = ", cabsData[1][2][0])
-    }
   }
 
   return cabsData
