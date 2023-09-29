@@ -1455,6 +1455,7 @@ func plotCABS(
       xmax = cabsData[set][0][len(cabsData[set][0])-1]
     }
   }
+
   xrange := []float64{xmin, xmax}
   xtick := 0.
   displayDigits := 2
@@ -1474,7 +1475,6 @@ func plotCABS(
   }
   //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
   //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
-
   xticks := []float64{}
   xtickLabels := []string{}
   for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
@@ -1524,7 +1524,7 @@ func plotCABS(
     xrange, yrange, xticks, yticks,
     xtickLabels, ytickLabels,
     slide,
-  )//
+  )
 
   for _, set := range sets {
 
@@ -2443,16 +2443,29 @@ func σCABS(
 
     // propagate errors through signal - background
 
-    /*for i := range σCombinedAcrossRunsSig {
+    σSigMinusBg := make([]float64, len(σCombinedAcrossRunsSig))
 
-      cabsData[set][2][i] = 0
-    }*/
+    for i := range σCombinedAcrossRunsSig {
 
+      σSigMinusBg[i] += math.Sqrt(math.Pow(σCombinedAcrossRunsSig[i], 2) +
+                          math.Pow(σCombinedAcrossRunsBg[i], 2))
+
+    }
+
+    if set == 1 {
+      fmt.Println("σCombinedAcrossRunsBg[0] = ", σCombinedAcrossRunsBg[0])
+      fmt.Println("σCombinedAcrossRunsSig[0] = ", σCombinedAcrossRunsSig[0])
+      fmt.Println("σSigMinusBg[0] = ", σSigMinusBg[0])
+    }
+
+    // 2. tack errors onto cabsData
+    // cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+    cabsData[set] = append(cabsData[set], σSigMinusBg)
+
+    if set == 1 {
+      fmt.Println("cabsData[1][0:3][0] = ", cabsData[1][0:3][0])
+    }
   }
-
-
-
-  // 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
 
   return cabsData
 }
