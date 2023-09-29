@@ -319,7 +319,7 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit) // 1. figure errors from CSVs 2. tack errors onto cabsData: cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
@@ -2308,6 +2308,7 @@ func bin(
 func σCABS(
   setsToPlotCABS, numAvgs []int,
   cabsData [][][]float64,
+  sigUnit string,
 ) (
   [][][]float64,
 ) {
@@ -2450,6 +2451,17 @@ func σCABS(
       σSigMinusBg[i] += math.Sqrt(math.Pow(σCombinedAcrossRunsSig[i], 2) +
                           math.Pow(σCombinedAcrossRunsBg[i], 2))
 
+      switch sigUnit {
+      case "mV":
+        σSigMinusBg[i] = σSigMinusBg[i]*1e3
+      case "uV":
+        σSigMinusBg[i] = σSigMinusBg[i]*1e6
+      case "nV":
+        σSigMinusBg[i] = σSigMinusBg[i]*1e9
+      case "pV":
+        σSigMinusBg[i] = σSigMinusBg[i]*1e12
+      }
+
     }
 
     if set == 1 {
@@ -2463,7 +2475,9 @@ func σCABS(
     cabsData[set] = append(cabsData[set], σSigMinusBg)
 
     if set == 1 {
-      fmt.Println("cabsData[1][0:3][0] = ", cabsData[1][0:3][0])
+      fmt.Println("cabsData[1][0][0] = ", cabsData[1][0][0])
+      fmt.Println("cabsData[1][1][0] = ", cabsData[1][1][0])
+      fmt.Println("cabsData[1][2][0] = ", cabsData[1][2][0])
     }
   }
 
