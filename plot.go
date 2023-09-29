@@ -2463,7 +2463,7 @@ func σCABS(
       }
 
       // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
-      σSigMinusBg[i] = σSigMinusBg[i]*10
+      //σSigMinusBg[i] = σSigMinusBg[i]*2
 
     }
 
