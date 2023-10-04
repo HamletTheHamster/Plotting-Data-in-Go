@@ -313,7 +313,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
@@ -2367,7 +2367,7 @@ func σCABS(
     			if err != nil {
     				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
     			} else {
-    				stdDevBg[set][run] = append(stdDevBg[set][run], values)
+    				stdDevBg[set][run] = append(stdDevBg[set][run], values*math.Sqrt(1.842e9)) // *math.Sqrt(1.842e9) undoes std dev "of the mean"
     			}
     		} else {
     			fmt.Printf("Row %d does not have enough columns\n", row+1)
