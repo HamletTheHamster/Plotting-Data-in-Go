@@ -2313,163 +2313,244 @@ func σCABS(
   [][][]float64,
 ) {
 
-  // 1. figure σ from CSVs
-  largestSet := setsToPlotCABS[0]
-  for _, v := range setsToPlotCABS {
-    if v > largestSet {
-      largestSet = v
+  // N = sampling rate (1,842,000 usually)
+  if false {
+    // 1. figure σ from dwell-time σ in CSVs
+    largestSet := setsToPlotCABS[0]
+    for _, v := range setsToPlotCABS {
+      if v > largestSet {
+        largestSet = v
+      }
     }
-  }
 
-  stdDevBg := make([][][]float64, largestSet+1)
-  stdDevSig := make([][][]float64, largestSet+1)
+    stdDevBg := make([][][]float64, largestSet+1)
+    stdDevSig := make([][][]float64, largestSet+1)
 
-  for _, set := range setsToPlotCABS {
+    for _, set := range setsToPlotCABS {
 
-    stdDevBg[set] = make([][]float64, numAvgs[set])
-    stdDevSig[set] = make([][]float64, numAvgs[set])
-
-    for run := 0; run < numAvgs[set]; run++ {
-
-      // Background
-      // Open the CSV file for reading
-      csvPath := "Data/" + fmt.Sprint(set+1) + "/Runs/Background/Run " + fmt.Sprint(run) + ".csv"
-    	file, err := os.Open(csvPath)
-    	if err != nil {
-    		fmt.Println("Error:", err)
-    		return cabsData
-    	}
-    	defer file.Close()
-
-    	// Create a CSV reader
-    	reader := csv.NewReader(file)
-
-    	// Read all CSV records
-    	records, err := reader.ReadAll()
-    	if err != nil {
-    		fmt.Println("Error:", err)
-    		return cabsData
-    	}
-
-    	// Iterate through the records (skip the first header row)
-    	for row, record := range records {
-    		if row == 0 {
-    			// Skip the header row
-    			continue
-    		}
-
-    		// Ensure there are at least 2 columns in the record
-    		if len(record) >= 2 {
-
-          record[1] = strings.TrimSpace(record[1])
-    			// Convert the second column to a float64 and append to the slice
-    			values, err := strconv.ParseFloat(record[1], 64)
-    			if err != nil {
-    				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
-    			} else {
-    				stdDevBg[set][run] = append(stdDevBg[set][run], values*math.Sqrt(1.842e9)) // *math.Sqrt(1.842e9) undoes std dev "of the mean"
-    			}
-    		} else {
-    			fmt.Printf("Row %d does not have enough columns\n", row+1)
-    		}
-    	}
-
-      // Signal
-      // Open the CSV file for reading
-      csvPath = "Data/" + fmt.Sprint(set+1) + "/Runs/Signal/Run " + fmt.Sprint(run) + ".csv"
-    	file, err = os.Open(csvPath)
-    	if err != nil {
-    		fmt.Println("Error:", err)
-    		return cabsData
-    	}
-    	defer file.Close()
-
-    	// Create a CSV reader
-    	reader = csv.NewReader(file)
-
-    	// Read all CSV records
-    	records, err = reader.ReadAll()
-    	if err != nil {
-    		fmt.Println("Error:", err)
-    		return cabsData
-    	}
-
-    	// Iterate through the records (skip the first header row)
-    	for row, record := range records {
-    		if row == 0 {
-    			// Skip the header row
-    			continue
-    		}
-
-    		// Ensure there are at least 2 columns in the record
-    		if len(record) >= 2 {
-
-          record[1] = strings.TrimSpace(record[1])
-    			// Convert the second column to a float64 and append to the slice
-    			values, err := strconv.ParseFloat(record[1], 64)
-    			if err != nil {
-    				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
-    			} else {
-    				stdDevSig[set][run] = append(stdDevSig[set][run], values)
-    			}
-    		} else {
-    			fmt.Printf("Row %d does not have enough columns\n", row+1)
-    		}
-    	}
-    }
-  }
-
-  // combine σ for each freq across runs
-  for _, set := range setsToPlotCABS {
-
-    σCombinedAcrossRunsBg := make([]float64, len(stdDevBg[set][0]))
-    σCombinedAcrossRunsSig := make([]float64, len(stdDevBg[set][0]))
-
-    for i := range stdDevBg[set][0] {
+      stdDevBg[set] = make([][]float64, numAvgs[set])
+      stdDevSig[set] = make([][]float64, numAvgs[set])
 
       for run := 0; run < numAvgs[set]; run++ {
 
-        // !assumes sig and background have same # of runs within a set
-        σCombinedAcrossRunsBg[i] += math.Pow(stdDevBg[set][run][i], 2)
-        σCombinedAcrossRunsSig[i] += math.Pow(stdDevSig[set][run][i], 2)
+        // Background
+        // Open the CSV file for reading
+        csvPath := "Data/" + fmt.Sprint(set+1) + "/Runs/Background/Run " + fmt.Sprint(run) + ".csv"
+      	file, err := os.Open(csvPath)
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+      	defer file.Close()
+
+      	// Create a CSV reader
+      	reader := csv.NewReader(file)
+
+      	// Read all CSV records
+      	records, err := reader.ReadAll()
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+
+      	// Iterate through the records (skip the first header row)
+      	for row, record := range records {
+      		if row == 0 {
+      			// Skip the header row
+      			continue
+      		}
+
+      		// Ensure there are at least 2 columns in the record
+      		if len(record) >= 2 {
+
+            record[1] = strings.TrimSpace(record[1])
+      			// Convert the second column to a float64 and append to the slice
+      			values, err := strconv.ParseFloat(record[1], 64)
+      			if err != nil {
+      				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
+      			} else {
+      				stdDevBg[set][run] = append(stdDevBg[set][run], values)
+      			}
+      		} else {
+      			fmt.Printf("Row %d does not have enough columns\n", row+1)
+      		}
+      	}
+
+        // Signal
+        // Open the CSV file for reading
+        csvPath = "Data/" + fmt.Sprint(set+1) + "/Runs/Signal/Run " + fmt.Sprint(run) + ".csv"
+      	file, err = os.Open(csvPath)
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+      	defer file.Close()
+
+      	// Create a CSV reader
+      	reader = csv.NewReader(file)
+
+      	// Read all CSV records
+      	records, err = reader.ReadAll()
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+
+      	// Iterate through the records (skip the first header row)
+      	for row, record := range records {
+      		if row == 0 {
+      			// Skip the header row
+      			continue
+      		}
+
+      		// Ensure there are at least 2 columns in the record
+      		if len(record) >= 2 {
+
+            record[1] = strings.TrimSpace(record[1])
+      			// Convert the second column to a float64 and append to the slice
+      			values, err := strconv.ParseFloat(record[1], 64)
+      			if err != nil {
+      				fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
+      			} else {
+      				stdDevSig[set][run] = append(stdDevSig[set][run], values)
+      			}
+      		} else {
+      			fmt.Printf("Row %d does not have enough columns\n", row+1)
+      		}
+      	}
       }
     }
 
-    // square root of sum of squares, divided by number of runs
-    for i := range σCombinedAcrossRunsBg {
+    // combine σ for each freq across runs
+    for _, set := range setsToPlotCABS {
 
-      σCombinedAcrossRunsBg[i] = math.Sqrt(σCombinedAcrossRunsBg[i])/float64(numAvgs[set])
-      σCombinedAcrossRunsSig[i] = math.Sqrt(σCombinedAcrossRunsSig[i])/float64(numAvgs[set])
-    }
+      σCombinedAcrossRunsBg := make([]float64, len(stdDevBg[set][0]))
+      σCombinedAcrossRunsSig := make([]float64, len(stdDevBg[set][0]))
 
-    // propagate errors through signal - background
+      for i := range stdDevBg[set][0] {
 
-    σSigMinusBg := make([]float64, len(σCombinedAcrossRunsSig))
+        for run := 0; run < numAvgs[set]; run++ {
 
-    for i := range σCombinedAcrossRunsSig {
-
-      σSigMinusBg[i] += math.Sqrt(math.Pow(σCombinedAcrossRunsSig[i], 2) +
-                          math.Pow(σCombinedAcrossRunsBg[i], 2))
-
-      switch sigUnit {
-      case "mV":
-        σSigMinusBg[i] = σSigMinusBg[i]*1e3
-      case "uV":
-        σSigMinusBg[i] = σSigMinusBg[i]*1e6
-      case "nV":
-        σSigMinusBg[i] = σSigMinusBg[i]*1e9
-      case "pV":
-        σSigMinusBg[i] = σSigMinusBg[i]*1e12
+          // !assumes sig and background have same # of runs within a set
+          σCombinedAcrossRunsBg[i] += math.Pow(stdDevBg[set][run][i], 2)
+          σCombinedAcrossRunsSig[i] += math.Pow(stdDevSig[set][run][i], 2)
+        }
       }
 
-      // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
-      //σSigMinusBg[i] = σSigMinusBg[i]*2
+      // square root of sum of squares, divided by number of runs
+      for i := range σCombinedAcrossRunsBg {
 
+        σCombinedAcrossRunsBg[i] = math.Sqrt(σCombinedAcrossRunsBg[i])/float64(numAvgs[set])
+        σCombinedAcrossRunsSig[i] = math.Sqrt(σCombinedAcrossRunsSig[i])/float64(numAvgs[set])
+      }
+
+      // propagate errors through signal - background
+
+      σSigMinusBg := make([]float64, len(σCombinedAcrossRunsSig))
+
+      for i, v := range σCombinedAcrossRunsSig {
+
+        σSigMinusBg[i] += math.Sqrt(math.Pow(v, 2) + math.Pow(σCombinedAcrossRunsBg[i], 2))
+
+        switch sigUnit {
+        case "mV":
+          σSigMinusBg[i] *= 1e3
+        case "uV":
+          σSigMinusBg[i] *= 1e6
+        case "nV":
+          σSigMinusBg[i] *= 1e9
+        case "pV":
+          σSigMinusBg[i] *= 1e12
+        }
+
+        // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
+        //σSigMinusBg[i] = σSigMinusBg[i]*2
+
+      }
+
+      // 2. tack errors onto cabsData
+      // cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
+      cabsData[set] = append(cabsData[set], σSigMinusBg)
+    }
+  } else {
+
+    // N = numAvgs (5 usually)
+    // Calculate σ across subtracted runs
+    largestSet := setsToPlotCABS[0]
+    for _, v := range setsToPlotCABS {
+      if v > largestSet {
+        largestSet = v
+      }
     }
 
-    // 2. tack errors onto cabsData
-    // cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
-    cabsData[set] = append(cabsData[set], σSigMinusBg)
+    runVals := make([][][]float64, largestSet+1)
+
+    for _, set := range setsToPlotCABS {
+
+      runVals[set] = make([][]float64, numAvgs[set])
+
+      for run := 0; run < numAvgs[set]; run++ {
+
+        // Open the CSV file for reading
+        csvPath := "Data/" + fmt.Sprint(set+1) + "/Runs/Subtracted/Run " + fmt.Sprint(run) + ".csv"
+      	file, err := os.Open(csvPath)
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+      	defer file.Close()
+
+      	// Create a CSV reader
+      	reader := csv.NewReader(file)
+
+      	// Read all CSV records
+      	records, err := reader.ReadAll()
+      	if err != nil {
+      		fmt.Println("Error:", err)
+      		return cabsData
+      	}
+
+      	// Iterate through the records
+      	for row, record := range records {
+
+      	record[0] = strings.TrimSpace(record[0])
+      		// Convert the column to a float64 and append to the slice
+      		values, err := strconv.ParseFloat(record[0], 64)
+      		if err != nil {
+      			fmt.Printf("Error parsing value in row %d: %v\n", row+1, err)
+      		} else {
+      			runVals[set][run] = append(runVals[set][run], values)
+      		}
+      	}
+      }
+
+      transposedRunVals := transpose(runVals[set])
+
+      stdDev := make([]float64, len(runVals[set][0]))
+
+      for i, v := range transposedRunVals {
+
+        stdDev[i] = σ(v)
+      }
+
+      fmt.Println(stdDev)
+
+      for i := range stdDev {
+        switch sigUnit {
+        case "mV":
+          stdDev[i] *= 1e3
+        case "uV":
+          stdDev[i] *= 1e6
+        case "nV":
+          stdDev[i] *= 1e9
+        case "pV":
+          stdDev[i] *= 1e12
+        }
+      }
+
+      cabsData[set] = append(cabsData[set], stdDev)
+
+    }
   }
 
   return cabsData
@@ -2563,16 +2644,37 @@ func binCabs(
   return cabsBinned
 }
 
+func transpose(
+  slice [][]float64,
+) (
+  [][]float64,
+) {
+
+	rows := len(slice)
+	cols := len(slice[0])
+
+	transposed := make([][]float64, cols)
+
+	for i := 0; i < cols; i++ {
+		transposed[i] = make([]float64, rows)
+		for j := 0; j < rows; j++ {
+			transposed[i][j] = slice[j][i]
+		}
+	}
+
+	return transposed
+}
+
 func σ(
   values []float64,
 ) (
   float64,
 ) {
 
-  // dBm -> uV
+  /* dBm -> uV
   for i, v := range values {
     values[i] = math.Pow(10, 6)*math.Pow(10, v/10.)
-  }
+  }*/
 
   // Sum of squares of the difference
   dev := 0.
