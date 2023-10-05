@@ -1315,7 +1315,7 @@ func logPlots(
     log = append(log, fmt.Sprintf("\tStart Frequency: %.2f\n", startFrequency[set]))
     log = append(log, fmt.Sprintf("\tStop Frequency: %.2f\n", stopFrequency[set]))
     log = append(log, fmt.Sprintf("\tStep Size: %.2f\n", step[set]))
-    log = append(log, fmt.Sprintf("\tNumber of Averages: %.2f\n", numAvgs[set]))
+    log = append(log, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
     log = append(log, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
   }
 
