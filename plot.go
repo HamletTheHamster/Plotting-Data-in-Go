@@ -319,7 +319,8 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit)
+    sigmaMultiple := 1.
+    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
@@ -2309,6 +2310,7 @@ func σCABS(
   setsToPlotCABS, numAvgs []int,
   cabsData [][][]float64,
   sigUnit string,
+  sigmaMultiple float64,
 ) (
   [][][]float64,
 ) {
@@ -2532,7 +2534,7 @@ func σCABS(
 
       for i, v := range transposedRunVals {
 
-        stdDev[i] = σ(v)*3.
+        stdDev[i] = σ(v)*sigmaMultiple
       }
 
       for i := range stdDev {

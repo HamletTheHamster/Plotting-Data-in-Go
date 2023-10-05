@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: 3-sigma
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 23-10-05
+	Label: 10000x reduced
+	Start Time (h:m:s): 14:28:24
+	End Time(h:m:s): 14:39:35
+	Pump Power: 17.450
+	Stokes Power: 6.480
+	Probe Power: 10.980
+	Lock-in Range: 0.08
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 200.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5004560.00
+	Number of Averages: %!f(int=05)
+	Data Collection Note: result similar to original
+
