@@ -2313,8 +2313,10 @@ func σCABS(
   [][][]float64,
 ) {
 
-  // N = sampling rate (1,842,000 usually)
-  if false {
+  N := "Number of Averages"
+
+  if N == "Sampling Rate" {
+    // Sampling rate = 1,842,000 usually
     // 1. figure σ from dwell-time σ in CSVs
     largestSet := setsToPlotCABS[0]
     for _, v := range setsToPlotCABS {
@@ -2472,9 +2474,9 @@ func σCABS(
       // cabsData[set][0: freq, 1: sig, 2: σ][rows of freq/sig/σ]
       cabsData[set] = append(cabsData[set], σSigMinusBg)
     }
-  } else {
+  } else if N == "Number of Averages" {
 
-    // N = numAvgs (5 usually)
+    // Number of Averages = 5 usually
     // Calculate σ across subtracted runs
     largestSet := setsToPlotCABS[0]
     for _, v := range setsToPlotCABS {
@@ -2530,10 +2532,8 @@ func σCABS(
 
       for i, v := range transposedRunVals {
 
-        stdDev[i] = σ(v)
+        stdDev[i] = σ(v)*3.
       }
-
-      fmt.Println(stdDev)
 
       for i := range stdDev {
         switch sigUnit {
