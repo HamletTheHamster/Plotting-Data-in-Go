@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: cabs working perfectly - 1mm full power
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-10-09
+	Label: Full Power
+	Start Time (h:m:s): 10:39:38
+	End Time(h:m:s): 10:50:50
+	Pump Power: 77.100
+	Stokes Power: 29.480
+	Probe Power: 52.970
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 100.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5004560.00
+	Number of Averages: 5
+	Data Collection Note: stokes filter 1548.932 probe filter 1549.016 pump laser 1548.9 probe laser 1548.98
+

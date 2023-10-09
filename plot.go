@@ -313,7 +313,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{1}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
