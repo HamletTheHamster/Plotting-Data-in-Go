@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: 1.5 hr run (20 avgs)
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 3
+	Data taken: 23-10-09
+	Label: 1.5 hrs (20 avgs)
+	Start Time (h:m:s): 13:02:39
+	End Time(h:m:s): 13:47:30
+	Pump Power: 4.540
+	Stokes Power: 1.517
+	Probe Power: 2.444
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 100.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5004560.00
+	Number of Averages: 20
+	Data Collection Note: 10000x less than full power
+
