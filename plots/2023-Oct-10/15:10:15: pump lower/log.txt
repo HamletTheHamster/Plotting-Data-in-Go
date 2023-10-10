@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: pump lower
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 5
+	Data taken: 23-10-10
+	Label: Pump Lower
+	Start Time (h:m:s): 13:59:21
+	End Time(h:m:s): 14:10:36
+	Pump Power: 19.190
+	Stokes Power: 32.210
+	Probe Power: 54.560
+	Lock-in Range: 0.04
+	Dwell Time: 1.000000000
+	Lock-in Bandwidth: 100.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5004560.00
+	Number of Averages: 5
+	Data Collection Note: 
+
