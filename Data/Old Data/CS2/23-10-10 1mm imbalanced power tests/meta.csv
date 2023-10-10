@@ -1,0 +1,8 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Notes
+23-10-10,Initial full power test,1,08:59:50,09:11:01,,,,1/frequency.csv,1/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-10,Full Power,2,11:36:51,11:48:04,,,,2/frequency.csv,2/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-10,Probe 5x lower,3,11:55:50,12:07:06,77.2,32.71,10.81,3/frequency.csv,3/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-10,been doing it wrong,4,12:21:07,12:32:23,,,,4/frequency.csv,4/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,need to turn each source down such that total scattered power remains constant
+23-10-10,Pump Lower,5,13:59:21,14:10:36,19.19,32.21,54.56,5/frequency.csv,5/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-10,Stokes Lower,6,14:24:36,14:35:52,76.6,8.02,54.65,6/frequency.csv,6/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-10,Probe Lower,7,14:49:36,15:00:52,75.6,32.53,13.48,7/frequency.csv,7/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
