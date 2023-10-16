@@ -1,0 +1,6 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Notes
+23-10-16,mistakenly full power,1,14:44:42,14:55:54,3.5,1.5,2.5,1/frequency.csv,1/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-16,10k 1s dwell 5 avgs,2,14:59:31,15:10:46,3.5,1.5,2.5,2/frequency.csv,2/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-16,10k .5s dwell 5 avgs,3,15:19:34,15:26:21,3.5,1.5,2.5,3/frequency.csv,3/signal.csv,0.04,0.5,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-16,10k .1s dwell 5 avgs,4,15:32:09,15:35:19,3.5,1.5,2.5,4/frequency.csv,4/signal.csv,0.04,0.1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
+23-10-16,10k 1ms dwell 5 avgs,5,15:38:56,15:41:11,3.5,1.5,2.5,5/frequency.csv,5/signal.csv,0.04,0.001,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,
