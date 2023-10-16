@@ -1,0 +1,27 @@
+Sample: CS2
+Runtime note: faster sweep test- p1 second dwell
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 3
+	Data taken: 23-10-16
+	Label: 0.1s dwell 50 avgs
+	Start Time (h:m:s): 11:43:59
+	End Time(h:m:s): 12:15:45
+	Pump Power: 73.600
+	Stokes Power: 32.140
+	Probe Power: 50.920
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000
+	Lock-in Bandwidth: 100.00
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00
+	Start Frequency: 2300000000.00
+	Stop Frequency: 2800000000.00
+	Step Size: 5004560.00
+	Number of Averages: 50
+	Data Collection Note: actually dwelling for about .28s
+

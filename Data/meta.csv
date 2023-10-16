@@ -1,0 +1,5 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Notes
+23-10-16,1s dwell 5 avgs,1,10:26:22,10:37:38,73.0,32.41,53.28,1/frequency.csv,1/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,extremely important that probe filter is placed far enough away (~2GHz here) to cut out *probe reflections* - pump laser 1548.9 probe laser 1548.98 stokes filter 1548.932 probe filter 1549.016
+23-10-16,'0.5s' dwell 10 avgs (28m),2,10:56:00,11:09:35,73.1,32.33,51.77,2/frequency.csv,2/signal.csv,0.04,0.5,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,10,very clearly not dwelling for 0.5 seconds - more like 0.8 seconds
+23-10-16,'0.1s' dwell 50 avgs (64m),3,11:43:59,12:15:45,73.6,32.14,50.92,3/frequency.csv,3/signal.csv,0.04,0.1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,50,actually dwelling for about .28s
+23-10-16,1s dwell 5 avgs (24m),4,12:30:29,12:41:44,73.5,32.17,50.72,4/frequency.csv,4/signal.csv,0.04,1,100,2.000000e+09,8,2.300000e+09,2.800000e+09,5.004560e+06,5,redo of baseline comparison
