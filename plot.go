@@ -30,7 +30,8 @@ func main() {
   date, label, setNums, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
-  step, numAvgs, asNotes, sNotes, notes := readMeta(
+  step, numAvgs, asNotes, sNotes, pumpLaser, probeLaser, probeFilter, stokesFilter,
+  notes := readMeta(
     cabs, lock, temp, coolingExperiment,
   )
 
@@ -334,7 +335,8 @@ func main() {
     log = logPlots(
       log, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
-      dataRate, order, startFrequency, stopFrequency, step, notes,
+      dataRate, order, startFrequency, stopFrequency, step,
+      pumpLaser, probeLaser, probeFilter, stokesFilter, notes,
     )
     plotCABS(
       setsToPlotCABS, cabsData, label, sample, sigUnit, logpath, length, slide,
@@ -394,7 +396,7 @@ func readMeta(
   []string, []string, []string, []string, []string, []float64, []float64,
   []float64, []float64, []float64, []string, []string, []string,
   []float64, []float64, []float64, []float64, []float64, []float64, []float64, []float64,
-  []int, []float64, []float64, []string,
+  []int, []float64, []float64, []string, []string, []string, []string, []string,
 ) {
 
   // Read
@@ -412,6 +414,7 @@ func readMeta(
   }
 
   var date, label, set, startTime, endTime, filepath, sigFilepath, freqFilepath, notes []string
+  var pumpLaser, probeLaser, probeFilter, stokesFilter []string
   var asPowers, sPowers, asNotes, sNotes []float64
   var pumpPowers, stokesPowers, probePowers []float64
   var lockinRange, dwell, bandwidth, dataRate, order []float64
@@ -421,6 +424,7 @@ func readMeta(
   var pumpCol, stokesCol, probeCol, filepathCol int
   var lockinRangeCol, dwellCol, bandwidthCol, dataRateCol, orderCol int
   var startFrequencyCol, stopFrequencyCol, stepCol, numAvgsCol, notesCol int
+  var pumpLaserCol, probeLaserCol, probeFilterCol, stokesFilterCol int
 
   for col, heading := range meta[0] {
     switch heading {
@@ -458,6 +462,14 @@ func readMeta(
       stopFrequencyCol = col
     case "Step":
       stepCol = col
+    case "Pump Laser":
+      pumpLaserCol = col
+    case "Probe Laser":
+      probeLaserCol = col
+    case "Probe Filter":
+      probeFilterCol = col
+    case "Stokes Filter":
+      stokesFilterCol = col
     case "Num Avgs":
       numAvgsCol = col
     case "Notes":
@@ -472,6 +484,10 @@ func readMeta(
       date = append(date, v[dateCol])
       label = append(label, v[labelCol])
       set = append(set, v[setCol])
+      pumpLaser = append(pumpLaser, v[pumpLaserCol])
+      probeLaser = append(probeLaser, v[probeLaserCol])
+      stokesFilter = append(stokesFilter, v[stokesFilterCol])
+      probeFilter = append(probeFilter, v[probeFilterCol])
       notes = append(notes, v[notesCol])
 
       if numAvg, err := strconv.Atoi(v[numAvgsCol]); err == nil {
@@ -661,7 +677,8 @@ func readMeta(
   return date, label, set, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
-  step, numAvgs, asNotes, sNotes, notes
+  step, numAvgs, asNotes, sNotes, pumpLaser, probeLaser, probeFilter, stokesFilter,
+  notes
 }
 
 func avgCSVs(
@@ -1293,7 +1310,7 @@ func logPlots(
   date, label, run, startTime, endTime []string,
   pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
   bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
-  notes []string,
+  pumpLaser, probeLaser, probeFilter, stokesFilter, notes []string,
 ) (
   []string,
 ) {
@@ -1304,17 +1321,21 @@ func logPlots(
     log = append(log, fmt.Sprintf("\tLabel: %s\n", label[set]))
     log = append(log, fmt.Sprintf("\tStart Time (h:m:s): %s\n", startTime[set]))
     log = append(log, fmt.Sprintf("\tEnd Time(h:m:s): %s\n", endTime[set]))
-    log = append(log, fmt.Sprintf("\tPump Power: %.3f\n", pumpPowers[set]))
-    log = append(log, fmt.Sprintf("\tStokes Power: %.3f\n", stokesPowers[set]))
-    log = append(log, fmt.Sprintf("\tProbe Power: %.3f\n", probePowers[set]))
+    log = append(log, fmt.Sprintf("\tPump Laser: %s nm\n", pumpLaser[set]))
+    log = append(log, fmt.Sprintf("\tProbe Laser: %s nm\n", probeLaser[set]))
+    log = append(log, fmt.Sprintf("\tStokes Filter: %s nm\n", stokesFilter[set]))
+    log = append(log, fmt.Sprintf("\tProbe Filter: %s nm\n", probeFilter[set]))
+    log = append(log, fmt.Sprintf("\tPump Power: %.3f mW\n", pumpPowers[set]))
+    log = append(log, fmt.Sprintf("\tStokes Power: %.3f mW\n", stokesPowers[set]))
+    log = append(log, fmt.Sprintf("\tProbe Power: %.3f mW\n", probePowers[set]))
     log = append(log, fmt.Sprintf("\tLock-in Range: %.2f\n", lockinRange[set]))
-    log = append(log, fmt.Sprintf("\tDwell Time: %.9f\n", dwell[set]))
-    log = append(log, fmt.Sprintf("\tLock-in Bandwidth: %.2f\n", bandwidth[set]))
+    log = append(log, fmt.Sprintf("\tDwell Time: %.9f s\n", dwell[set]))
+    log = append(log, fmt.Sprintf("\tLock-in Bandwidth: %.2f Hz\n", bandwidth[set]))
     log = append(log, fmt.Sprintf("\tLock-in Bandwidth Order: %.0f\n", order[set]))
-    log = append(log, fmt.Sprintf("\tData Sampling Rate: %.2f\n", dataRate[set]))
-    log = append(log, fmt.Sprintf("\tStart Frequency: %.2f\n", startFrequency[set]))
-    log = append(log, fmt.Sprintf("\tStop Frequency: %.2f\n", stopFrequency[set]))
-    log = append(log, fmt.Sprintf("\tStep Size: %.2f\n", step[set]))
+    log = append(log, fmt.Sprintf("\tData Sampling Rate: %.2f Sa/s\n", dataRate[set]))
+    log = append(log, fmt.Sprintf("\tStart Frequency: %.2f Hz\n", startFrequency[set]))
+    log = append(log, fmt.Sprintf("\tStop Frequency: %.2f Hz\n", stopFrequency[set]))
+    log = append(log, fmt.Sprintf("\tStep Size: %.2f Hz\n", step[set]))
     log = append(log, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
     log = append(log, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
   }
