@@ -1486,10 +1486,22 @@ func plotCABS(
     displayDigits = 1
   } else if (xmax - xmin)/8 > 0.1 {
     xtick = 0.25
+  } else if (xmax - xmin)/8 > 0.075 {
+    xtick = 0.075
   } else if (xmax - xmin)/8 > 0.05 {
     xtick = 0.05
+  } else if (xmax - xmin/8) > 0.025 {
+    xtick = 0.025
   } else if (xmax - xmin)/8 > 0.01 {
-    xtick = 0.01
+    xtick = 0.02
+  } else if (xmax - xmin)/8 > 0.0075 {
+    xtick = 0.0075
+  } else if (xmax - xmin)/8 > 0.005 {
+    xtick = 0.005
+  } else if (xmax - xmin)/8 > 0.0025 {
+    xtick = 0.0025
+  } else if (xmax - xmin)/8 > 0.001 {
+    xtick = 0.001
   }
   firstTick := 0.
   for m := float64(int(xmin)); m <= xmin; m += xtick {
