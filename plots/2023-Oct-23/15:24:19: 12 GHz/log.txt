@@ -1,0 +1,31 @@
+Sample: UHNA3
+Runtime note: 12 GHz
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 5
+	Data taken: 23-10-23
+	Label: 12 GHz
+	Start Time (h:m:s): 12:32:01
+	End Time(h:m:s): 12:33:46
+	Pump Laser: 1548.9 nm
+	Probe Laser: 1548.996 nm
+	Stokes Filter: 1549.085 nm
+	Probe Filter: 1548.973 nm
+	Pump Power: 56.700 mW
+	Stokes Power: 25.610 mW
+	Probe Power: 40.910 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9280000000.00 Hz
+	Step Size: 5004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: bimodal but higher freq peak at 9.165?
+

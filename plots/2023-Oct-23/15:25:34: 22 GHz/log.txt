@@ -1,0 +1,31 @@
+Sample: UHNA3
+Runtime note: 22 GHz
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 15
+	Data taken: 23-10-23
+	Label: 22 GHz
+	Start Time (h:m:s): 13:40:46
+	End Time(h:m:s): 13:42:31
+	Pump Laser: 1548.9 nm
+	Probe Laser: 1549.076 nm
+	Stokes Filter: 1549.165 nm
+	Probe Filter: 1548.973 nm
+	Pump Power: 58.000 mW
+	Stokes Power: 25.650 mW
+	Probe Power: 39.920 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 2000000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9280000000.00 Hz
+	Step Size: 5004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: complete crater right at center peak
+
