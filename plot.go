@@ -314,13 +314,13 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{15}
+    setsToPlotCABS := []int{2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    sigmaMultiple := 1.
+    sigmaMultiple := 2.
     cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
 
     binCabsSets := []int{}
