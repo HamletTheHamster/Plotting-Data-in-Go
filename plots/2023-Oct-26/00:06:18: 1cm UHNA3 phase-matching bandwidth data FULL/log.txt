@@ -1,0 +1,31 @@
+Sample: UHNA3
+Runtime note: 1cm UHNA3 phase-matching bandwidth data FULL
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 16
+	Data taken: 23-10-25
+	Label: 12.5 GHz
+	Start Time (h:m:s): 13:00:20
+	End Time(h:m:s): 13:04:45
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.854 nm
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.943 nm
+	Pump Power: 56.200 mW
+	Stokes Power: 24.720 mW
+	Probe Power: 40.820 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9280000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
