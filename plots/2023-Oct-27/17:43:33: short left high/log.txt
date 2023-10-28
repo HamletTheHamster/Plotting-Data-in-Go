@@ -1,0 +1,127 @@
+Sample: CS2
+Runtime note: short left high
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 3
+	Data taken: 23-10-27
+	Label: 10.5 GHz
+	Start Time (h:m:s): 11:04:00
+	End Time(h:m:s): 11:09:32
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.892 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.928 nm
+	Pump Power: 70.200 mW
+	Stokes Power: 29.670 mW
+	Probe Power: 48.590 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 4
+	Data taken: 23-10-27
+	Label: 10.75 GHz
+	Start Time (h:m:s): 11:17:27
+	End Time(h:m:s): 11:22:59
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.894 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.930 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.830 mW
+	Probe Power: 48.620 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 9
+	Data taken: 23-10-27
+	Label: 12 GHz
+	Start Time (h:m:s): 12:22:55
+	End Time(h:m:s): 12:28:27
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.904 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.940 nm
+	Pump Power: 70.200 mW
+	Stokes Power: 29.730 mW
+	Probe Power: 48.510 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 14
+	Data taken: 23-10-27
+	Label: 13.25 GHz
+	Start Time (h:m:s): 13:27:14
+	End Time(h:m:s): 13:32:47
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.914 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.950 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.630 mW
+	Probe Power: 48.030 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 15
+	Data taken: 23-10-27
+	Label: 13.5
+	Start Time (h:m:s): 15:28:24
+	End Time(h:m:s): 15:33:55
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.916 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.952 nm
+	Pump Power: 70.000 mW
+	Stokes Power: 29.750 mW
+	Probe Power: 49.130 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+

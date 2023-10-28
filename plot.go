@@ -314,13 +314,20 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,2,4,6,8,10,12}
+    setsToPlotCABS := []int{5,11,16}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    // tall: 5,11,16
+    // medium: 0,4,6,9,10,12,15
+      // left high: 4,9,10,15
+      // right high: 0,6,12
+    // short: 1,2,3,7,8,13,14
+      // left high: 2,3,8,13,14
+      // right high: 1,7
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
-    sigmaMultiple := 2.
+    sigmaMultiple := 1.
     cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
 
     binCabsSets := []int{}
@@ -1536,7 +1543,7 @@ func plotCABS(
       }
     }
   }
-  ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/16
+  ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/1000 //16
   ymin -= (ymax - ymin)/32
   yrange := []float64{ymin, ymax}
   ytick := ((ymax - ymin)/8)
@@ -3551,7 +3558,7 @@ func prepPlot(
 
     p.Y.Tick.Label.Font.Size = 36
 
-    p.Legend.TextStyle.Font.Size = 36
+    p.Legend.TextStyle.Font.Size = 28
   }
 
   // Enclose plot
@@ -3691,7 +3698,7 @@ func palette(
   }
 
   if dark {
-    darkColor := make([]color.RGBA, 16)
+    darkColor := make([]color.RGBA, 17)
     darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
     darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
     darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
@@ -3708,11 +3715,12 @@ func palette(
     darkColor[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
     darkColor[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
     darkColor[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+    darkColor[16] = color.RGBA{R: 255, G: 102, B: 102, A: 255}
 
     return darkColor[brush]
   }
 
-  col := make([]color.RGBA, 16)
+  col := make([]color.RGBA, 17)
   col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
   col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
   col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
@@ -3729,6 +3737,7 @@ func palette(
   col[3] = color.RGBA{R: 91, G: 22, B: 22, A: 255}
   col[13] = color.RGBA{R: 22, G: 44, B: 91, A: 255}
   col[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
+  col[16] = color.RGBA{R: 255, G: 102, B: 102, A: 255}
 
   return col[brush]
 }

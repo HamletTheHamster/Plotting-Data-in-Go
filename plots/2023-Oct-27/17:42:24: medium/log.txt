@@ -1,0 +1,175 @@
+Sample: CS2
+Runtime note: medium
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-10-27
+	Label: 10 GHz
+	Start Time (h:m:s): 10:31:42
+	End Time(h:m:s): 10:37:13
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.888 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.924 nm
+	Pump Power: 69.700 mW
+	Stokes Power: 27.820 mW
+	Probe Power: 48.160 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 5
+	Data taken: 23-10-27
+	Label: 11 GHz
+	Start Time (h:m:s): 11:30:30
+	End Time(h:m:s): 11:36:02
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.896 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.932 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.800 mW
+	Probe Power: 48.610 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 7
+	Data taken: 23-10-27
+	Label: 11.5 GHz
+	Start Time (h:m:s): 11:56:47
+	End Time(h:m:s): 12:02:19
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.900 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.936 nm
+	Pump Power: 70.000 mW
+	Stokes Power: 29.800 mW
+	Probe Power: 48.100 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 10
+	Data taken: 23-10-27
+	Label: 12.25 GHz
+	Start Time (h:m:s): 12:35:52
+	End Time(h:m:s): 12:41:24
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.906 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.942 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.670 mW
+	Probe Power: 48.450 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 11
+	Data taken: 23-10-27
+	Label: 12.5 GHz
+	Start Time (h:m:s): 12:48:42
+	End Time(h:m:s): 12:54:14
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.908 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.944 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.740 mW
+	Probe Power: 48.190 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 13
+	Data taken: 23-10-27
+	Label: 13 GHz
+	Start Time (h:m:s): 13:14:20
+	End Time(h:m:s): 13:19:52
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.912 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.948 nm
+	Pump Power: 70.000 mW
+	Stokes Power: 30.070 mW
+	Probe Power: 48.390 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+
+Run 16
+	Data taken: 23-10-27
+	Label: 13.75
+	Start Time (h:m:s): 15:44:15
+	End Time(h:m:s): 15:49:47
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.918 nm
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.954 nm
+	Pump Power: 70.300 mW
+	Stokes Power: 29.860 mW
+	Probe Power: 49.340 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
