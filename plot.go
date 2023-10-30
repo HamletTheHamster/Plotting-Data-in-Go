@@ -314,7 +314,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    //setsToPlotCABS := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
     // tall: 5,11,16
     // medium: 0,4,6,9,10,12,15
       // left high: 4,9,10,15
@@ -323,12 +323,21 @@ func main() {
       // left high: 2,3,8,13,14
       // right high: 1,7
 
+    setsToPlotCABS := rangeInt(0, 16)
+
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath,
     )
 
     sigmaMultiple := 1.
     cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
+
+    normalized := []string{"PPP"}
+    if normalized[0] == "PPP" {
+      cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
+    }
+
+    fmt.Println(normalized[0])
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
@@ -688,6 +697,56 @@ func readMeta(
   notes
 }
 
+func logHeader(
+  cabs, lock, temp, slide bool,
+  sample, coolingExperiment, note string,
+  length float64,
+) (
+  []string,
+) {
+
+  log := []string{}
+  if sample != "" {
+    log = append(log, "Sample: " + sample + "\n")
+  }
+  if note != "" {
+    log = append(log, "Runtime note: " + note + "\n")
+  }
+  if slide {
+    log = append(log, "Figures formatted for slide presentation\n")
+  }
+
+  fmt.Printf(log[0])
+
+  if coolingExperiment != "" {
+    log = append(log, "\n*Cooling Data: " + coolingExperiment + "*\n")
+    fmt.Printf("\n*Cooling Data: " + coolingExperiment + "*\n")
+  } else if cabs {
+    log = append(log, "\n*CABS Data*\n")
+    fmt.Printf("\n*CABS Data*\n")
+  }
+  if temp {
+    log = append(log, "\n*Temperature-dependent data*\n")
+    fmt.Printf("\n*Temperature-dependent data*\n")
+  }
+  if sample == "LCOF" {
+    str := fmt.Sprintf("\n*Liquid-core optical fiber sample*\n")
+    log = append(log, str)
+    fmt.Printf(str)
+  }
+  if lock {
+    str := fmt.Sprintf("\n*Data gathered from Lock-in*\n\n")
+    log = append(log, str)
+    fmt.Printf(str)
+  } else {
+    str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n\n")
+    log = append(log, str)
+    fmt.Printf(str)
+  }
+
+  return log
+}
+
 func avgCSVs(
   nAvg int,
   powers []float64,
@@ -907,6 +966,18 @@ func avgCSVs(
   }
 
   return σas, σs
+}
+
+func rangeInt(
+  start, end int,
+) (
+  []int,
+) {
+    nums := make([]int, end-start)
+    for i := range nums {
+        nums[i] = start + i
+    }
+    return nums
 }
 
 func getCoolingData(
@@ -1244,56 +1315,6 @@ func readCSV(
     return nil, err
   }
   return rows, nil
-}
-
-func logHeader(
-  cabs, lock, temp, slide bool,
-  sample, coolingExperiment, note string,
-  length float64,
-) (
-  []string,
-) {
-
-  log := []string{}
-  if sample != "" {
-    log = append(log, "Sample: " + sample + "\n")
-  }
-  if note != "" {
-    log = append(log, "Runtime note: " + note + "\n")
-  }
-  if slide {
-    log = append(log, "Figures formatted for slide presentation\n")
-  }
-
-  fmt.Printf(log[0])
-
-  if coolingExperiment != "" {
-    log = append(log, "\n*Cooling Data: " + coolingExperiment + "*\n")
-    fmt.Printf("\n*Cooling Data: " + coolingExperiment + "*\n")
-  } else if cabs {
-    log = append(log, "\n*CABS Data*\n")
-    fmt.Printf("\n*CABS Data*\n")
-  }
-  if temp {
-    log = append(log, "\n*Temperature-dependent data*\n")
-    fmt.Printf("\n*Temperature-dependent data*\n")
-  }
-  if sample == "LCOF" {
-    str := fmt.Sprintf("\n*Liquid-core optical fiber sample*\n")
-    log = append(log, str)
-    fmt.Printf(str)
-  }
-  if lock {
-    str := fmt.Sprintf("\n*Data gathered from Lock-in*\n\n")
-    log = append(log, str)
-    fmt.Printf(str)
-  } else {
-    str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n\n")
-    log = append(log, str)
-    fmt.Printf(str)
-  }
-
-  return log
 }
 
 func logBinning(
@@ -2592,6 +2613,32 @@ func σCABS(
 
       cabsData[set] = append(cabsData[set], stdDev)
 
+    }
+  }
+
+  return cabsData
+}
+
+func normalizeByPowers(
+  setsToPlotCABS []int,
+  cabsData [][][]float64,
+  pumpPowers, stokesPowers, probePowers []float64,
+) (
+  [][][]float64,
+) {
+
+  for _, set := range setsToPlotCABS {
+
+    // sig
+    for i := range cabsData[set][1] {
+
+      cabsData[set][1][i] /= pumpPowers[set]*stokesPowers[set]*probePowers[set]
+    }
+
+    // σ
+    for i := range cabsData[set][2] {
+
+      cabsData[set][2][i] /= pumpPowers[set]*stokesPowers[set]*probePowers[set]
     }
   }
 
