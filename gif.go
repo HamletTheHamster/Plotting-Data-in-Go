@@ -58,7 +58,7 @@ func main() {
 
 	for _, result := range frameResults {
 		frames = append(frames, result.Palette)
-		delays = append(delays, 5)
+		delays = append(delays, 4)
 	}
 
 	// Save as a GIF
