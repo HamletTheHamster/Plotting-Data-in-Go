@@ -314,7 +314,7 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    setsToPlotCABS := []int{0,1,2,3}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
     // tall: 5,11,16
     // medium: 0,4,6,9,10,12,15
       // left high: 4,9,10,15
@@ -323,7 +323,7 @@ func main() {
       // left high: 2,3,8,13,14
       // right high: 1,7
 
-    setsToPlotCABS := rangeInt(0, 75)
+    //setsToPlotCABS := rangeInt(5, 19)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -3874,6 +3874,51 @@ func savePlot(
     os.Exit(1)
   }
 }
+
+/*func pngsToGIF(
+  pngPaths []string,
+  gifPath string,
+) (
+  error,
+) {
+
+    var frames []*image.Paletted
+    var delays []int
+
+    for _, fname := range pngPaths {
+        // Open the PNG file
+        f, err := os.Open(fname)
+        if err != nil {
+            return err
+        }
+
+        // Decode the PNG
+        img, err := png.Decode(f)
+        if err != nil {
+            return err
+        }
+        f.Close()
+
+        // Convert the image to Paletted
+        palettedImage := image.NewPaletted(img.Bounds(), ipalette.Plan9)
+        idraw.Draw(palettedImage, img.Bounds(), img, image.Point{}, idraw.Over)
+
+        frames = append(frames, palettedImage)
+        delays = append(delays, 10) // Add a delay for this frame
+    }
+
+    // Save as a GIF
+    outFile, err := os.Create(gifPath)
+    if err != nil {
+        return err
+    }
+    defer outFile.Close()
+
+    return gif.EncodeAll(outFile, &gif.GIF{
+        Image: frames,
+        Delay: delays,
+    })
+}*/
 
 func normalizeFit(
   fit []float64,
