@@ -323,7 +323,7 @@ func main() {
       // left high: 2,3,8,13,14
       // right high: 1,7
 
-    setsToPlotCABS := rangeInt(0, 16)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -1230,12 +1230,15 @@ func getLockData(
     fmt.Println(err)
     os.Exit(1)
   }
-  defer sigf.Close()
   sigDataStr, err := readCSV(sigf)
   if err != nil {
     fmt.Println(err)
+    sigf.Close()
     os.Exit(1)
   }
+
+  // Explicitly close the file (avoids too many files open error)
+  sigf.Close()
 
   // Read frequency data
   freqf, err := os.Open("Data/" + freqCSVName)
@@ -1243,20 +1246,21 @@ func getLockData(
     fmt.Println(err)
     os.Exit(1)
   }
-  defer freqf.Close()
   freqDataStr, err := readCSV(freqf)
   if err != nil {
     fmt.Println(err)
+    freqf.Close()
     os.Exit(1)
   }
+
+  // Explicitly close the file (avoids too many files open error)
+  freqf.Close()
 
   // Transpose
   var freqStrT, sigStrT []string
 
   for i := range sigDataStr {
     sigStrT = append(sigStrT, sigDataStr[i][0])
-  }
-  for i := range freqDataStr {
     freqStrT = append(freqStrT, freqDataStr[i][0])
   }
 
@@ -1496,7 +1500,7 @@ func plotCABS(
   xlabel := "Frequency (GHz)"
   var ylabel string
   if contains(normalized, "Powers") {
-    ylabel = "Normalized by Powers"
+    ylabel = "Normalized by Powers (V/W³)"
   } else {
     ylabel = "Spectral Density (" + sigUnit + ")"
   }
@@ -2422,7 +2426,6 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
-      	defer file.Close()
 
       	// Create a CSV reader
       	reader := csv.NewReader(file)
@@ -2433,6 +2436,7 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
+        file.Close()
 
       	// Iterate through the records (skip the first header row)
       	for row, record := range records {
@@ -2465,7 +2469,6 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
-      	defer file.Close()
 
       	// Create a CSV reader
       	reader = csv.NewReader(file)
@@ -2476,6 +2479,7 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
+        file.Close()
 
       	// Iterate through the records (skip the first header row)
       	for row, record := range records {
@@ -2582,7 +2586,6 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
-      	defer file.Close()
 
       	// Create a CSV reader
       	reader := csv.NewReader(file)
@@ -2593,6 +2596,7 @@ func σCABS(
       		fmt.Println("Error:", err)
       		return cabsData
       	}
+        file.Close()
 
       	// Iterate through the records
       	for row, record := range records {
@@ -3804,7 +3808,7 @@ func palette(
     darkColor[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
     darkColor[16] = color.RGBA{R: 255, G: 102, B: 102, A: 255}
 
-    return darkColor[brush]
+    return darkColor[brush % len(darkColor)]
   }
 
   col := make([]color.RGBA, 17)
@@ -3826,7 +3830,7 @@ func palette(
   col[14] = color.RGBA{R: 59, G: 17, B: 66, A: 255}
   col[16] = color.RGBA{R: 255, G: 102, B: 102, A: 255}
 
-  return col[brush]
+  return col[brush % len(col)]
 }
 
 func savePlot(
