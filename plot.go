@@ -325,18 +325,19 @@ func main() {
 
     setsToPlotCABS := rangeInt(0, 16)
 
+    normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
-      setsToPlotCABS, lock, sigFilepath, freqFilepath,
+      setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
 
     sigmaMultiple := 1.
-    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
+    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized)
 
-    normalized := []string{"Powers"}
-    if normalized[0] == "Powers" {
+    if contains(normalized, "Powers") {
       cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
       fmt.Println("*Data normalized by " + normalized[0] + "*\n")
       log = append(log, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+
     }
 
     binCabsSets := []int{}
@@ -355,7 +356,7 @@ func main() {
       pumpLaser, probeLaser, probeFilter, stokesFilter, notes,
     )
     plotCABS(
-      setsToPlotCABS, cabsData, label, sample, sigUnit, logpath, length, slide,
+      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, slide,
     )
   }
 
@@ -1036,7 +1037,7 @@ func getCoolingData(
 func getCABSData(
   sets []int,
   lock bool,
-  sigFileNames, freqFileNames []string,
+  sigFileNames, freqFileNames, normalized []string,
 ) (
   [][][]float64, string,
 ) {
@@ -1053,50 +1054,59 @@ func getCABSData(
       cabsDataPreUnit = append(cabsDataPreUnit, lockData)
     }
 
-    // Check for most appropriate signal unit (preference of larger)
-    largestSig := 0.
-    for set := range cabsDataPreUnit {
-      for _, s := range sets {
-        if set == s {
-          for _, v := range cabsDataPreUnit[set][1] {
-            if v > largestSig {
-              largestSig = v
+    // if not going to be normalized
+    if !contains(normalized, "Powers") {
+
+      // Check for most appropriate signal unit (preference of larger)
+      largestSig := 0.
+      for set := range cabsDataPreUnit {
+        for _, s := range sets {
+          if set == s {
+            for _, v := range cabsDataPreUnit[set][1] {
+              if v > largestSig {
+                largestSig = v
+              }
             }
           }
         }
-      }
 
-    }
-    if largestSig > 1e-3 {
-      for set := range cabsDataPreUnit {
-        for i, v := range cabsDataPreUnit[set][1] {
-          cabsDataPreUnit[set][1][i] = v*1e3
-          sigUnit = "mV"
-        }
-        cabsData = append(cabsData, cabsDataPreUnit[set])
       }
-    } else if largestSig > 1e-6 {
-      for set := range cabsDataPreUnit {
-        for i, v := range cabsDataPreUnit[set][1] {
-          cabsDataPreUnit[set][1][i] = v*1e6
-          sigUnit = "uV"
+      if largestSig > 1e-3 {
+        sigUnit = "mV"
+        for set := range cabsDataPreUnit {
+          for i, v := range cabsDataPreUnit[set][1] {
+            cabsDataPreUnit[set][1][i] = v*1e3
+          }
+          cabsData = append(cabsData, cabsDataPreUnit[set])
         }
-        cabsData = append(cabsData, cabsDataPreUnit[set])
+      } else if largestSig > 1e-6 {
+        sigUnit = "uV"
+        for set := range cabsDataPreUnit {
+          for i, v := range cabsDataPreUnit[set][1] {
+            cabsDataPreUnit[set][1][i] = v*1e6
+          }
+          cabsData = append(cabsData, cabsDataPreUnit[set])
+        }
+      } else if largestSig > 1e-9 {
+        sigUnit = "nV"
+        for set := range cabsDataPreUnit {
+          for i, v := range cabsDataPreUnit[set][1] {
+            cabsDataPreUnit[set][1][i] = v*1e9
+          }
+          cabsData = append(cabsData, cabsDataPreUnit[set])
+        }
+      } else if largestSig > 1e-12 {
+        sigUnit = "pV"
+        for set := range cabsDataPreUnit {
+          for i, v := range cabsDataPreUnit[set][1] {
+            cabsDataPreUnit[set][1][i] = v*1e12
+          }
+          cabsData = append(cabsData, cabsDataPreUnit[set])
+        }
       }
-    } else if largestSig > 1e-9 {
+    } else {
+      sigUnit = ""
       for set := range cabsDataPreUnit {
-        for i, v := range cabsDataPreUnit[set][1] {
-          cabsDataPreUnit[set][1][i] = v*1e9
-          sigUnit = "nV"
-        }
-        cabsData = append(cabsData, cabsDataPreUnit[set])
-      }
-    } else if largestSig > 1e-12 {
-      for set := range cabsDataPreUnit {
-        for i, v := range cabsDataPreUnit[set][1] {
-          cabsDataPreUnit[set][1][i] = v*1e12
-          sigUnit = "pV"
-        }
         cabsData = append(cabsData, cabsDataPreUnit[set])
       }
     }
@@ -1452,7 +1462,7 @@ func plotRaw(
 func plotCABS(
   sets []int,
   cabsData [][][]float64,
-  label []string,
+  label, normalized []string,
   sample, sigUnit, logpath string,
   length float64,
   slide bool,
@@ -1484,7 +1494,12 @@ func plotCABS(
 
   title := l + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
-  ylabel := "Spectral Density (" + sigUnit + ")"
+  var ylabel string
+  if contains(normalized, "Powers") {
+    ylabel = "Normalized by Powers"
+  } else {
+    ylabel = "Spectral Density (" + sigUnit + ")"
+  }
   legend := ""
 
   /* Manual Axes
@@ -2372,6 +2387,7 @@ func σCABS(
   cabsData [][][]float64,
   sigUnit string,
   sigmaMultiple float64,
+  normalized []string,
 ) (
   [][][]float64,
 ) {
@@ -2517,15 +2533,18 @@ func σCABS(
 
         σSigMinusBg[i] += math.Sqrt(math.Pow(v, 2) + math.Pow(σCombinedAcrossRunsBg[i], 2))
 
-        switch sigUnit {
-        case "mV":
-          σSigMinusBg[i] *= 1e3
-        case "uV":
-          σSigMinusBg[i] *= 1e6
-        case "nV":
-          σSigMinusBg[i] *= 1e9
-        case "pV":
-          σSigMinusBg[i] *= 1e12
+        // only scale to appropriate unit if not being normalized later
+        if len(normalized) > 0 {
+          switch sigUnit {
+          case "mV":
+            σSigMinusBg[i] *= 1e3
+          case "uV":
+            σSigMinusBg[i] *= 1e6
+          case "nV":
+            σSigMinusBg[i] *= 1e9
+          case "pV":
+            σSigMinusBg[i] *= 1e12
+          }
         }
 
         // 1σ = 68.27%, 2σ = 95.45%, 3σ = 99.73%
@@ -2598,16 +2617,19 @@ func σCABS(
         stdDev[i] = σ(v)*sigmaMultiple
       }
 
-      for i := range stdDev {
-        switch sigUnit {
-        case "mV":
-          stdDev[i] *= 1e3
-        case "uV":
-          stdDev[i] *= 1e6
-        case "nV":
-          stdDev[i] *= 1e9
-        case "pV":
-          stdDev[i] *= 1e12
+      // only scale to appropriate unit if not being normalized later
+      if len(normalized) > 0 {
+        for i := range stdDev {
+          switch sigUnit {
+          case "mV":
+            stdDev[i] *= 1e3
+          case "uV":
+            stdDev[i] *= 1e6
+          case "nV":
+            stdDev[i] *= 1e9
+          case "pV":
+            stdDev[i] *= 1e12
+          }
         }
       }
 
@@ -2619,6 +2641,19 @@ func σCABS(
   return cabsData
 }
 
+func contains(
+  list []string, a string,
+) (
+  bool,
+) {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
 func normalizeByPowers(
   setsToPlotCABS []int,
   cabsData [][][]float64,
@@ -2628,6 +2663,11 @@ func normalizeByPowers(
 ) {
 
   for _, set := range setsToPlotCABS {
+
+    // mW -> W
+    pumpPowers[set] /= 1e3
+    stokesPowers[set] /= 1e3
+    probePowers[set] /= 1e3
 
     // sig
     for i := range cabsData[set][1] {
