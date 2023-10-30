@@ -332,12 +332,12 @@ func main() {
     sigmaMultiple := 1.
     cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple)
 
-    normalized := []string{"PPP"}
-    if normalized[0] == "PPP" {
+    normalized := []string{"Powers"}
+    if normalized[0] == "Powers" {
       cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
+      fmt.Println("*Data normalized by " + normalized[0] + "*\n")
+      log = append(log, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
     }
-
-    fmt.Println(normalized[0])
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
