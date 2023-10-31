@@ -333,7 +333,9 @@ func main() {
     )
 
     sigmaMultiple := 1.
-    cabsData = σCABS(setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized)
+    cabsData = σCABS(
+      setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized,
+    )
 
     if contains(normalized, "Powers") {
       cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
@@ -356,13 +358,10 @@ func main() {
     optimizedParams := make([][]float64, len(cabsData))
     for _, set := range setsToPlotCABS {
 
-      // Extract data for the current set
-      frequencies := cabsData[set][0]
-      signals := cabsData[set][1]
-      σ := cabsData[set][2]
-
-      // Fit the Lorentzian
-      optimizedParams[set] = FitLorentzian(frequencies, signals, σ, initialParams)
+      optimizedParams[set] = FitLorentzian(
+        // freq, sig, σ, guess
+        cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+      )
     }
 
     binCabsSets := []int{}
