@@ -316,16 +316,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
-    // tall: 5,11,16
-    // medium: 0,4,6,9,10,12,15
-      // left high: 4,9,10,15
-      // right high: 0,6,12
-    // short: 1,2,3,7,8,13,14
-      // left high: 2,3,8,13,14
-      // right high: 1,7
+    //setsToPlotCABS := []int{}
 
-    //setsToPlotCABS := rangeInt(0, 1)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -2745,7 +2738,6 @@ func FitLorentzian(
       Tau:        1e-6,
       Eps1:       1e-8,
       Eps2:       1e-8,
-      // ... (other fields if needed)
   }
 
   settings := &lm.Settings{Iterations: 1000, ObjectiveTol: 1e-16}
