@@ -4,6 +4,7 @@ import (
   "image/color"
   "github.com/Arafatk/glot"
   "github.com/maorshutman/lm"
+  //"./LMA"
   "encoding/csv"
   "bufio"
   "fmt"
@@ -19,6 +20,7 @@ import (
   "gonum.org/v1/plot/vg/draw"
   "time"
   "flag"
+  "log"
 )
 
 func main() {
@@ -35,7 +37,7 @@ func main() {
     cabs, lock, temp, coolingExperiment,
   )
 
-  log := logHeader(
+  logFile := logHeader(
     cabs, lock, temp, slide, sample, coolingExperiment, note,
     length,
   )
@@ -120,7 +122,7 @@ func main() {
         // as
         header := fmt.Sprintf("\nAnti-Stokes\nSet  \t Power \t\t Width \t\t Peak \t\t Center\n")
         fmt.Printf(header)
-        log = append(log, header)
+        logFile = append(logFile, header)
 
         var asFits [][][]float64
         var asWidthLine [][]float64
@@ -162,7 +164,7 @@ func main() {
 
           str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f uV \t %.4f GHz\n", set, asPowers[set], wid*1000, amp, cen)
           fmt.Printf(str)
-          log = append(log, str)
+          logFile = append(logFile, str)
 
           // Create Lorentzian fit data according to solved fit parameters
           df := .001
@@ -199,7 +201,7 @@ func main() {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
         fmt.Printf(header)
-        log = append(log, header)
+        logFile = append(logFile, header)
 
         var sFits [][][]float64
         var sWidthLine [][]float64
@@ -243,7 +245,7 @@ func main() {
 
           str := fmt.Sprintf("%d \t %.2f mW \t %.2f MHz \t %.6f uV \t %.4f GHz\n", set, sPowers[set], wid*1000, amp, cen)
           fmt.Printf(str)
-          log = append(log, str)
+          logFile = append(logFile, str)
 
           // Create Lorentzian fit data according to solved fit parameters
           df := .001
@@ -264,7 +266,7 @@ func main() {
           sLinewidths = append(sLinewidths, sfwhm[i])
         }
         fmt.Printf("\n")
-        log = append(log, "\n")
+        logFile = append(logFile, "\n")
 
         goPlotsFits(
           fitStokes, s, sFits, sWidthLines, σs, sLabel, sfwhm, sNotes, temp, slide,
@@ -307,14 +309,14 @@ func main() {
           str := fmt.Sprintf("Stokes & AntiStokes sets not equal\n" +
             "(Height ratio and linewidth plots not produced)\n")
           fmt.Printf(str)
-          log = append(log, str)
+          logFile = append(logFile, str)
         }
       }
     }
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
+    setsToPlotCABS := []int{0}  // 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
     // tall: 5,11,16
     // medium: 0,4,6,9,10,12,15
       // left high: 4,9,10,15
@@ -323,7 +325,7 @@ func main() {
       // left high: 2,3,8,13,14
       // right high: 1,7
 
-    setsToPlotCABS := rangeInt(0, 75)
+    //setsToPlotCABS := rangeInt(0, 1)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -336,31 +338,54 @@ func main() {
     if contains(normalized, "Powers") {
       cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
       fmt.Println("*Data normalized by " + normalized[0] + "*\n")
-      log = append(log, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+      logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
 
+    }
+
+    // Fit data
+    var initialParams []float64
+    switch sample {
+      case "CS2":
+        initialParams = []float64{50, 2.5, .1} //amp, cen, wid
+      case "UHNA3":
+        initialParams = []float64{1, 9.14, .1} //amp, cen, wid
+      default:
+        initialParams = []float64{1, 5, .1}
+    }
+
+    optimizedParams := make([][]float64, len(cabsData))
+    for _, set := range setsToPlotCABS {
+
+      // Extract data for the current set
+      frequencies := cabsData[set][0]
+      signals := cabsData[set][1]
+      σ := cabsData[set][2]
+
+      // Fit the Lorentzian
+      optimizedParams[set] = FitLorentzian(frequencies, signals, σ, initialParams)
     }
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
       binMHz := 11.
-      log = logBinning(
-        log, binCabsSets, binMHz,
+      logFile = logBinning(
+        logFile, binCabsSets, binMHz,
         )
       cabsData = binCabs(binCabsSets, cabsData, binMHz) // 3. combine above-calculated σ (cabsData[set][2]) with binned σ. (only relevant if binned)
     }
 
-    log = logPlots(
-      log, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
+    logFile = logPlots(
+      logFile, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
       dataRate, order, startFrequency, stopFrequency, step,
-      pumpLaser, probeLaser, probeFilter, stokesFilter, notes,
+      pumpLaser, probeLaser, probeFilter, stokesFilter, notes, optimizedParams,
     )
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, slide,
     )
   }
 
-  writeLog(logpath, log)
+  writeLog(logpath, logFile)
 }
 
 //----------------------------------------------------------------------------//
@@ -380,7 +405,7 @@ func flags() (
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
-  flag.StringVar(&note, "note", "", "note to append log folder name")
+  flag.StringVar(&note, "note", "", "note to append folder name")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.IntVar(&avg, "avg", 0, "number of CSV files to average")
   flag.Parse()
@@ -706,46 +731,46 @@ func logHeader(
   []string,
 ) {
 
-  log := []string{}
+  logFile := []string{}
   if sample != "" {
-    log = append(log, "Sample: " + sample + "\n")
+    logFile = append(logFile, "Sample: " + sample + "\n")
   }
   if note != "" {
-    log = append(log, "Runtime note: " + note + "\n")
+    logFile = append(logFile, "Runtime note: " + note + "\n")
   }
   if slide {
-    log = append(log, "Figures formatted for slide presentation\n")
+    logFile = append(logFile, "Figures formatted for slide presentation\n")
   }
 
-  fmt.Printf(log[0])
+  fmt.Printf(logFile[0])
 
   if coolingExperiment != "" {
-    log = append(log, "\n*Cooling Data: " + coolingExperiment + "*\n")
+    logFile = append(logFile, "\n*Cooling Data: " + coolingExperiment + "*\n")
     fmt.Printf("\n*Cooling Data: " + coolingExperiment + "*\n")
   } else if cabs {
-    log = append(log, "\n*CABS Data*\n")
+    logFile = append(logFile, "\n*CABS Data*\n")
     fmt.Printf("\n*CABS Data*\n")
   }
   if temp {
-    log = append(log, "\n*Temperature-dependent data*\n")
+    logFile = append(logFile, "\n*Temperature-dependent data*\n")
     fmt.Printf("\n*Temperature-dependent data*\n")
   }
   if sample == "LCOF" {
     str := fmt.Sprintf("\n*Liquid-core optical fiber sample*\n")
-    log = append(log, str)
+    logFile = append(logFile, str)
     fmt.Printf(str)
   }
   if lock {
     str := fmt.Sprintf("\n*Data gathered from Lock-in*\n\n")
-    log = append(log, str)
+    logFile = append(logFile, str)
     fmt.Printf(str)
   } else {
     str := fmt.Sprintf("\n*Data gathered from Spectrum Analyzer*\n\n")
-    log = append(log, str)
+    logFile = append(logFile, str)
     fmt.Printf(str)
   }
 
-  return log
+  return logFile
 }
 
 func avgCSVs(
@@ -1332,7 +1357,7 @@ func readCSV(
 }
 
 func logBinning(
-  log []string,
+  logFile []string,
   binCabsSets []int,
   binMHz float64,
 ) (
@@ -1340,49 +1365,54 @@ func logBinning(
 ) {
 
   for _, set := range binCabsSets {
-    log = append(log, fmt.Sprintf("Run %d binned to %.3f MHz\n", set+1, binMHz))
+    logFile = append(logFile, fmt.Sprintf("Run %d binned to %.3f MHz\n", set+1, binMHz))
   }
 
-  return log
+  return logFile
 }
 
 func logPlots(
-  log []string,
+  logFile []string,
   setsToPlotCABS, numAvgs []int,
   date, label, run, startTime, endTime []string,
   pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
   bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
   pumpLaser, probeLaser, probeFilter, stokesFilter, notes []string,
+  optimizedParams [][]float64,
 ) (
   []string,
 ) {
 
   for _, set := range setsToPlotCABS {
-    log = append(log, fmt.Sprintf("\nRun %s\n", run[set]))
-    log = append(log, fmt.Sprintf("\tData taken: %s\n", date[set]))
-    log = append(log, fmt.Sprintf("\tLabel: %s\n", label[set]))
-    log = append(log, fmt.Sprintf("\tStart Time (h:m:s): %s\n", startTime[set]))
-    log = append(log, fmt.Sprintf("\tEnd Time(h:m:s): %s\n", endTime[set]))
-    log = append(log, fmt.Sprintf("\tPump Laser: %s nm\n", pumpLaser[set]))
-    log = append(log, fmt.Sprintf("\tProbe Laser: %s nm\n", probeLaser[set]))
-    log = append(log, fmt.Sprintf("\tStokes Filter: %s nm\n", stokesFilter[set]))
-    log = append(log, fmt.Sprintf("\tProbe Filter: %s nm\n", probeFilter[set]))
-    log = append(log, fmt.Sprintf("\tPump Power: %.3f mW\n", pumpPowers[set]))
-    log = append(log, fmt.Sprintf("\tStokes Power: %.3f mW\n", stokesPowers[set]))
-    log = append(log, fmt.Sprintf("\tProbe Power: %.3f mW\n", probePowers[set]))
-    log = append(log, fmt.Sprintf("\tLock-in Range: %.2f\n", lockinRange[set]))
-    log = append(log, fmt.Sprintf("\tDwell Time: %.9f s\n", dwell[set]))
-    log = append(log, fmt.Sprintf("\tLock-in Bandwidth: %.2f Hz\n", bandwidth[set]))
-    log = append(log, fmt.Sprintf("\tLock-in Bandwidth Order: %.0f\n", order[set]))
-    log = append(log, fmt.Sprintf("\tData Sampling Rate: %.2f Sa/s\n", dataRate[set]))
-    log = append(log, fmt.Sprintf("\tStart Frequency: %.2f Hz\n", startFrequency[set]))
-    log = append(log, fmt.Sprintf("\tStop Frequency: %.2f Hz\n", stopFrequency[set]))
-    log = append(log, fmt.Sprintf("\tStep Size: %.2f Hz\n", step[set]))
-    log = append(log, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
-    log = append(log, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
+    logFile = append(logFile, fmt.Sprintf("\nRun %s\n", run[set]))
+    logFile = append(logFile, fmt.Sprintf("\tData taken: %s\n", date[set]))
+    logFile = append(logFile, fmt.Sprintf("\tLabel: %s\n", label[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStart Time (h:m:s): %s\n", startTime[set]))
+    logFile = append(logFile, fmt.Sprintf("\tEnd Time(h:m:s): %s\n", endTime[set]))
+    logFile = append(logFile, fmt.Sprintf("\tPump Laser: %s nm\n", pumpLaser[set]))
+    logFile = append(logFile, fmt.Sprintf("\tProbe Laser: %s nm\n", probeLaser[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStokes Filter: %s nm\n", stokesFilter[set]))
+    logFile = append(logFile, fmt.Sprintf("\tProbe Filter: %s nm\n", probeFilter[set]))
+    logFile = append(logFile, fmt.Sprintf("\tPump Power: %.3f mW\n", pumpPowers[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStokes Power: %.3f mW\n", stokesPowers[set]))
+    logFile = append(logFile, fmt.Sprintf("\tProbe Power: %.3f mW\n", probePowers[set]))
+    logFile = append(logFile, fmt.Sprintf("\tLock-in Range: %.2f\n", lockinRange[set]))
+    logFile = append(logFile, fmt.Sprintf("\tDwell Time: %.9f s\n", dwell[set]))
+    logFile = append(logFile, fmt.Sprintf("\tLock-in Bandwidth: %.2f Hz\n", bandwidth[set]))
+    logFile = append(logFile, fmt.Sprintf("\tLock-in Bandwidth Order: %.0f\n", order[set]))
+    logFile = append(logFile, fmt.Sprintf("\tData Sampling Rate: %.2f Sa/s\n", dataRate[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStart Frequency: %.2f Hz\n", startFrequency[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStop Frequency: %.2f Hz\n", stopFrequency[set]))
+    logFile = append(logFile, fmt.Sprintf("\tStep Size: %.2f Hz\n", step[set]))
+    logFile = append(logFile, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
+    logFile = append(logFile, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
+    logFile = append(logFile, fmt.Sprintf("\tFit Parameters:\n"))
+    logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
+    logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
+    logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n\n", optimizedParams[set][2]))
   }
 
-  return log
+  return logFile
 }
 
 func getAllLabels(
@@ -2689,6 +2719,75 @@ func normalizeByPowers(
   return cabsData
 }
 
+func FitLorentzian(
+  frequencies, signals, uncertainties, initialParams []float64,
+) (
+  []float64,
+) {
+
+  // Define the residual function
+  resFunc := func(dst, params []float64) {
+      r := residuals(params, frequencies, signals, uncertainties)
+      for i := range r {
+          dst[i] = r[i]
+      }
+  }
+
+  // Define NumJac instance
+  nj := &lm.NumJac{Func: resFunc}
+
+  // Problem definition
+  problem := lm.LMProblem{
+      Dim:        3,
+      Size:       len(frequencies),
+      Func:       resFunc,
+      Jac:        nj.Jac, // Use the numerical Jacobian
+      InitParams: initialParams,
+      Tau:        1e-6,
+      Eps1:       1e-8,
+      Eps2:       1e-8,
+      // ... (other fields if needed)
+  }
+
+  settings := &lm.Settings{Iterations: 1000, ObjectiveTol: 1e-16}
+
+  result, err := lm.LM(problem, settings)
+  if err != nil {
+      log.Fatal("optimization failed:", err)
+  }
+
+  return result.X
+}
+
+func Lorentzian(
+  f, A, f0, gamma float64,
+) (
+  float64,
+) {
+    return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2)))
+}
+
+func residuals(
+  params, frequencies, signals, uncertainties []float64,
+) (
+  []float64,
+) {
+
+    A, f0, gamma := params[0], params[1], params[2]
+    r := make([]float64, len(frequencies))
+
+    for i, f := range frequencies {
+        modelValue := Lorentzian(f, A, f0, gamma)
+        if len(uncertainties) > 0 && uncertainties[i] != 0 {
+            r[i] = (signals[i] - modelValue) / uncertainties[i]
+        } else {
+            r[i] = signals[i] - modelValue
+        }
+    }
+
+    return r
+}
+
 func binCabs(
   setsToBin []int,
   cabsData [][][]float64,
@@ -3936,7 +4035,7 @@ func normalizeFit(
 
 func writeLog(
   logpath string,
-  log []string,
+  logFile []string,
 ) {
 
   date := time.Now()
@@ -3965,7 +4064,7 @@ func writeLog(
 
   w := bufio.NewWriter(txt)
   defer w.Flush()
-  for _, line := range log {
+  for _, line := range logFile {
     if _, err := w.WriteString(line); err != nil {
       fmt.Println(err)
       os.Exit(1)
