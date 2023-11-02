@@ -4,7 +4,6 @@ import (
   "image/color"
   "github.com/Arafatk/glot"
   "github.com/maorshutman/lm"
-  //"./LMA"
   "encoding/csv"
   "bufio"
   "fmt"
@@ -318,7 +317,7 @@ func main() {
 
     //setsToPlotCABS := []int{}
 
-    setsToPlotCABS := rangeInt(0, 75)
+    setsToPlotCABS := rangeInt(0, 1)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -337,7 +336,7 @@ func main() {
 
     }
 
-    // Fit data
+    // Fit data / Sinc
     var initialParams []float64
     switch sample {
       case "CS2":
@@ -349,13 +348,32 @@ func main() {
     }
 
     optimizedParams := make([][]float64, len(cabsData))
-    for _, set := range setsToPlotCABS {
+    phaseMatchPeaks := make([]float64, len(setsToPlotCABS))
+    pumpProbeSep := make([]float64, len(setsToPlotCABS))
 
+    for _, set := range setsToPlotCABS {
       optimizedParams[set] = FitLorentzian(
         // freq, sig, σ, guess
         cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
       )
+
+      phaseMatchPeaks[set] = optimizedParams[set][0]
+      probeValue, err := strconv.ParseFloat(probeLaser[set], 64)
+      if err != nil {
+        // handle error, maybe log it and/or return
+        log.Fatal("Failed to parse probeLaser:", err)
+      }
+
+      pumpValue, err := strconv.ParseFloat(pumpLaser[set], 64)
+      if err != nil {
+        // handle error, maybe log it and/or return
+        log.Fatal("Failed to parse pumpLaser:", err)
+      }
+
+      pumpProbeSep[set] = (probeValue - pumpValue) / .008
     }
+
+    // plot(x: pumpProbeSep, y: phaseMatchPeaks)
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
