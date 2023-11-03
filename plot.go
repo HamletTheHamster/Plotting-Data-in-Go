@@ -24,7 +24,7 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sample, coolingExperiment, note, length, csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
 
@@ -317,7 +317,7 @@ func main() {
 
     //setsToPlotCABS := []int{}
 
-    setsToPlotCABS := rangeInt(0, 1)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -352,6 +352,7 @@ func main() {
     pumpProbeSep := make([]float64, len(setsToPlotCABS))
 
     for _, set := range setsToPlotCABS {
+
       optimizedParams[set] = FitLorentzian(
         // freq, sig, σ, guess
         cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
@@ -373,7 +374,12 @@ func main() {
       pumpProbeSep[set] = (probeValue - pumpValue) / .008
     }
 
-    // plot(x: pumpProbeSep, y: phaseMatchPeaks)
+    if sinc {
+
+      plotSinc(
+        setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label, sample, logpath, length,
+      )
+    }
 
     binCabsSets := []int{}
     if len(binCabsSets) > 0 {
@@ -387,7 +393,7 @@ func main() {
     logFile = logPlots(
       logFile, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
       pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
-      dataRate, order, startFrequency, stopFrequency, step,
+      dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep,
       pumpLaser, probeLaser, probeFilter, stokesFilter, notes, optimizedParams,
     )
     plotCABS(
@@ -401,10 +407,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, string, string, string, float64, int,
+  bool, bool, bool, bool, bool, string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide bool
+  var cabs, lock, temp, slide, sinc bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -413,6 +419,7 @@ func flags() (
   flag.BoolVar(&lock, "lockin", false, "lock-in data")
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
+  flag.BoolVar(&sinc, "sinc", false, "plot sinc^2 function (phase-matching data)")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -430,7 +437,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sample, coolingExperiment, note, length, avg
+  return cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length, avg
 }
 
 func logpath(
@@ -1386,7 +1393,7 @@ func logPlots(
   setsToPlotCABS, numAvgs []int,
   date, label, run, startTime, endTime []string,
   pumpPowers, stokesPowers, probePowers, lockinRange, dwell []float64,
-  bandwidth, dataRate, order, startFrequency, stopFrequency, step []float64,
+  bandwidth, dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep []float64,
   pumpLaser, probeLaser, probeFilter, stokesFilter, notes []string,
   optimizedParams [][]float64,
 ) (
@@ -1401,6 +1408,7 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\tEnd Time(h:m:s): %s\n", endTime[set]))
     logFile = append(logFile, fmt.Sprintf("\tPump Laser: %s nm\n", pumpLaser[set]))
     logFile = append(logFile, fmt.Sprintf("\tProbe Laser: %s nm\n", probeLaser[set]))
+    logFile = append(logFile, fmt.Sprintf("\tPump-Probe Separation: %.2f GHz\n", pumpProbeSep[set]))
     logFile = append(logFile, fmt.Sprintf("\tStokes Filter: %s nm\n", stokesFilter[set]))
     logFile = append(logFile, fmt.Sprintf("\tProbe Filter: %s nm\n", probeFilter[set]))
     logFile = append(logFile, fmt.Sprintf("\tPump Power: %.3f mW\n", pumpPowers[set]))
@@ -2362,6 +2370,55 @@ func goPlotasFits(
   }
 
   savePlot(p, "Anti-Stokes w Fits", logpath)
+}
+
+func plotSinc(
+  sets []int,
+  phaseMatchData [][]float64,
+  label []string,
+  sample, logpath string,
+  length float64,
+) {
+
+  pts := buildData(phaseMatchData)
+
+  // Create a new plot
+	p := plot.New()
+
+  var l string
+
+  switch length {
+  case 0.0:
+    l = ""
+  case 0.001:
+    l = "1 mm"
+  case 0.01:
+    l = "1 cm"
+  case 0.004:
+    l = "4 mm"
+  case 0.0000005:
+    l = "500 nm"
+  case 0.00001:
+    l = "10 μm"
+  default:
+    l = strconv.FormatFloat(length, 'f', 1, 64)
+  }
+
+	p.Title.Text = l + " " + sample + " Phase-Matching Bandwidth"
+	p.X.Label.Text = "Pump-Probe Separation (GHz)"
+	p.Y.Label.Text = "Peak Spectral Density"
+
+	// Add the first series to the plot
+	scatter, err := plotter.NewScatter(pts)
+	if err != nil {
+		log.Fatalf("Could not create line for the first series: %v", err)
+	}
+	//p.GlyphStyle.Color = plotutil.Color(0)
+  //p.GlyphStyle.Radius = vg.Points(5) //3
+  //p.Shape = draw.CircleGlyph{}
+	p.Add(scatter)
+
+  savePlot(p, "Phase-Match", logpath)
 }
 
 func bin(
