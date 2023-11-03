@@ -377,7 +377,8 @@ func main() {
     if sinc {
 
       plotSinc(
-        setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label, sample, logpath, length,
+        setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
+        sample, logpath, length, slide,
       )
     }
 
@@ -2378,12 +2379,10 @@ func plotSinc(
   label []string,
   sample, logpath string,
   length float64,
+  slide bool,
 ) {
 
   pts := buildData(phaseMatchData)
-
-  // Create a new plot
-	p := plot.New()
 
   var l string
 
@@ -2404,19 +2403,80 @@ func plotSinc(
     l = strconv.FormatFloat(length, 'f', 1, 64)
   }
 
-	p.Title.Text = l + " " + sample + " Phase-Matching Bandwidth"
-	p.X.Label.Text = "Pump-Probe Separation (GHz)"
-	p.Y.Label.Text = "Peak Spectral Density"
+	title := l + " " + sample + " Phase-Matching Bandwidth"
+	xlabel := "Pump-Probe Separation (GHz)"
+	ylabel := "Peak Spectral Density"
+  legend := ""
 
-	// Add the first series to the plot
+  // Auto Axes
+  xmin, xmax, ymin, ymax := 0., 0., 0., 0.
+  for i, v := range phaseMatchData[0] {
+    if v > xmax {
+      xmax = v
+    }
+    if phaseMatchData[1][i] > ymax {
+      ymax = phaseMatchData[1][i]
+    }
+  }
+
+  xrange := []float64{xmin, xmax}
+  yrange := []float64{ymin, ymax}
+
+  xtick := 0.
+  displayDigits := 2
+  if (xmax - xmin)/8 > 5 {
+    xtick = 5
+  } else if (xmax - xmin)/8 > 2.5 {
+    xtick = 2.5
+  } else if (xmax - xmin)/8 > 1 {
+    xtick = 1
+  } else if (xmax - xmin)/8 > 0.5 {
+    xtick = 0.5
+  }
+  firstTick := 0.
+  for m := float64(int(xmin)); m <= xmin; m += xtick {
+    firstTick = m
+  }
+  xticks := []float64{}
+  xtickLabels := []string{}
+  for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
+    xticks = append(xticks, firstTick + xtick*i)
+    if int(i)%2 != 0 {
+      xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
+    } else {
+      xtickLabels = append(xtickLabels, "")
+    }
+  }
+
+  ytick := ((ymax - ymin)/8)
+  yticks := []float64{}
+  ytickLabels := []string{}
+  for i := 0.; i < 11; i++ {
+    yticks = append(yticks, ytick*i + ymin)
+    if int(i)%2 != 0 {
+      ytickLabels = append(ytickLabels, strconv.FormatFloat(ytick*i + ymin, 'f', 2, 64))
+    } else {
+      ytickLabels = append(ytickLabels, "")
+    }
+  }
+  yticks = append(yticks, ymax)
+  ytickLabels = append(ytickLabels, "")
+
+  p, t, r := prepPlot(
+    title, xlabel, ylabel, legend,
+    xrange, yrange, xticks, yticks,
+    xtickLabels, ytickLabels,
+    slide,
+  )
+
 	scatter, err := plotter.NewScatter(pts)
 	if err != nil {
 		log.Fatalf("Could not create line for the first series: %v", err)
 	}
-	//p.GlyphStyle.Color = plotutil.Color(0)
-  //p.GlyphStyle.Radius = vg.Points(5) //3
-  //p.Shape = draw.CircleGlyph{}
-	p.Add(scatter)
+	scatter.GlyphStyle.Color = palette(0, false, "")
+  scatter.GlyphStyle.Radius = vg.Points(5) //3
+  scatter.Shape = draw.CircleGlyph{}
+	p.Add(scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
