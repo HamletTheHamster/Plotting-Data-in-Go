@@ -317,7 +317,7 @@ func main() {
 
     //setsToPlotCABS := []int{}
 
-    setsToPlotCABS := rangeInt(0, 75)
+    setsToPlotCABS := rangeInt(0, 30)
 
     normalized := []string{"Powers"}
     cabsData, sigUnit := getCABSData(
@@ -342,7 +342,7 @@ func main() {
       case "CS2":
         initialParams = []float64{50, 2.5, .1} //amp, cen, wid
       case "UHNA3":
-        initialParams = []float64{1, 9.14, .1} //amp, cen, wid
+        initialParams = []float64{10, 9.14, .1} //amp, cen, wid
       default:
         initialParams = []float64{1, 5, .1}
     }
