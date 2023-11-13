@@ -315,11 +315,11 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{}
+    setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(0, 30)
+    //setsToPlotCABS := rangeInt(0, 30)
 
-    normalized := []string{"Powers"}
+    normalized := []string{"Powers"} // "Powers"
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
@@ -340,11 +340,11 @@ func main() {
     var initialParams []float64
     switch sample {
       case "CS2":
-        initialParams = []float64{50, 2.5, .1} //amp, cen, wid
+        initialParams = []float64{150, 2.5, .08, 30} //amp, cen, wid, C
       case "UHNA3":
-        initialParams = []float64{10, 9.14, .1} //amp, cen, wid
+        initialParams = []float64{10, 9.14, .1, 0} //amp, cen, wid, C
       default:
-        initialParams = []float64{1, 5, .1}
+        initialParams = []float64{1, 5, .1, 0}
     }
 
     optimizedParams := make([][]float64, len(cabsData))
@@ -2865,7 +2865,7 @@ func FitLorentzian(
 
   // Problem definition
   problem := lm.LMProblem{
-      Dim:        3,
+      Dim:        4,
       Size:       len(frequencies),
       Func:       resFunc,
       Jac:        nj.Jac, // Use the numerical Jacobian
@@ -2886,11 +2886,11 @@ func FitLorentzian(
 }
 
 func Lorentzian(
-  f, A, f0, gamma float64,
+  f, A, f0, gamma, C float64,
 ) (
   float64,
 ) {
-    return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2)))
+    return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2))) + C
 }
 
 func residuals(
@@ -2899,11 +2899,11 @@ func residuals(
   []float64,
 ) {
 
-    A, f0, gamma := params[0], params[1], params[2]
+    A, f0, gamma, C := params[0], params[1], params[2], params[3]
     r := make([]float64, len(frequencies))
 
     for i, f := range frequencies {
-        modelValue := Lorentzian(f, A, f0, gamma)
+        modelValue := Lorentzian(f, A, f0, gamma, C)
         if len(uncertainties) > 0 && uncertainties[i] != 0 {
             r[i] = (signals[i] - modelValue) / uncertainties[i]
         } else {
