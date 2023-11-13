@@ -1,0 +1,68 @@
+Sample: CS2
+Runtime note: normalize units
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Powers*
+
+Run 1
+	Data taken: 23-11-13
+	Label: 11.25 GHz P-Pr
+	Start Time (h:m:s): 12:48:35
+	End Time(h:m:s): 12:56:23
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.898 nm
+	Pump-Probe Separation: 11.25 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.934 nm
+	Pump Power: 0.070 mW
+	Stokes Power: 0.131 mW
+	Probe Power: 0.050 mW
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 5004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: nope
+
+	Fit Parameters:
+		Amp: 113.4827555465253
+		Cen: -0.22044470482542658
+		Wid: 0.008779521165118258
+
+
+Run 2
+	Data taken: 23-11-13
+	Label: 1MHz 1s dwell
+	Start Time (h:m:s): 13:38:25
+	End Time(h:m:s): 14:17:47
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.898 nm
+	Pump-Probe Separation: 11.25 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.934 nm
+	Pump Power: 0.070 mW
+	Stokes Power: 0.132 mW
+	Probe Power: 0.049 mW
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 1004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: nope
+
+	Fit Parameters:
+		Amp: 99.36613558578412
+		Cen: -19.645739328418678
+		Wid: 16.306186622082773
+

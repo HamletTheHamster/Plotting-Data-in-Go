@@ -315,11 +315,11 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{0,1}
 
     //setsToPlotCABS := rangeInt(0, 30)
 
-    normalized := []string{"Powers"} // "Powers"
+    normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
@@ -1428,7 +1428,8 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\tFit Parameters:\n"))
     logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
-    logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n\n", optimizedParams[set][2]))
+    logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
+    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][3]))
   }
 
   return logFile
@@ -2779,7 +2780,7 @@ func σCABS(
       }
 
       // only scale to appropriate unit if not being normalized later
-      if len(normalized) > 0 {
+      if !(len(normalized) > 0) {
         for i := range stdDev {
           switch sigUnit {
           case "mV":
