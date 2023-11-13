@@ -315,9 +315,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1}
+    //setsToPlotCABS := []int{0}
 
-    //setsToPlotCABS := rangeInt(0, 30)
+    setsToPlotCABS := rangeInt(0, 15)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -2891,7 +2891,8 @@ func Lorentzian(
 ) (
   float64,
 ) {
-    return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2))) + C
+    return .25 * A * math.Pow(gamma, 2) / (math.Pow(f - f0, 2) + (.25 * math.Pow(gamma, 2))) + C
+    //return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2))) + C
 }
 
 func residuals(
