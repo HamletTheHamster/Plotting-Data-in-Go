@@ -315,9 +315,9 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(0, 15)
+    //setsToPlotCABS := rangeInt(0, 15)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -348,8 +348,8 @@ func main() {
     }
 
     optimizedParams := make([][]float64, len(cabsData))
-    phaseMatchPeaks := make([]float64, len(setsToPlotCABS))
-    pumpProbeSep := make([]float64, len(setsToPlotCABS))
+    phaseMatchPeaks := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
+    pumpProbeSep := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
 
     for _, set := range setsToPlotCABS {
 
@@ -1535,6 +1535,8 @@ func plotCABS(
     l = "4 mm"
   case 0.0000005:
     l = "500 nm"
+  case 0.0001:
+    l = "100 μm"
   case 0.00001:
     l = "10 μm"
   default:

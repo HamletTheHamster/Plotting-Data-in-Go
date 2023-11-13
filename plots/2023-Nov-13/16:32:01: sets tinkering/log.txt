@@ -1,0 +1,38 @@
+Sample: CS2
+Runtime note: sets tinkering
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 23-11-13
+	Label: 100 um CS2
+	Start Time (h:m:s): 15:26:41
+	End Time(h:m:s): 16:06:04
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.898 nm
+	Pump-Probe Separation: 11.25 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.934 nm
+	Pump Power: 70.000 mW
+	Stokes Power: 133.200 mW
+	Probe Power: 49.870 mW
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 1004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: yes
+
+	Fit Parameters:
+		Amp: 2.3784663359610025
+		Cen: 2.533928378294122
+		Wid: 0.06524113537117682
+		C:   10.385303662005585
+
