@@ -1123,7 +1123,7 @@ func getCABSData(
           cabsData = append(cabsData, cabsDataPreUnit[set])
         }
       } else if largestSig > 1e-6 {
-        sigUnit = "uV"
+        sigUnit = "μV"
         for set := range cabsDataPreUnit {
           for i, v := range cabsDataPreUnit[set][1] {
             cabsDataPreUnit[set][1][i] = v*1e6

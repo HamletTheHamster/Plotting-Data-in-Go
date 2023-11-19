@@ -1,0 +1,38 @@
+Sample: CS2
+Runtime note: 100um CS2 true measurement
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 23-11-18
+	Label: probe on empty cell bkg
+	Start Time (h:m:s): 14:03:31
+	End Time(h:m:s): 19:31:27
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.898 nm
+	Pump-Probe Separation: 11.25 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.934 nm
+	Pump Power: 80.000 mW
+	Stokes Power: 170.700 mW
+	Probe Power: 63.060 mW
+	Lock-in Range: 0.04
+	Dwell Time: 5.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 1004560.00 Hz
+	Number of Averages: 10
+	Data Collection Note: yes! true measurement! probe on with empty cell background
+
+	Fit Parameters:
+		Amp: 37.08446467376503
+		Cen: 2.5597989581131166
+		Wid: -0.2809038203013165
+		C:   -21.921070859447802
+
