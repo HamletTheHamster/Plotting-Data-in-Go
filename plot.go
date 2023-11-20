@@ -340,7 +340,7 @@ func main() {
     var initialParams []float64
     switch sample {
       case "CS2":
-        initialParams = []float64{150, 2.5, .08, 30} //amp, cen, wid, C
+        initialParams = []float64{25, 2.5, .08, 0} //amp, cen, wid, C
       case "UHNA3":
         initialParams = []float64{10, 9.14, .1, 0} //amp, cen, wid, C
       default:
@@ -1580,28 +1580,30 @@ func plotCABS(
   xrange := []float64{xmin, xmax}
   xtick := 0.
   displayDigits := 2
-  if (xmax - xmin)/8 > 0.25 {
-    xtick = 0.5
-    displayDigits = 1
-  } else if (xmax - xmin)/8 > 0.1 {
-    xtick = 0.25
-  } else if (xmax - xmin)/8 > 0.075 {
-    xtick = 0.075
-  } else if (xmax - xmin)/8 > 0.05 {
-    xtick = 0.05
-  } else if (xmax - xmin/8) > 0.025 {
-    xtick = 0.025
-  } else if (xmax - xmin)/8 > 0.01 {
-    xtick = 0.02
-  } else if (xmax - xmin)/8 > 0.0075 {
-    xtick = 0.0075
-  } else if (xmax - xmin)/8 > 0.005 {
-    xtick = 0.005
-  } else if (xmax - xmin)/8 > 0.0025 {
-    xtick = 0.0025
-  } else if (xmax - xmin)/8 > 0.001 {
-    xtick = 0.001
+  switch {
+    case (xmax - xmin)/8 > 0.25:
+      xtick = 0.5
+      displayDigits = 1
+    case (xmax - xmin)/8 > 0.1:
+      xtick = 0.25
+    case (xmax - xmin)/8 > 0.075:
+      xtick = 0.075
+    case (xmax - xmin)/8 > 0.05:
+      xtick = 0.05
+    case (xmax - xmin)/8 > 0.025:
+      xtick = 0.025
+    case (xmax - xmin)/8 > 0.01:
+      xtick = 0.02
+    case (xmax - xmin)/8 > 0.0075:
+      xtick = 0.0075
+    case (xmax - xmin)/8 > 0.005:
+      xtick = 0.005
+    case (xmax - xmin)/8 > 0.0025:
+      xtick = 0.0025
+    case (xmax - xmin)/8 > 0.001:
+      xtick = 0.001
   }
+
   firstTick := 0.
   for m := float64(int(xmin)); m <= xmin; m += xtick {
     firstTick = m
@@ -2787,12 +2789,14 @@ func σCABS(
           switch sigUnit {
           case "mV":
             stdDev[i] *= 1e3
-          case "uV":
+          case "μV":
             stdDev[i] *= 1e6
           case "nV":
             stdDev[i] *= 1e9
           case "pV":
             stdDev[i] *= 1e12
+          default:
+            fmt.Printf("Warning: Unrecognized signal unit '%s' for standard deviation scaling.\n", sigUnit)
           }
         }
       }
