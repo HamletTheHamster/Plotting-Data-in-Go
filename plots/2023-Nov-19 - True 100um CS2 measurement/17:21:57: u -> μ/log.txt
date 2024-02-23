@@ -1,4 +1,4 @@
-Sample: CS2
+=Sample: CS2
 Runtime note: u -> μ
 
 *CABS Data*
@@ -35,4 +35,3 @@ Run 1
 		Cen: 2.5597989581641185
 		Wid: 0.2809038188093689
 		C:   -21.921070700706203
-

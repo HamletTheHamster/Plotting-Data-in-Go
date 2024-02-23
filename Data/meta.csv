@@ -1,2 +1,2 @@
 Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
-23-11-18,probe on empty cell bkg,1,14:03:31,19:31:27,80.0,170.7,63.06,1/frequency.csv,1/signal.csv,0.04,5,100,1.842000e+09,8,2.350000e+09,2.700000e+09,1.004560e+06,10,1548.808,1548.898,1548.844,1548.934,yes! true measurement! probe on with empty cell background
+24-02-21,1 cm UHNA3,1,13:42:50,13:47:40,52,120,38,1/frequency.csv,1/signal.csv,0.04,0.5,100,1.842000e+09,8,9.000000e+09,9.360000e+09,5.004567e+06,5,1549,1549.08,1549.073,1549.153,success
