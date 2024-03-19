@@ -315,7 +315,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1}
+    setsToPlotCABS := []int{0,1,2,3,4}
 
     //setsToPlotCABS := rangeInt(0, 15)
 
