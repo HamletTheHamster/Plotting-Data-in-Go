@@ -1,0 +1,162 @@
+Sample: UHNA3
+Runtime note: 1mm UHNA3 phase-matching part 2
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-03-19
+	Label: 6 GHz
+	Start Time (h:m:s): 12:46:57
+	End Time(h:m:s): 12:59:07
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.802 nm
+	Pump-Probe Separation: 6.00 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.891 nm
+	Pump Power: 125.100 mW
+	Stokes Power: 57.800 mW
+	Probe Power: 39.060 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 188.29885922188737
+		Cen: 9.174665645815645
+		Wid: -0.12507009358690716
+		C:   0.712087336599497
+
+
+Run 2
+	Data taken: 24-03-19
+	Label: 6.5 GHZ
+	Start Time (h:m:s): 13:15:39
+	End Time(h:m:s): 13:27:50
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.806 nm
+	Pump-Probe Separation: 6.50 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.895 nm
+	Pump Power: 125.700 mW
+	Stokes Power: 57.100 mW
+	Probe Power: 39.250 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 156.63772608715715
+		Cen: 9.177595736409545
+		Wid: 0.11081221739049082
+		C:   7.830958500269086
+
+
+Run 3
+	Data taken: 24-03-19
+	Label: 7 GHz
+	Start Time (h:m:s): 13:43:44
+	End Time(h:m:s): 13:55:57
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.810 nm
+	Pump-Probe Separation: 7.00 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.899 nm
+	Pump Power: 125.200 mW
+	Stokes Power: 56.200 mW
+	Probe Power: 39.870 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 154.60865372778122
+		Cen: 9.170453775469566
+		Wid: 0.15037107154394783
+		C:   8.952870490422306
+
+
+Run 4
+	Data taken: 24-03-19
+	Label: 7.5 GHz
+	Start Time (h:m:s): 14:10:30
+	End Time(h:m:s): 14:22:44
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.814 nm
+	Pump-Probe Separation: 7.50 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.903 nm
+	Pump Power: 235.200 mW
+	Stokes Power: 54.600 mW
+	Probe Power: 39.370 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 185.7024590956453
+		Cen: 9.169927744645948
+		Wid: -0.12054458299166812
+		C:   -10.086873893206025
+
+
+Run 5
+	Data taken: 24-03-19
+	Label: 8 GHz
+	Start Time (h:m:s): 14:37:13
+	End Time(h:m:s): 14:49:27
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.818 nm
+	Pump-Probe Separation: 8.00 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.907 nm
+	Pump Power: 124.500 mW
+	Stokes Power: 53.200 mW
+	Probe Power: 39.390 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 199.39359272495096
+		Cen: 9.158807795821739
+		Wid: 0.17284556944870288
+		C:   -28.029604724027873
+
