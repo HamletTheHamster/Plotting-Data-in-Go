@@ -315,11 +315,11 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1,2,3,4}
+    setsToPlotCABS := []int{0,1}
 
     //setsToPlotCABS := rangeInt(0, 15)
 
-    normalized := []string{} // "Powers"
+    normalized := []string{"Powers"} // "Powers"
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
