@@ -1,0 +1,39 @@
+Sample: UHNA3
+Runtime note: fix legend normalized by powers
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Powers*
+
+Run 1
+	Data taken: 24-04-08
+	Label: 1cm UHNA3
+	Start Time (h:m:s): 15:21:42
+	End Time(h:m:s): 15:26:33
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.08 nm
+	Pump-Probe Separation: 10.00 GHz
+	Stokes Filter: 1549.073 nm
+	Probe Filter: 1549.165 nm
+	Pump Power: 0.061 mW
+	Stokes Power: 0.042 mW
+	Probe Power: 0.140 mW
+	Lock-in Range: 1.50
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: nearly 6 mV!!! (vs ~1.1 mV before)
+
+	Fit Parameters:
+		Amp: 13.786585165661984
+		Cen: 9.144936241923501
+		Wid: 0.08648179667076687
+		C:   -0.03340708743053797
+
