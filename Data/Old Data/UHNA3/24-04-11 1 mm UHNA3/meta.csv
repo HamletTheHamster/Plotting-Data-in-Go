@@ -1,0 +1,2 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
+24-04-11,1 mm UHNA3,1,19:40:39,19:45:33,60.6,142.5,35.66,1/frequency.csv,1/signal.csv,1.5,0.5,100,1.842000e+09,8,9.000000e+09,9.360000e+09,5.004567e+06,5,1548.808,1548.898,1548.881,1548.971,probe off bg

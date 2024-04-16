@@ -319,7 +319,7 @@ func main() {
 
     //setsToPlotCABS := rangeInt(0, 15)
 
-    normalized := []string{"Powers"} // "Powers"
+    normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
@@ -379,6 +379,7 @@ func main() {
       plotSinc(
         setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
         sample, logpath, length, slide,
+        pumpPowers, stokesPowers, probePowers, pumpLaser,
       )
     }
 
@@ -2385,6 +2386,8 @@ func plotSinc(
   sample, logpath string,
   length float64,
   slide bool,
+  pumpPowers, stokesPowers, probePowers []float64,
+  pumpLaser []string,
 ) {
 
   pts := buildData(phaseMatchData)
@@ -2482,6 +2485,32 @@ func plotSinc(
   scatter.GlyphStyle.Radius = vg.Points(5) //3
   scatter.Shape = draw.CircleGlyph{}
 	p.Add(scatter, t, r)
+
+  /* Plot theoretical sinc^2
+  if pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64); err != nil {
+    fmt.Println("Error converting string to float: ", err)
+  }
+
+  G0 := 0.1 // Example value, replace with the appropriate value.
+  omega := 2 * math.Pi * c / pumpWavelength
+  theoreticalPts := make(plotter.XYs, len(phaseMatchData[0]))
+
+  for i, deltaFreq := range phaseMatchData[0] {
+    deltaK := 2 * math.Pi * deltaFreq * 1e9 / c // Convert GHz to Hz and calculate Delta k
+    GB := G0 * math.Pow(omegaB/2, 2) / (math.Pow(omegaB - omega, 2) + math.Pow(omegaB/2, 2))
+    sincTerm := math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
+    PSig := 0.25 * math.Pow(GB * length, 2) * pumpPowers[0] * stokesPowers[0] * probePowers[0] * sincTerm
+
+    theoreticalPts[i].X = deltaFreq
+    theoreticalPts[i].Y = PSig
+  }
+
+  line, err := plotter.NewLine(theoreticalPts)
+  if err != nil {
+    log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
+  }
+  line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red line for theoretical plot
+  p.Add(line)*/
 
   savePlot(p, "Phase-Match", logpath)
 }
