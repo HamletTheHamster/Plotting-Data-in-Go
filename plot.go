@@ -315,9 +315,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    //setsToPlotCABS := []int{0}
 
-    //setsToPlotCABS := rangeInt(0, 15)
+    setsToPlotCABS := rangeInt(0, 74)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -379,7 +379,7 @@ func main() {
       plotSinc(
         setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
         sample, logpath, length, slide,
-        pumpPowers, stokesPowers, probePowers, pumpLaser,
+        pumpPowers, stokesPowers, probePowers, pumpLaser, probeLaser,
       )
     }
 
@@ -2387,7 +2387,7 @@ func plotSinc(
   length float64,
   slide bool,
   pumpPowers, stokesPowers, probePowers []float64,
-  pumpLaser []string,
+  pumpLaser, probeLaser []string,
 ) {
 
   pts := buildData(phaseMatchData)
@@ -2486,23 +2486,60 @@ func plotSinc(
   scatter.Shape = draw.CircleGlyph{}
 	p.Add(scatter, t, r)
 
-  /* Plot theoretical sinc^2
-  if pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64); err != nil {
-    fmt.Println("Error converting string to float: ", err)
+  // Plot theoretical sinc^2
+  //omegaB := 9.15e9 // in Hz
+  //c := 299792458. // speed of light in vacuum, in m/s
+  GB := 0.6 // 0.6 W^-1 m^-1 UHNA3 r=0.9um
+  //length += 0.017
+
+  var conv float64
+
+  pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
+  if err != nil {
+    fmt.Println("Error converting string pumpWavelength to float:", err)
   }
 
-  G0 := 0.1 // Example value, replace with the appropriate value.
-  omega := 2 * math.Pi * c / pumpWavelength
   theoreticalPts := make(plotter.XYs, len(phaseMatchData[0]))
+  probeWavelengths := make([]float64, 0, len(probeLaser))
+  for i, deltaFreq := range phaseMatchData[0] { // P-Pr separation in GHz
+    probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
+    if err != nil {
+      fmt.Println("Error converting string probeWavelength to float:", err)
+    }
+    probeWavelengths = append(probeWavelengths, probeWavelength)
 
-  for i, deltaFreq := range phaseMatchData[0] {
-    deltaK := 2 * math.Pi * deltaFreq * 1e9 / c // Convert GHz to Hz and calculate Delta k
-    GB := G0 * math.Pow(omegaB/2, 2) / (math.Pow(omegaB - omega, 2) + math.Pow(omegaB/2, 2))
+    //2*pi(1/1.549e-6 - 1/1.54908e-6
+    deltaK := 2*math.Pi*(1/(pumpWavelength*1e-9) - 1/(probeWavelength*1e-9))
+
+    //deltaK := 2 * math.Pi * deltaFreq * 1e9 * c // Convert GHz to Hz and calculate Delta k
     sincTerm := math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
-    PSig := 0.25 * math.Pow(GB * length, 2) * pumpPowers[0] * stokesPowers[0] * probePowers[0] * sincTerm
+    PSig := 0.25 * math.Pow(GB * length, 2) * 1e-3*pumpPowers[0] * 1e-3*stokesPowers[0] * 1e-3*probePowers[0] * sincTerm
+
+    if i == 0 {
+      fmt.Printf("pumpWavelength = %f\n", pumpWavelength)
+      fmt.Printf("probeWavelength = %f\n", probeWavelength)
+      fmt.Printf("pumpWavelength*1e-9 = %.12f\n", pumpWavelength*1e-9)
+      fmt.Printf("probeWavelength*1e-9 = %.12f\n", probeWavelength*1e-9)
+      fmt.Printf("1/pumpWavelength*1e-9 = %f\n", 1/(pumpWavelength*1e-9))
+      fmt.Printf("1/probeWavelength*1e-9 = %f\n", 1/(probeWavelength*1e-9))
+      fmt.Printf("deltaK = %f\n", deltaK)
+      fmt.Printf("sincTerm = %f\n", sincTerm)
+      fmt.Printf("PSig = %f nW\n", PSig*1e9)
+      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][0])
+      conv = phaseMatchData[1][0]/(PSig)
+      fmt.Printf("conversion = %f mV/nW\n", conv/1e9)
+    } else if i == 1 {
+      fmt.Printf("PSig = %f nW\n", PSig*1e9)
+      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][1])
+      fmt.Printf("conversion = %f mV/nW\n", phaseMatchData[1][1]/(1e9*PSig))
+    }
+
+    //conv = phaseMatchData[1][i]/PSig
+
+    spectralDensity := PSig*conv
 
     theoreticalPts[i].X = deltaFreq
-    theoreticalPts[i].Y = PSig
+    theoreticalPts[i].Y = spectralDensity
   }
 
   line, err := plotter.NewLine(theoreticalPts)
@@ -2510,7 +2547,7 @@ func plotSinc(
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
   line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red line for theoretical plot
-  p.Add(line)*/
+  p.Add(line, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
