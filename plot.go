@@ -2490,7 +2490,7 @@ func plotSinc(
   //omegaB := 9.15e9 // in Hz
   //c := 299792458. // speed of light in vacuum, in m/s
   GB := 0.6 // 0.6 W^-1 m^-1 UHNA3 r=0.9um
-  length += 0.009
+  //length += 0.009
 
   var conv float64
 
@@ -2522,10 +2522,8 @@ func plotSinc(
     }
     probeWavelengths = append(probeWavelengths, probeWavelength)
 
-    //2*pi(1/1.549e-6 - 1/1.54908e-6
     deltaK := 2*math.Pi*(1/(pumpWavelength*1e-9) - 1/(probeWavelength*1e-9))
 
-    //deltaK := 2 * math.Pi * deltaFreq * 1e9 * c // Convert GHz to Hz and calculate Delta k
     sincTerm := math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
     PSig := 0.25 * math.Pow(GB * length, 2) * 1e-3*pumpPowers[0] * 1e-3*stokesPowers[0] * 1e-3*probePowers[0] * sincTerm
 
