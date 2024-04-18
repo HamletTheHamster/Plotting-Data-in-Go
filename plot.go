@@ -2490,7 +2490,7 @@ func plotSinc(
   //omegaB := 9.15e9 // in Hz
   //c := 299792458. // speed of light in vacuum, in m/s
   GB := 0.6 // 0.6 W^-1 m^-1 UHNA3 r=0.9um
-  //length += 0.017
+  length += 0.009
 
   var conv float64
 
@@ -2499,9 +2499,23 @@ func plotSinc(
     fmt.Println("Error converting string pumpWavelength to float:", err)
   }
 
+  increment := 0.5
+  separations := make([]float64, 74)
+  for i := range separations {
+      separations[i] = float64(i) * increment + 5
+  }
+
+  fmt.Printf("last separation = %f\n", separations[len(separations)-1])
+
   theoreticalPts := make(plotter.XYs, len(phaseMatchData[0]))
   probeWavelengths := make([]float64, 0, len(probeLaser))
-  for i, deltaFreq := range phaseMatchData[0] { // P-Pr separation in GHz
+  wavelengthIncrement := 0.004
+  wavelengthSeparations := make([]float64, 10)
+  for i := range wavelengthSeparations {
+    probeWavelengths = append(probeWavelengths, 1548.754 + float64(i)*wavelengthIncrement)
+  }
+
+  for i, deltaFreq := range separations { // P-Pr separation in GHz
     probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
     if err != nil {
       fmt.Println("Error converting string probeWavelength to float:", err)
@@ -2516,7 +2530,7 @@ func plotSinc(
     PSig := 0.25 * math.Pow(GB * length, 2) * 1e-3*pumpPowers[0] * 1e-3*stokesPowers[0] * 1e-3*probePowers[0] * sincTerm
 
     if i == 0 {
-      fmt.Printf("pumpWavelength = %f\n", pumpWavelength)
+      /*fmt.Printf("pumpWavelength = %f\n", pumpWavelength)
       fmt.Printf("probeWavelength = %f\n", probeWavelength)
       fmt.Printf("pumpWavelength*1e-9 = %.12f\n", pumpWavelength*1e-9)
       fmt.Printf("probeWavelength*1e-9 = %.12f\n", probeWavelength*1e-9)
@@ -2525,22 +2539,24 @@ func plotSinc(
       fmt.Printf("deltaK = %f\n", deltaK)
       fmt.Printf("sincTerm = %f\n", sincTerm)
       fmt.Printf("PSig = %f nW\n", PSig*1e9)
-      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][0])
-      conv = phaseMatchData[1][0]/(PSig)
+      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][0])*/
+      //conv = phaseMatchData[1][0]/(PSig)
+      //fmt.Printf("conversion = %f mV/nW\n", conv/1e9)
+    } else if i == 9 {
+      fmt.Printf("phaseMatchData[0][0] = %f mV\n", phaseMatchData[0][0])
+      conv = phaseMatchData[1][9]/(PSig)
       fmt.Printf("conversion = %f mV/nW\n", conv/1e9)
-    } else if i == 1 {
-      fmt.Printf("PSig = %f nW\n", PSig*1e9)
-      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][1])
-      fmt.Printf("conversion = %f mV/nW\n", phaseMatchData[1][1]/(1e9*PSig))
     }
 
     //conv = phaseMatchData[1][i]/PSig
 
-    spectralDensity := PSig*conv
+    spectralDensity := PSig*4.11e9 //+ 0.1
 
     theoreticalPts[i].X = deltaFreq
     theoreticalPts[i].Y = spectralDensity
   }
+
+  fmt.Printf("probeWavelengths = %f\n", probeWavelengths)
 
   line, err := plotter.NewLine(theoreticalPts)
   if err != nil {
