@@ -1,0 +1,39 @@
+Sample: UHNA3
+Runtime note: 1cm UHNA3 new 1W probe amp normalized by powers at meters
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Powers*
+
+Run 1
+	Data taken: 24-04-19
+	Label: 5 GHz P-Pr
+	Start Time (h:m:s): 15:04:21
+	End Time(h:m:s): 15:23:30
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.794 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1548.831 nm
+	Probe Filter: 1548.883 nm
+	Pump Power: 0.081 mW
+	Stokes Power: 0.203 mW
+	Probe Power: 0.286 mW
+	Lock-in Range: 1.50
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 8750000000.00 Hz
+	Stop Frequency: 9600000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: Beautiful - unchecked 50 ohm on lock-in! signal went from ~9mV to ~33mV
+
+	Fit Parameters:
+		Amp: 6.479100637701244
+		Cen: 9.156863714602176
+		Wid: 0.09367923894195708
+		C:   0.12356223746331604
+
