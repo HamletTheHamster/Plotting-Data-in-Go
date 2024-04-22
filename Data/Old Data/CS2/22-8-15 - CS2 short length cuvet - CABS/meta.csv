@@ -1,0 +1,5 @@
+Date,Label,Sets,Pump,Stokes,Probe,Frequency,Signal,Num Avgs,Notes
+,3 GHz CS2,1,99.9,39.41,35.61,1/frequency.csv,1/signal.csv,0,success - low res - expected shape [all notes in OneNote page 8-15-22]
+,3 GHz CS2,2,104.2,40.38,35.57,2/frequency.csv,2/signal.csv,0,Success - high res - inverted
+,3 GHz CS2,3,.154,.154,8,3/frequency.csv,3/signal.csv,0,success - low res again - inverted
+,6 GHz P-Pr,4,105.4,38.94,36.73,5/frequency.csv,5/signal.csv,0,success - high res
