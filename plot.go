@@ -3929,6 +3929,7 @@ func prepPlot(
   p.X.Padding = vg.Points(-12.5) // -12.5
 
   p.Y.Label.Text = ylabel
+  p.Y.Label.TextStyle.Font.Typeface = "liberation"
   p.Y.Label.TextStyle.Font.Variant = "Sans"
   p.Y.LineStyle.Width = vg.Points(1.5)
   p.Y.Min = yrange[0]
