@@ -315,7 +315,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{3}
 
     //setsToPlotCABS := rangeInt(0, 74)
 
@@ -324,80 +324,99 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
 
-    sigmaMultiple := 1.
-    cabsData = σCABS(
-      setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized,
-    )
-
-    if contains(normalized, "Powers") {
-      cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
-      fmt.Println("*Data normalized by " + normalized[0] + "*\n")
-      logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
-
-    }
-
-    // Fit data / Sinc
-    var initialParams []float64
-    switch sample {
-      case "CS2":
-        initialParams = []float64{25, 2.5, .08, 0} //amp, cen, wid, C
-      case "UHNA3":
-        initialParams = []float64{10, 9.14, .1, 0} //amp, cen, wid, C
-      default:
-        initialParams = []float64{1, 5, .1, 0}
-    }
-
-    optimizedParams := make([][]float64, len(cabsData))
-    phaseMatchPeaks := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
-    pumpProbeSep := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
-
-    for _, set := range setsToPlotCABS {
-
-      optimizedParams[set] = FitLorentzian(
-        // freq, sig, σ, guess
-        cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+    if info, err := os.Stat("Data/1/Runs"); err == nil && info.IsDir() {
+      sigmaMultiple := 1.
+      cabsData = σCABS(
+        setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized,
       )
 
-      phaseMatchPeaks[set] = optimizedParams[set][0]
-      probeValue, err := strconv.ParseFloat(probeLaser[set], 64)
-      if err != nil {
-        // handle error, maybe log it and/or return
-        log.Fatal("Failed to parse probeLaser:", err)
+      if contains(normalized, "Powers") {
+        cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
+        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+
       }
 
-      pumpValue, err := strconv.ParseFloat(pumpLaser[set], 64)
-      if err != nil {
-        // handle error, maybe log it and/or return
-        log.Fatal("Failed to parse pumpLaser:", err)
+      // Fit data / Sinc
+      var initialParams []float64
+      switch sample {
+        case "CS2":
+          initialParams = []float64{25, 2.5, .08, 0} //amp, cen, wid, C
+        case "UHNA3":
+          initialParams = []float64{10, 9.14, .1, 0} //amp, cen, wid, C
+        default:
+          initialParams = []float64{1, 5, .1, 0}
       }
 
-      pumpProbeSep[set] = (probeValue - pumpValue) / .008
-    }
+      optimizedParams := make([][]float64, len(cabsData))
+      phaseMatchPeaks := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
+      pumpProbeSep := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
 
-    if sinc {
+      for _, set := range setsToPlotCABS {
 
-      plotSinc(
-        setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
-        sample, logpath, length, slide,
-        pumpPowers, stokesPowers, probePowers, pumpLaser, probeLaser,
-      )
-    }
-
-    binCabsSets := []int{}
-    if len(binCabsSets) > 0 {
-      binMHz := 11.
-      logFile = logBinning(
-        logFile, binCabsSets, binMHz,
+        optimizedParams[set] = FitLorentzian(
+          // freq, sig, σ, guess
+          cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
         )
-      cabsData = binCabs(binCabsSets, cabsData, binMHz) // 3. combine above-calculated σ (cabsData[set][2]) with binned σ. (only relevant if binned)
-    }
 
-    logFile = logPlots(
-      logFile, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
-      pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
-      dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep,
-      pumpLaser, probeLaser, probeFilter, stokesFilter, notes, optimizedParams,
-    )
+        phaseMatchPeaks[set] = optimizedParams[set][0]
+        probeValue, err := strconv.ParseFloat(probeLaser[set], 64)
+        if err != nil {
+          // handle error, maybe log it and/or return
+          log.Fatal("Failed to parse probeLaser:", err)
+        }
+
+        pumpValue, err := strconv.ParseFloat(pumpLaser[set], 64)
+        if err != nil {
+          // handle error, maybe log it and/or return
+          log.Fatal("Failed to parse pumpLaser:", err)
+        }
+
+        pumpProbeSep[set] = (probeValue - pumpValue) / .008
+      }
+
+      if sinc {
+
+        plotSinc(
+          setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
+          sample, logpath, length, slide,
+          pumpPowers, stokesPowers, probePowers, pumpLaser, probeLaser,
+        )
+      }
+
+      binCabsSets := []int{}
+      if len(binCabsSets) > 0 {
+        binMHz := 11.
+        logFile = logBinning(
+          logFile, binCabsSets, binMHz,
+          )
+        cabsData = binCabs(binCabsSets, cabsData, binMHz) // 3. combine above-calculated σ (cabsData[set][2]) with binned σ. (only relevant if binned)
+      }
+
+      logFile = logPlots(
+        logFile, setsToPlotCABS, numAvgs, date, label, setNums, startTime, endTime,
+        pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
+        dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep,
+        pumpLaser, probeLaser, probeFilter, stokesFilter, notes, optimizedParams,
+      )
+    } else {
+
+      if contains(normalized, "Powers") {
+        cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
+        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+
+      }
+
+      binCabsSets := []int{3}
+      if len(binCabsSets) > 0 {
+        binMHz := 5.
+        logFile = logBinning(
+          logFile, binCabsSets, binMHz,
+          )
+        cabsData = binCabs(binCabsSets, cabsData, binMHz)
+      }
+    }
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, slide,
     )
@@ -1686,9 +1705,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set, false, "")
+      e.LineStyle.Color = palette(set-2, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set-2, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1716,7 +1735,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, "")
+    l.GlyphStyle.Color = palette(set-2, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -1765,11 +1784,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
       xrange := []float64{2.3, 2.8}
-      yrange := []float64{0, 60}
+      yrange := []float64{-50, 700}
       xtick := []float64{2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{0, 10, 20, 30, 40, 50, 60}
+      ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700}
       xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"0", "", "20", "", "40", "", "60",}
+      ytickLabel := []string{"0", "", "200", "", "400", "", "600", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "glass slide":
@@ -3923,7 +3942,7 @@ func prepPlot(
   }
 
   p.Y.Tick.Marker = plot.ConstantTicks(yticks)
-  p.Y.Padding = vg.Points(-6) // -0.5
+  p.Y.Padding = vg.Points(-0.5) // -6
 
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
