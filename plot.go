@@ -315,7 +315,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{3}
 
     //setsToPlotCABS := rangeInt(0, 74)
 
@@ -408,7 +408,7 @@ func main() {
 
       }
 
-      binCabsSets := []int{0}
+      binCabsSets := []int{3}
       if len(binCabsSets) > 0 {
         binMHz := 11.
         logFile = logBinning(
@@ -1705,9 +1705,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set+1, false, "")
+      e.LineStyle.Color = palette(set-2, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set+1, false, "")
+      plotSet.GlyphStyle.Color = palette(set-2, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1721,7 +1721,7 @@ func plotCABS(
         os.Exit(1)
       }
 
-      plotSet.GlyphStyle.Color = palette(set+1, false, "")
+      plotSet.GlyphStyle.Color = palette(set-2, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1735,7 +1735,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set+1, false, "")
+    l.GlyphStyle.Color = palette(set-2, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -1784,11 +1784,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
       xrange := []float64{2.3, 2.8}
-      yrange := []float64{0, 60}
+      yrange := []float64{-50, 700}
       xtick := []float64{2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
-      ytick := []float64{0, 10, 20, 30, 40, 50, 60}
+      ytick := []float64{0, 100, 200, 300, 400, 500, 600, 700}
       xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"", "10", "", "30", "", "50", ""}
+      ytickLabel := []string{"0", "", "200", "", "400", "", "600", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "glass slide":
@@ -3926,7 +3926,7 @@ func prepPlot(
   }
 
   p.X.Tick.Marker = plot.ConstantTicks(xticks)
-  p.X.Padding = vg.Points(-12.5) // -12.5
+  p.X.Padding = vg.Points(-8) // -12.5
 
   p.Y.Label.Text = ylabel
   p.Y.Label.TextStyle.Font.Typeface = "liberation"
