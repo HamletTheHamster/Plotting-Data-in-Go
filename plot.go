@@ -1686,9 +1686,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set, false, "")
+      e.LineStyle.Color = palette(set-1, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set-1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1716,7 +1716,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, "")
+    l.GlyphStyle.Color = palette(set-1, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -3928,7 +3928,7 @@ func prepPlot(
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-25)
-  p.Legend.YOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(0)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)

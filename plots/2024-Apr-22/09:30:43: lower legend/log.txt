@@ -1,0 +1,38 @@
+Sample: UHNA3
+Runtime note: lower legend
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 24-04-19
+	Label: 5 GHz P-Pr
+	Start Time (h:m:s): 22:58:04
+	End Time(h:m:s): 23:17:14
+	Pump Laser: 1548.754 nm
+	Probe Laser: 1548.794 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1548.883 nm
+	Probe Filter: 1548.831 nm
+	Pump Power: 98.810 mW
+	Stokes Power: 223.400 mW
+	Probe Power: 348.600 mW
+	Lock-in Range: 1.50
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 30.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 8750000000.00 Hz
+	Stop Frequency: 9600000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters:
+		Amp: 32.411661770129065
+		Cen: 9.152233823531219
+		Wid: 0.0957637986527826
+		C:   0.9233572769968523
+
