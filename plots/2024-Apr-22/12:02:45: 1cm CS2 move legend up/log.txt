@@ -1,5 +1,5 @@
 Sample: CS2
-Runtime note: 1cm CS2 11MHz bin FINAL FOR PUB
+Runtime note: 1cm CS2 move legend up
 Figures formatted for slide presentation
 
 *CABS Data*

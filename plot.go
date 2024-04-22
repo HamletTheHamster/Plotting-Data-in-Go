@@ -1705,9 +1705,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set, false, "")
+      e.LineStyle.Color = palette(set+1, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set+1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1721,7 +1721,7 @@ func plotCABS(
         os.Exit(1)
       }
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set+1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1735,7 +1735,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, "")
+    l.GlyphStyle.Color = palette(set+1, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -1788,7 +1788,7 @@ func axes(
       xtick := []float64{2.3, 2.35, 2.4, 2.45, 2.5, 2.55, 2.6, 2.65, 2.7, 2.75, 2.8}
       ytick := []float64{0, 10, 20, 30, 40, 50, 60}
       xtickLabel := []string{"2.3", "", "2.4", "", "2.5", "", "2.6", "", "2.7", "", "2.8"}
-      ytickLabel := []string{"0", "", "20", "", "40", "", "60"}
+      ytickLabel := []string{"", "10", "", "30", "", "50", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "glass slide":
@@ -3926,7 +3926,7 @@ func prepPlot(
   }
 
   p.X.Tick.Marker = plot.ConstantTicks(xticks)
-  p.X.Padding = vg.Points(-8) // -12.5
+  p.X.Padding = vg.Points(-12.5) // -12.5
 
   p.Y.Label.Text = ylabel
   p.Y.Label.TextStyle.Font.Variant = "Sans"
@@ -3947,7 +3947,7 @@ func prepPlot(
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
-  p.Legend.YOffs = vg.Points(0)
+  p.Legend.YOffs = vg.Points(25)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)
