@@ -324,7 +324,7 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
 
-    if info, err := os.Stat("Data/1/Runs"); err == nil && info.IsDir() {
+    if multipleRuns, err := os.Stat("Data/1/Runs"); err == nil && multipleRuns.IsDir() {
       sigmaMultiple := 1.
       cabsData = σCABS(
         setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized,
