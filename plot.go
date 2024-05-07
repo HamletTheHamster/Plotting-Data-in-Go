@@ -315,7 +315,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{3}
+    setsToPlotCABS := []int{0}
 
     //setsToPlotCABS := rangeInt(0, 74)
 
@@ -408,7 +408,7 @@ func main() {
 
       }
 
-      binCabsSets := []int{3}
+      binCabsSets := []int{}
       if len(binCabsSets) > 0 {
         binMHz := 11.
         logFile = logBinning(
@@ -1549,6 +1549,8 @@ func plotCABS(
     l = ""
   case 0.001:
     l = "1 mm"
+  case 0.009:
+    l = "9 mm"
   case 0.01:
     l = "1 cm"
   case 0.004:
@@ -1578,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
+  /* Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }//
+  }*/
 
-  /* Auto Axes
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1672,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
+  ytickLabels = append(ytickLabels, "")//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1705,9 +1707,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set-2, false, "")
+      e.LineStyle.Color = palette(set, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set-2, false, "")
+      plotSet.GlyphStyle.Color = palette(set, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1721,7 +1723,7 @@ func plotCABS(
         os.Exit(1)
       }
 
-      plotSet.GlyphStyle.Color = palette(set-2, false, "")
+      plotSet.GlyphStyle.Color = palette(set, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1735,7 +1737,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set-2, false, "")
+    l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
@@ -1843,6 +1845,15 @@ func axes(
       ytick := []float64{-50, -25, 0, 25, 50}
       xtickLabel := []string{".100", "", ".120", "", ".140"}
       ytickLabel := []string{"-50", "", "0", "", "50"}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "PCF":
+      xrange := []float64{10.5, 11.5}
+      yrange := []float64{0, 15}
+      xtick := []float64{10.5, 10.6, 10.7, 10.8, 10.9, 11, 11.1, 11.2, 11.3, 11.4, 11.5}
+      ytick := []float64{0, 3, 6, 9, 12, 15}
+      xtickLabel := []string{"10.5", "", "10.7", "", "10.9", "", "11.1", "", "11.3", "", "11.5"}
+      ytickLabel := []string{"0", "3", "6", "9", "12", "15"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }

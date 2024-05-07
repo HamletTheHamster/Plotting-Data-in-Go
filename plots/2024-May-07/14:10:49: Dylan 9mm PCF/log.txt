@@ -1,0 +1,38 @@
+Sample: PCF
+Runtime note: Dylan 9mm PCF
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-05-06
+	Label: 9mm PCF
+	Start Time (h:m:s): 19:34:02
+	End Time(h:m:s): 20:52:46
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.042 nm
+	Pump-Probe Separation: 5.25 GHz
+	Stokes Filter: 1549.083 nm
+	Probe Filter: 1549.141 nm
+	Pump Power: 11.660 mW
+	Stokes Power: 41.800 mW
+	Probe Power: 57.000 mW
+	Lock-in Range: 0.20
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10100000000.00 Hz
+	Stop Frequency: 10800000000.00 Hz
+	Step Size: 3004567.00 Hz
+	Number of Averages: 15
+	Data Collection Note: powers in mW
+
+	Fit Parameters:
+		Amp: -704.3653800449382
+		Cen: 10.182557447546946
+		Wid: -0.5518823540833119
+		C:   737.4394475181244
+
