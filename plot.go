@@ -1580,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  /* Manual Axes
+  // Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }*/
+  }//
 
-  // Auto Axes
+  /* Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1674,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")//
+  ytickLabels = append(ytickLabels, "")*/
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1776,12 +1776,12 @@ func axes(
   case "CABS":
     switch sample {
     case "UHNA3":
-      xrange := []float64{8.75, 9.6}
-      yrange := []float64{0, 50}
+      xrange := []float64{8.7, 9.6}
+      yrange := []float64{0, 225}
       xtick := []float64{8.7, 8.8, 8.9, 9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6}
-      ytick := []float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50}
+      ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225}
       xtickLabel := []string{"", "8.8", "", "9", "", "9.2", "", "9.4", "", "9.6"}
-      ytickLabel := []string{"0", "", "10", "", "20", "", "30", "", "40", "", "50"}
+      ytickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
