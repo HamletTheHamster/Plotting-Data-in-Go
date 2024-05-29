@@ -1707,9 +1707,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set, false, "")
+      e.LineStyle.Color = palette(set-1, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set-1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1723,7 +1723,7 @@ func plotCABS(
         os.Exit(1)
       }
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set-1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1737,7 +1737,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, "")
+    l.GlyphStyle.Color = palette(set-1, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
