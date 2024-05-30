@@ -315,7 +315,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
 
     //setsToPlotCABS := rangeInt(0, 74)
 
@@ -1580,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
+  /* Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }//
+  }*/
 
-  /* Auto Axes
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1674,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
+  ytickLabels = append(ytickLabels, "")//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1707,9 +1707,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set-1, false, "")
+      e.LineStyle.Color = palette(set, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set-1, false, "")
+      plotSet.GlyphStyle.Color = palette(set, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1723,7 +1723,7 @@ func plotCABS(
         os.Exit(1)
       }
 
-      plotSet.GlyphStyle.Color = palette(set-1, false, "")
+      plotSet.GlyphStyle.Color = palette(set, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1737,7 +1737,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set-1, false, "")
+    l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
     p.Legend.Add(label[set], l)
