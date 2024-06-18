@@ -1,0 +1,38 @@
+Sample: 2 ARROW Waveguide
+Runtime note: shift legend down
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-06-17
+	Label: 2-8-30-4
+	Start Time (h:m:s): 20:47:45
+	End Time(h:m:s): 21:01:29
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.073 nm
+	Probe Filter: 1549.109 nm
+	Pump Power: 0.150 mW
+	Stokes Power: 0.000 mW
+	Probe Power: 23.500 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 10000000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: omg I did it. First Try even. powers are hard to say because reflections. Gathered @tap by turning each up individually with other two turned down. units in uW. Don't think any of them are accurate. and yes I got negative reading on stokes. but all of these seemed to be different before the measurement started. The signal generator overheated and might not be working properly now. Idk.
+
+	Fit Parameters:
+		Amp: 6.117211181042692
+		Cen: 9.195370051815061
+		Wid: -0.06753388520967687
+		C:   0.5587376018694322
+

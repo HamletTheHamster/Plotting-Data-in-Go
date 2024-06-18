@@ -1549,8 +1549,8 @@ func plotCABS(
     l = ""
   case 0.001:
     l = "1 mm"
-  case 0.009:
-    l = "9 mm"
+  case 0.008:
+    l = "8 mm"
   case 0.01:
     l = "1 cm"
   case 0.004:
@@ -1580,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  /* Manual Axes
+  // Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }*/
+  }//
 
-  // Auto Axes
+  /* Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1674,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")//
+  ytickLabels = append(ytickLabels, "")*/
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1856,13 +1856,13 @@ func axes(
       ytickLabel := []string{"0", "3", "6", "9", "12", "15"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
-    case "Waveguide":
-      xrange := []float64{8.7, 9.6}
-      yrange := []float64{0, 225}
-      xtick := []float64{8.7, 8.8, 8.9, 9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6}
-      ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225}
-      xtickLabel := []string{"", "8.8", "", "9", "", "9.2", "", "9.4", "", "9.6"}
-      ytickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", ""}
+    case "2 ARROW Waveguide":
+      xrange := []float64{9., 10.}
+      yrange := []float64{0, 25}
+      xtick := []float64{9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10.}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25}
+      xtickLabel := []string{"9.0", "", "9.2", "", "9.4", "", "9.6", "", "9.8", "", "10"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", "", "20", "", "25"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
@@ -3968,7 +3968,7 @@ func prepPlot(
   p.Legend.TextStyle.Font.Variant = "Sans"
   p.Legend.Top = true
   p.Legend.XOffs = vg.Points(-50)
-  p.Legend.YOffs = vg.Points(25)
+  p.Legend.YOffs = vg.Points(0)
   p.Legend.Padding = vg.Points(10)
   p.Legend.ThumbnailWidth = vg.Points(50)
   p.Legend.Add(legend)
