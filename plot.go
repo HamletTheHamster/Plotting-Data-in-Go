@@ -1562,7 +1562,7 @@ func plotCABS(
   case 0.00001:
     l = "10 μm"
   default:
-    l = strconv.FormatFloat(length, 'f', 1, 64)
+    l = strconv.FormatFloat(length, 'f', 3, 64) + " m"
   }
 
   type errorPoints struct {
