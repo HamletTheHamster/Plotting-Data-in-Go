@@ -1,0 +1,2 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
+24-05-30,~5 fW with g0=0.6,1,14:31:03,14:39:04,1.03,1.05,0.00254,1/frequency.csv,1/signal.csv,0.02,1,100,1.842000e+09,8,9.000000e+09,9.360000e+09,5.004567e+06,5,1549,1549.02,1549.073,1549.109,short run SNR 10+

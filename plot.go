@@ -1856,6 +1856,15 @@ func axes(
       ytickLabel := []string{"0", "3", "6", "9", "12", "15"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "Waveguide":
+      xrange := []float64{8.7, 9.6}
+      yrange := []float64{0, 225}
+      xtick := []float64{8.7, 8.8, 8.9, 9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6}
+      ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225}
+      xtickLabel := []string{"", "8.8", "", "9", "", "9.2", "", "9.4", "", "9.6"}
+      ytickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
   case "fits":
     switch sample {
