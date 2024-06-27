@@ -1580,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  /* Manual Axes
+  // Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }*/
+  }//
 
-  // Auto Axes
+  /* Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1674,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")//
+  ytickLabels = append(ytickLabels, "")*/
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1858,11 +1858,11 @@ func axes(
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "2 ARROW Waveguide":
       xrange := []float64{9., 10.}
-      yrange := []float64{0, 30}
+      yrange := []float64{0, 25}
       xtick := []float64{9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10.}
-      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25, 27.5, 30}
+      ytick := []float64{0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5, 20, 22.5, 25}
       xtickLabel := []string{"9.0", "", "9.2", "", "9.4", "", "9.6", "", "9.8", "", "10"}
-      ytickLabel := []string{"0", "", "5", "", "10", "", "15", "", "20", "", "25", "", "30"}
+      ytickLabel := []string{"0", "", "5", "", "10", "", "15", "", "20", "", "25"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }

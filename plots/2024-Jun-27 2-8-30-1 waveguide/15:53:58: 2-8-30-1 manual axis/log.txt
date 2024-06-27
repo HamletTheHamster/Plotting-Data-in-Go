@@ -1,0 +1,38 @@
+Sample: 2 ARROW Waveguide
+Runtime note: 2-8-30-1 manual axis
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 24-06-27
+	Label: 2-8-30-1
+	Start Time (h:m:s): 14:44:43
+	End Time(h:m:s): 14:58:33
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.073 nm
+	Probe Filter: 1549.109 nm
+	Pump Power: 0.000 mW
+	Stokes Power: 0.000 mW
+	Probe Power: 0.000 mW
+	Lock-in Range: 0.02
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 10000000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: Yes
+
+	Fit Parameters:
+		Amp: 18.812560621272823
+		Cen: 9.200618100884995
+		Wid: -0.03820539089026484
+		C:   0.2531023768631644
+
