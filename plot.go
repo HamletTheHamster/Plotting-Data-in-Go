@@ -1866,6 +1866,18 @@ func axes(
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
+  case "sinc":
+    switch sample {
+    case "1cmUHNA3":
+      xrange := []float64{0, 45}
+      yrange := []float64{0, 3}
+      xtick := []float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
+      ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3}
+      xtickLabel := []string{"", "5", "", "15", "", "25", "", "35", "", ""}
+      ytickLabel := []string{"", "0.5", "", "1.5", "", "2.5", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    }
   case "fits":
     switch sample {
     case "LCOF":
@@ -2455,7 +2467,7 @@ func plotSinc(
 	ylabel := "Peak Spectral Density"
   legend := ""
 
-  // Auto Axes
+  /* Auto Axes
   xmin, xmax, ymin, ymax := 0., 0., 0., 0.
   for i, v := range phaseMatchData[0] {
     if v > xmax {
@@ -2508,6 +2520,14 @@ func plotSinc(
   }
   yticks = append(yticks, ymax)
   ytickLabels = append(ytickLabels, "")
+  */
+
+  // Manual Axes
+  xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("sinc", "1cmUHNA3", "")
+  if err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -2521,17 +2541,13 @@ func plotSinc(
 		log.Fatalf("Could not create line for the first series: %v", err)
 	}
 	scatter.GlyphStyle.Color = palette(0, false, "")
-  scatter.GlyphStyle.Radius = vg.Points(5) //3
+  scatter.GlyphStyle.Radius = vg.Points(8) //3
   scatter.Shape = draw.CircleGlyph{}
 
-  // Create legend entry for experimental points
-  p.Legend.Add("Experimental", scatter)
-
-	p.Add(scatter, t, r)
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-  length = 0.0086
+  length = 0.00865
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
   if err != nil {
@@ -2566,25 +2582,39 @@ func plotSinc(
     theoreticalPts[i].X = deltaFrequency
   }
 
+  // Apply vertical offset to theoretical points
+  for i := 0; i < numPoints; i++ {
+    theoreticalPts[i].Y += 0.015
+  }
+
   // Calculate scaling factor
   scalingFactor := phaseMatchData[1][0] / theoreticalPts[0].Y
+  scalingFactor = 12
 
   // Apply scaling factor to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y *= scalingFactor
   }
 
-  line, err := plotter.NewLine(theoreticalPts)
+  // Apply slanted vertical offset to theoretical points
+  for i := 0; i < numPoints; i++ {
+    theoreticalPts[i].Y -= 0.0015*float64(i)
+  }
+
+  line, err := plotter.NewLine(theoreticalPts[4:])
   if err != nil {
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
-  line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red line for theoretical plot
+  line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 150} // Red line for theoretical plot
+  line.Width = vg.Points(10)
 
   // Create legend entry for theoretical line
-  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.1f mm)", length*1e3)
+  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f mm)", length*1e3)
   p.Legend.Add(theoreticalLegendLabel, line)
+  p.Legend.Add("Experimental", scatter)
 
   p.Add(line, t, r)
+  p.Add(scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
