@@ -2526,76 +2526,49 @@ func plotSinc(
 	p.Add(scatter, t, r)
 
   // Plot theoretical sinc^2
-  //omegaB := 9.15e9 // in Hz
-  //c := 299792458. // speed of light in vacuum, in m/s
-  GB := 0.6 // 0.6 W^-1 m^-1 UHNA3 r=0.9um
-  //length += 0.009
-  uhna3CoreIndexGuess := 1.6
-
-  var conv float64
+  c := 299792458.0 // speed of light in m/s
+  length = 0.0086
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
   if err != nil {
     fmt.Println("Error converting string pumpWavelength to float:", err)
   }
+  pumpWavelength *= 1e-9
 
-  increment := 0.5
-  separations := make([]float64, 74)
-  for i := range separations {
-      separations[i] = float64(i) * increment + 5
-  }
+  pumpFrequency := c / pumpWavelength // Convert pump wavelength to frequency in Hz
 
-  fmt.Printf("last separation = %f\n", separations[len(separations)-1])
+  numPoints := len(probeLaser)
+  theoreticalPts := make(plotter.XYs, numPoints)
 
-  theoreticalPts := make(plotter.XYs, len(phaseMatchData[0]))
-  probeWavelengths := make([]float64, 0, len(probeLaser))
-  wavelengthIncrement := 0.004
-  wavelengthSeparations := make([]float64, 10)
-  for i := range wavelengthSeparations {
-    probeWavelengths = append(probeWavelengths, 1548.754 + float64(i)*wavelengthIncrement)
-  }
-
-  for i, deltaFreq := range separations { // P-Pr separation in GHz
+  for i := 0; i < numPoints; i++ {
     probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
     if err != nil {
       fmt.Println("Error converting string probeWavelength to float:", err)
     }
-    probeWavelengths = append(probeWavelengths, probeWavelength)
+    probeWavelength *= 1e-9
 
-    //deltaK := 2*math.Pi*(1/(pumpWavelength*1e-9) - 1/(probeWavelength*1e-9))
-    deltaK := 4*math.Pi*1.6*
+    deltaLambda := probeWavelength - pumpWavelength
+    deltaK := (4 * math.Pi * 1.6 * deltaLambda) / (pumpWavelength * pumpWavelength)
 
-    sincTerm := math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
-    PSig := 0.25 * math.Pow(GB * length, 2) * 1e-3*pumpPowers[0] * 1e-3*stokesPowers[0] * 1e-3*probePowers[0] * sincTerm
-
-    if i == 0 {
-      /*fmt.Printf("pumpWavelength = %f\n", pumpWavelength)
-      fmt.Printf("probeWavelength = %f\n", probeWavelength)
-      fmt.Printf("pumpWavelength*1e-9 = %.12f\n", pumpWavelength*1e-9)
-      fmt.Printf("probeWavelength*1e-9 = %.12f\n", probeWavelength*1e-9)
-      fmt.Printf("1/pumpWavelength*1e-9 = %f\n", 1/(pumpWavelength*1e-9))
-      fmt.Printf("1/probeWavelength*1e-9 = %f\n", 1/(probeWavelength*1e-9))
-      fmt.Printf("deltaK = %f\n", deltaK)
-      fmt.Printf("sincTerm = %f\n", sincTerm)
-      fmt.Printf("PSig = %f nW\n", PSig*1e9)
-      fmt.Printf("phaseMatchData[1][0] = %f mV\n", phaseMatchData[1][0])*/
-      //conv = phaseMatchData[1][0]/(PSig)
-      //fmt.Printf("conversion = %f mV/nW\n", conv/1e9)
-    } else if i == 9 {
-      fmt.Printf("phaseMatchData[0][0] = %f mV\n", phaseMatchData[0][0])
-      conv = phaseMatchData[1][9]/(PSig)
-      fmt.Printf("conversion = %f mV/nW\n", conv/1e9)
+    sincTerm := 1.0
+    if deltaK != 0 {
+      sincTerm = math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
     }
+    theoreticalPts[i].Y = sincTerm
 
-    //conv = phaseMatchData[1][i]/PSig
-
-    spectralDensity := PSig*4.11e9 //+ 0.1
-
-    theoreticalPts[i].X = deltaFreq
-    theoreticalPts[i].Y = spectralDensity
+    // Convert deltaLambda to deltaFrequency
+    probeFrequency := c / probeWavelength
+    deltaFrequency := (pumpFrequency - probeFrequency) / 1e9 // Convert to GHz
+    theoreticalPts[i].X = deltaFrequency
   }
 
-  fmt.Printf("probeWavelengths = %f\n", probeWavelengths)
+  // Calculate scaling factor
+  scalingFactor := phaseMatchData[1][0] / theoreticalPts[0].Y
+
+  // Apply scaling factor to theoretical points
+  for i := 0; i < numPoints; i++ {
+    theoreticalPts[i].Y *= scalingFactor
+  }
 
   line, err := plotter.NewLine(theoreticalPts)
   if err != nil {
