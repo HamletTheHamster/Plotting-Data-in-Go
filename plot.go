@@ -2523,6 +2523,10 @@ func plotSinc(
 	scatter.GlyphStyle.Color = palette(0, false, "")
   scatter.GlyphStyle.Radius = vg.Points(5) //3
   scatter.Shape = draw.CircleGlyph{}
+
+  // Create legend entry for experimental points
+  p.Legend.Add("Experimental", scatter)
+
 	p.Add(scatter, t, r)
 
   // Plot theoretical sinc^2
@@ -2575,6 +2579,11 @@ func plotSinc(
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
   line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red line for theoretical plot
+
+  // Create legend entry for theoretical line
+  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.1f mm)", length*1e3)
+  p.Legend.Add(theoreticalLegendLabel, line)
+
   p.Add(line, t, r)
 
   savePlot(p, "Phase-Match", logpath)
