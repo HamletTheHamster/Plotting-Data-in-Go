@@ -315,9 +315,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    //setsToPlotCABS := []int{1}
 
-    //setsToPlotCABS := rangeInt(0, 74)
+    setsToPlotCABS := rangeInt(0, 74)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -1580,14 +1580,14 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
+  /* Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }//
+  }*/
 
-  /* Auto Axes
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1674,7 +1674,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
+  ytickLabels = append(ytickLabels, "")//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -2530,6 +2530,7 @@ func plotSinc(
   //c := 299792458. // speed of light in vacuum, in m/s
   GB := 0.6 // 0.6 W^-1 m^-1 UHNA3 r=0.9um
   //length += 0.009
+  uhna3CoreIndexGuess := 1.6
 
   var conv float64
 
@@ -2561,7 +2562,8 @@ func plotSinc(
     }
     probeWavelengths = append(probeWavelengths, probeWavelength)
 
-    deltaK := 2*math.Pi*(1/(pumpWavelength*1e-9) - 1/(probeWavelength*1e-9))
+    //deltaK := 2*math.Pi*(1/(pumpWavelength*1e-9) - 1/(probeWavelength*1e-9))
+    deltaK := 4*math.Pi*1.6*
 
     sincTerm := math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
     PSig := 0.25 * math.Pow(GB * length, 2) * 1e-3*pumpPowers[0] * 1e-3*stokesPowers[0] * 1e-3*probePowers[0] * sincTerm
