@@ -2568,7 +2568,7 @@ func plotSinc(
     probeWavelength *= 1e-9
 
     deltaLambda := probeWavelength - pumpWavelength
-    deltaK := (4 * math.Pi * 1.6 * deltaLambda) / (pumpWavelength * pumpWavelength)
+    deltaK := (4 * math.Pi * 1.6 * deltaLambda) / (pumpWavelength * probeWavelength)
 
     sincTerm := 1.0
     if deltaK != 0 {
