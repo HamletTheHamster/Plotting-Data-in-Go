@@ -1571,6 +1571,7 @@ func plotCABS(
   }
 
   title := l + " " + sample + " CABS"
+  title = "Last Few Measurements with Largest Error"
   xlabel := "Frequency (GHz)"
   var ylabel string
   if contains(normalized, "Powers") {
@@ -2463,6 +2464,7 @@ func plotSinc(
   }
 
 	title := l + " " + sample + " Phase-Matching Bandwidth"
+  //title = "4. Negative Sloped Offset"
 	xlabel := "Pump-Probe Separation (GHz)"
 	ylabel := "Peak Spectral Density"
   legend := ""
@@ -2547,7 +2549,8 @@ func plotSinc(
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-  length = 0.00865
+  uhna3Index := 1.38
+  length = 0.01
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
   if err != nil {
@@ -2568,7 +2571,7 @@ func plotSinc(
     probeWavelength *= 1e-9
 
     deltaLambda := probeWavelength - pumpWavelength
-    deltaK := (4 * math.Pi * 1.6 * deltaLambda) / (pumpWavelength * probeWavelength)
+    deltaK := (4 * math.Pi * uhna3Index * deltaLambda) / (pumpWavelength * probeWavelength)
 
     sincTerm := 1.0
     if deltaK != 0 {
@@ -2582,11 +2585,6 @@ func plotSinc(
     theoreticalPts[i].X = deltaFrequency
   }
 
-  // Apply vertical offset to theoretical points
-  for i := 0; i < numPoints; i++ {
-    theoreticalPts[i].Y += 0.015
-  }
-
   // Calculate scaling factor
   scalingFactor := phaseMatchData[1][0] / theoreticalPts[0].Y
   scalingFactor = 12
@@ -2594,6 +2592,11 @@ func plotSinc(
   // Apply scaling factor to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y *= scalingFactor
+  }
+
+  // Apply vertical offset to theoretical points
+  for i := 0; i < numPoints; i++ {
+    theoreticalPts[i].Y += 0.2
   }
 
   // Apply slanted vertical offset to theoretical points
@@ -2609,7 +2612,7 @@ func plotSinc(
   line.Width = vg.Points(10)
 
   // Create legend entry for theoretical line
-  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f mm)", length*1e3)
+  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
   p.Legend.Add(theoreticalLegendLabel, line)
   p.Legend.Add("Experimental", scatter)
 
