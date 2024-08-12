@@ -2628,18 +2628,6 @@ func plotSinc(
   theoreticalPtsLower := make(plotter.XYs, numPoints)
   theoreticalPtsUpper := make(plotter.XYs, numPoints)
 
-  // Scaling factors for lower and upper bounds
-  scalingFactorLower := phaseMatchData[1][0] / theoreticalPtsLower[0].Y
-  scalingFactorLower = 13
-  scalingFactorUpper := phaseMatchData[1][0] / theoreticalPtsUpper[0].Y
-  scalingFactorUpper = 11
-
-  // Apply scaling factor to lower and upper bound points
-  for i := 0; i < numPoints; i++ {
-    theoreticalPtsLower[i].Y *= scalingFactorLower
-    theoreticalPtsUpper[i].Y *= scalingFactorUpper
-  }
-
   for i := 0; i < numPoints; i++ {
     probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
     if err != nil {
@@ -2657,14 +2645,14 @@ func plotSinc(
     sincTermLower := 1.0
     sincTermUpper := 1.0
     if deltaKLower != 0 {
-        sincTermLower = math.Pow(math.Sin(deltaKLower * lengthLower / 2) / (deltaKLower * length / 2), 2)
+        sincTermLower = math.Pow(math.Sin(deltaKLower * lengthLower / 2) / (deltaKLower * lengthLower / 2), 2)
     }
     if deltaKUpper != 0 {
-        sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * length / 2), 2)
+        sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * lengthUpper / 2), 2)
     }
 
-    theoreticalPtsLower[i].Y = sincTermLower * scalingFactorLower
-    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactorUpper
+    theoreticalPtsLower[i].Y = sincTermLower * scalingFactor
+    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactor
 
     // Convert deltaLambda to deltaFrequency
     probeFrequency := c / probeWavelength
@@ -2673,7 +2661,7 @@ func plotSinc(
     theoreticalPtsUpper[i].X = deltaFrequency
   }
 
-  lineLower, err := plotter.NewLine(theoreticalPtsLower[5:])
+  /*lineLower, err := plotter.NewLine(theoreticalPtsLower[5:])
   if err != nil {
     log.Fatalf("Could not create line for lower bound of theoretical sinc²: %v", err)
   }
@@ -2683,9 +2671,35 @@ func plotSinc(
   if err != nil {
     log.Fatalf("Could not create line for upper bound of theoretical sinc²: %v", err)
   }
-  lineUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red line for upper bound
+  lineUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red line for upper bound*/
 
-  p.Add(lineLower, lineUpper, line, scatter, t, r)
+  // Adjust the number of points to exclude from the beginning
+  startIndex := 4 // Set this to the index where you want the shading to start
+
+  // Create the shaded area between the upper and lower bounds
+  fillBetween := make(plotter.XYs, 2*(numPoints - startIndex))
+
+  // Fill lower bound points
+  for i := startIndex; i < numPoints; i++ {
+    fillBetween[i-startIndex].X = theoreticalPtsLower[i].X
+    fillBetween[i-startIndex].Y = theoreticalPtsLower[i].Y
+  }
+
+  // Fill upper bound points in reverse order
+  for i := startIndex; i < numPoints; i++ {
+    fillBetween[numPoints-startIndex+(i-startIndex)].X = theoreticalPtsUpper[numPoints-i+startIndex-1].X
+    fillBetween[numPoints-startIndex+(i-startIndex)].Y = theoreticalPtsUpper[numPoints-i+startIndex-1].Y
+  }
+
+  // Create a polygon for the filled area
+  polygon, err := plotter.NewPolygon(fillBetween)
+  if err != nil {
+    log.Fatalf("Could not create polygon for filled area: %v", err)
+  }
+  polygon.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
+  polygon.LineStyle.Width = vg.Length(0) // No border
+
+  p.Add(polygon, line, scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
