@@ -2661,48 +2661,61 @@ func plotSinc(
     theoreticalPtsUpper[i].X = deltaFrequency
   }
 
-  /*lineLower, err := plotter.NewLine(theoreticalPtsLower[5:])
-  if err != nil {
-    log.Fatalf("Could not create line for lower bound of theoretical sinc²: %v", err)
-  }
-  lineLower.Color = color.RGBA{R: 0, G: 0, B: 0, A: 50} // Lighter red line for lower bound
-
-  lineUpper, err := plotter.NewLine(theoreticalPtsUpper[3:])
-  if err != nil {
-    log.Fatalf("Could not create line for upper bound of theoretical sinc²: %v", err)
-  }
-  lineUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red line for upper bound*/
-
   // Adjust the number of points to exclude from the beginning
   startIndex := 4 // Set this to the index where you want the shading to start
 
-  // Create the shaded area between the upper and lower bounds
-  fillBetween := make(plotter.XYs, 2*(numPoints - startIndex))
+  // Create the shaded area between the theoretical line and the upper bound
+  fillUpper := make(plotter.XYs, 2*(numPoints-startIndex))
 
-  // Fill lower bound points
+  // Fill theoretical line points
   for i := startIndex; i < numPoints; i++ {
-    fillBetween[i-startIndex].X = theoreticalPtsLower[i].X
-    fillBetween[i-startIndex].Y = theoreticalPtsLower[i].Y
+    fillUpper[i-startIndex].X = theoreticalPts[i].X
+    fillUpper[i-startIndex].Y = theoreticalPts[i].Y
   }
 
   // Fill upper bound points in reverse order
   for i := startIndex; i < numPoints; i++ {
-    fillBetween[numPoints-startIndex+(i-startIndex)].X = theoreticalPtsUpper[numPoints-i+startIndex-1].X
-    fillBetween[numPoints-startIndex+(i-startIndex)].Y = theoreticalPtsUpper[numPoints-i+startIndex-1].Y
+    fillUpper[numPoints-startIndex+(i-startIndex)].X = theoreticalPtsUpper[numPoints-i+startIndex-1].X
+    fillUpper[numPoints-startIndex+(i-startIndex)].Y = theoreticalPtsUpper[numPoints-i+startIndex-1].Y
   }
 
-  // Create a polygon for the filled area
-  polygon, err := plotter.NewPolygon(fillBetween)
+  // Create a polygon for the filled area between the theoretical line and upper bound
+  polygonUpper, err := plotter.NewPolygon(fillUpper)
   if err != nil {
     log.Fatalf("Could not create polygon for filled area: %v", err)
   }
-  polygon.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
-  polygon.LineStyle.Width = vg.Length(0) // No border
+  polygonUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
+  polygonUpper.LineStyle.Width = vg.Length(0) // No border
 
-  p.Add(polygon, line, scatter, t, r)
+  // Create the shaded area between the theoretical line and the lower bound
+  fillLower := make(plotter.XYs, 2*(numPoints-startIndex))
+
+  // Fill lower bound points
+  for i := startIndex; i < numPoints; i++ {
+    fillLower[i-startIndex].X = theoreticalPtsLower[i].X
+    fillLower[i-startIndex].Y = theoreticalPtsLower[i].Y
+  }
+
+  // Fill theoretical line points in reverse order
+  for i := startIndex; i < numPoints; i++ {
+    fillLower[numPoints-startIndex+(i-startIndex)].X = theoreticalPts[numPoints-i+startIndex-1].X
+    fillLower[numPoints-startIndex+(i-startIndex)].Y = theoreticalPts[numPoints-i+startIndex-1].Y
+  }
+
+  // Create a polygon for the filled area between the theoretical line and lower bound
+  polygonLower, err := plotter.NewPolygon(fillLower)
+  if err != nil {
+    log.Fatalf("Could not create polygon for filled area: %v", err)
+  }
+  polygonLower.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
+  polygonLower.LineStyle.Width = vg.Length(0) // No border
+
+  // Add the polygons, line, and scatter to the plot
+  p.Add(polygonUpper, polygonLower, line, scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
+
 
 func bin(
   sets []int,
