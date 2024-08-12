@@ -2549,8 +2549,8 @@ func plotSinc(
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-  uhna3Index := 1.4447
-  uhna3Index = 1.463705 // middle of range
+  //uhna3Index := 1.4447
+  uhna3Index := 1.463705 // middle of range
   length = 0.01
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
@@ -2621,12 +2621,24 @@ func plotSinc(
   // Uncertainty bounds for theoretical line
   uhna3IndexLower := 1.4447 // Lower bound of the refractive index
   uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
-  lengthLower := length + length*.05
-  lengthUpper := length - length*.05
+  lengthLower := length - .05*length
+  lengthUpper := length + .05*length
 
   // Arrays to hold the upper and lower bound points
   theoreticalPtsLower := make(plotter.XYs, numPoints)
   theoreticalPtsUpper := make(plotter.XYs, numPoints)
+
+  // Scaling factors for lower and upper bounds
+  scalingFactorLower := phaseMatchData[1][0] / theoreticalPtsLower[0].Y
+  scalingFactorLower = 13
+  scalingFactorUpper := phaseMatchData[1][0] / theoreticalPtsUpper[0].Y
+  scalingFactorUpper = 11
+
+  // Apply scaling factor to lower and upper bound points
+  for i := 0; i < numPoints; i++ {
+    theoreticalPtsLower[i].Y *= scalingFactorLower
+    theoreticalPtsUpper[i].Y *= scalingFactorUpper
+  }
 
   for i := 0; i < numPoints; i++ {
     probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
@@ -2651,8 +2663,8 @@ func plotSinc(
         sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * length / 2), 2)
     }
 
-    theoreticalPtsLower[i].Y = sincTermLower * scalingFactor
-    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactor
+    theoreticalPtsLower[i].Y = sincTermLower * scalingFactorLower
+    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactorUpper
 
     // Convert deltaLambda to deltaFrequency
     probeFrequency := c / probeWavelength
@@ -2661,13 +2673,13 @@ func plotSinc(
     theoreticalPtsUpper[i].X = deltaFrequency
   }
 
-  lineLower, err := plotter.NewLine(theoreticalPtsLower[4:])
+  lineLower, err := plotter.NewLine(theoreticalPtsLower[5:])
   if err != nil {
     log.Fatalf("Could not create line for lower bound of theoretical sinc²: %v", err)
   }
   lineLower.Color = color.RGBA{R: 0, G: 0, B: 0, A: 50} // Lighter red line for lower bound
 
-  lineUpper, err := plotter.NewLine(theoreticalPtsUpper[4:])
+  lineUpper, err := plotter.NewLine(theoreticalPtsUpper[3:])
   if err != nil {
     log.Fatalf("Could not create line for upper bound of theoretical sinc²: %v", err)
   }
