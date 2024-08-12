@@ -2550,7 +2550,8 @@ func plotSinc(
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
   uhna3Index := 1.4447
-  length = 0.0095
+  uhna3Index = 1.463705 // middle of range
+  length = 0.01
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
   if err != nil {
@@ -2616,8 +2617,63 @@ func plotSinc(
   p.Legend.Add(theoreticalLegendLabel, line)
   p.Legend.Add("Experimental", scatter)
 
-  p.Add(line, t, r)
-  p.Add(scatter, t, r)
+
+  // Uncertainty bounds for theoretical line
+  uhna3IndexLower := 1.4447 // Lower bound of the refractive index
+  uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
+  lengthLower := length + length*.05
+  lengthUpper := length - length*.05
+
+  // Arrays to hold the upper and lower bound points
+  theoreticalPtsLower := make(plotter.XYs, numPoints)
+  theoreticalPtsUpper := make(plotter.XYs, numPoints)
+
+  for i := 0; i < numPoints; i++ {
+    probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
+    if err != nil {
+        fmt.Println("Error converting string probeWavelength to float:", err)
+    }
+    probeWavelength *= 1e-9
+
+    deltaLambda := probeWavelength - pumpWavelength
+
+    // Calculate deltaK for lower and upper bounds
+    deltaKLower := (4 * math.Pi * uhna3IndexLower * deltaLambda) / (pumpWavelength * probeWavelength)
+    deltaKUpper := (4 * math.Pi * uhna3IndexUpper * deltaLambda) / (pumpWavelength * probeWavelength)
+
+    // Compute sinc² term for lower and upper bounds
+    sincTermLower := 1.0
+    sincTermUpper := 1.0
+    if deltaKLower != 0 {
+        sincTermLower = math.Pow(math.Sin(deltaKLower * lengthLower / 2) / (deltaKLower * length / 2), 2)
+    }
+    if deltaKUpper != 0 {
+        sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * length / 2), 2)
+    }
+
+    theoreticalPtsLower[i].Y = sincTermLower * scalingFactor
+    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactor
+
+    // Convert deltaLambda to deltaFrequency
+    probeFrequency := c / probeWavelength
+    deltaFrequency := (pumpFrequency - probeFrequency) / 1e9 // Convert to GHz
+    theoreticalPtsLower[i].X = deltaFrequency
+    theoreticalPtsUpper[i].X = deltaFrequency
+  }
+
+  lineLower, err := plotter.NewLine(theoreticalPtsLower[4:])
+  if err != nil {
+    log.Fatalf("Could not create line for lower bound of theoretical sinc²: %v", err)
+  }
+  lineLower.Color = color.RGBA{R: 0, G: 0, B: 0, A: 50} // Lighter red line for lower bound
+
+  lineUpper, err := plotter.NewLine(theoreticalPtsUpper[4:])
+  if err != nil {
+    log.Fatalf("Could not create line for upper bound of theoretical sinc²: %v", err)
+  }
+  lineUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red line for upper bound
+
+  p.Add(lineLower, lineUpper, line, scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
