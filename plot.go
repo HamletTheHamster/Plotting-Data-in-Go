@@ -2550,7 +2550,7 @@ func plotSinc(
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
   uhna3Index := 1.4447
-  length = 0.01
+  length = 0.0095
 
   pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
   if err != nil {
