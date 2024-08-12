@@ -2549,39 +2549,39 @@ func plotSinc(
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-uhna3Index := 1.463705 // middle of range
-length = 0.01
+  uhna3Index := 1.463705 // middle of range
+  //length = 0.01
 
-scalingFactor := 12.0
+  scalingFactor := 12.0
 
-// Uncertainty bounds for theoretical line
-uhna3IndexLower := 1.4447 // Lower bound of the refractive index
-uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
-lengthLower := length - .05*length
-lengthUpper := length + .05*length
+  // Uncertainty bounds for theoretical line
+  uhna3IndexLower := 1.4447 // Lower bound of the refractive index
+  uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
+  lengthLower := length - .05*length
+  lengthUpper := length + .05*length
 
-// Convert pump wavelength to pump frequency
-pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
-if err != nil {
+  // Convert pump wavelength to pump frequency
+  pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
+  if err != nil {
     fmt.Println("Error converting string pumpWavelength to float:", err)
-}
-pumpWavelength *= 1e-9 // Convert to meters
-pumpFrequency := c / pumpWavelength // Calculate pump frequency in Hz
+  }
+  pumpWavelength *= 1e-9 // Convert to meters
+  pumpFrequency := c / pumpWavelength // Calculate pump frequency in Hz
 
-minFrequency := 5.0e9  // Frequency separation in Hz
-maxFrequency := 42.0e9 // Frequency separation in Hz
+  minFrequency := 5.0e9  // Frequency separation in Hz
+  maxFrequency := 42.0e9 // Frequency separation in Hz
 
-numPoints := 1000
-frequencySeparation := make([]float64, numPoints)
-for i := 0; i < numPoints; i++ {
+  numPoints := 1000
+  frequencySeparation := make([]float64, numPoints)
+  for i := 0; i < numPoints; i++ {
     frequencySeparation[i] = minFrequency + (maxFrequency-minFrequency)*float64(i)/float64(numPoints-1)
-}
+  }
 
-theoreticalPts := make(plotter.XYs, numPoints)
-theoreticalPtsLower := make(plotter.XYs, numPoints)
-theoreticalPtsUpper := make(plotter.XYs, numPoints)
+  theoreticalPts := make(plotter.XYs, numPoints)
+  theoreticalPtsLower := make(plotter.XYs, numPoints)
+  theoreticalPtsUpper := make(plotter.XYs, numPoints)
 
-for i := 0; i < numPoints; i++ {
+  for i := 0; i < numPoints; i++ {
     // Calculate the probe frequency by adding the frequency separation to the pump frequency
     probeFrequency := pumpFrequency + frequencySeparation[i]
     probeWavelength := c / probeFrequency // Convert probe frequency to wavelength in meters
@@ -2622,33 +2622,35 @@ for i := 0; i < numPoints; i++ {
 
     theoreticalPtsLower[i].X = frequencySeparation[i] / 1e9 // Convert to GHz for plotting
     theoreticalPtsUpper[i].X = frequencySeparation[i] / 1e9 // Convert to GHz for plotting
-}
+  }
 
 
   /* Apply vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y += 0.2
+    theoreticalPtsUpper[i].Y += 0.2
+    theoreticalPtsLower[i].Y += 0.2
   }*/
 
   /* Apply slanted vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
-    theoreticalPts[i].Y -= 0.0015*float64(i)
+    theoreticalPts[i].Y -= 0.0015*float64(i)*75/1000
   }*/
 
-  line, err := plotter.NewLine(theoreticalPts[4:])
+  // Adjust the number of points to exclude from the beginning
+  startIndex := 45
+
+  line, err := plotter.NewLine(theoreticalPts[startIndex:])
   if err != nil {
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
   line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 150} // Red line for theoretical plot
-  line.Width = vg.Points(10)
+  line.Width = vg.Points(1)
 
   // Create legend entry for theoretical line
   theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
   p.Legend.Add(theoreticalLegendLabel, line)
   p.Legend.Add("Experimental", scatter)
-
-  // Adjust the number of points to exclude from the beginning
-  startIndex := 4 // Set this to the index where you want the shading to start
 
   // Create the shaded area between the theoretical line and the upper bound
   fillUpper := make(plotter.XYs, 2*(numPoints-startIndex))
