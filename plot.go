@@ -2594,15 +2594,15 @@ func plotSinc(
     theoreticalPts[i].Y *= scalingFactor
   }
 
-  // Apply vertical offset to theoretical points
+  /* Apply vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y += 0.2
-  }
+  }*/
 
-  // Apply slanted vertical offset to theoretical points
+  /* Apply slanted vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y -= 0.0015*float64(i)
-  }
+  }*/
 
   line, err := plotter.NewLine(theoreticalPts[4:])
   if err != nil {
