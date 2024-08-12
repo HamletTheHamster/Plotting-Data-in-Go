@@ -2549,51 +2549,81 @@ func plotSinc(
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-  //uhna3Index := 1.4447
-  uhna3Index := 1.463705 // middle of range
-  length = 0.01
+uhna3Index := 1.463705 // middle of range
+length = 0.01
 
-  pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
-  if err != nil {
+scalingFactor := 12.0
+
+// Uncertainty bounds for theoretical line
+uhna3IndexLower := 1.4447 // Lower bound of the refractive index
+uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
+lengthLower := length - .05*length
+lengthUpper := length + .05*length
+
+// Convert pump wavelength to pump frequency
+pumpWavelength, err := strconv.ParseFloat(pumpLaser[0], 64)
+if err != nil {
     fmt.Println("Error converting string pumpWavelength to float:", err)
-  }
-  pumpWavelength *= 1e-9
+}
+pumpWavelength *= 1e-9 // Convert to meters
+pumpFrequency := c / pumpWavelength // Calculate pump frequency in Hz
 
-  pumpFrequency := c / pumpWavelength // Convert pump wavelength to frequency in Hz
+minFrequency := 5.0e9  // Frequency separation in Hz
+maxFrequency := 42.0e9 // Frequency separation in Hz
 
-  numPoints := len(probeLaser)
-  theoreticalPts := make(plotter.XYs, numPoints)
+numPoints := 1000
+frequencySeparation := make([]float64, numPoints)
+for i := 0; i < numPoints; i++ {
+    frequencySeparation[i] = minFrequency + (maxFrequency-minFrequency)*float64(i)/float64(numPoints-1)
+}
 
-  for i := 0; i < numPoints; i++ {
-    probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
-    if err != nil {
-      fmt.Println("Error converting string probeWavelength to float:", err)
-    }
-    probeWavelength *= 1e-9
+theoreticalPts := make(plotter.XYs, numPoints)
+theoreticalPtsLower := make(plotter.XYs, numPoints)
+theoreticalPtsUpper := make(plotter.XYs, numPoints)
+
+for i := 0; i < numPoints; i++ {
+    // Calculate the probe frequency by adding the frequency separation to the pump frequency
+    probeFrequency := pumpFrequency + frequencySeparation[i]
+    probeWavelength := c / probeFrequency // Convert probe frequency to wavelength in meters
 
     deltaLambda := probeWavelength - pumpWavelength
+
     deltaK := (4 * math.Pi * uhna3Index * deltaLambda) / (pumpWavelength * probeWavelength)
+
+    if i == 0 {
+        fmt.Printf("probeWavelength = %e\n", probeWavelength)
+        fmt.Printf("pumpWavelength = %e\n", pumpWavelength)
+        fmt.Printf("%f\n", deltaK)
+    }
 
     sincTerm := 1.0
     if deltaK != 0 {
-      sincTerm = math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
+        sincTerm = math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
     }
-    theoreticalPts[i].Y = sincTerm
+    theoreticalPts[i].Y = sincTerm * scalingFactor
+    theoreticalPts[i].X = frequencySeparation[i] / 1e9 // Convert frequency separation to GHz for plotting
 
-    // Convert deltaLambda to deltaFrequency
-    probeFrequency := c / probeWavelength
-    deltaFrequency := (pumpFrequency - probeFrequency) / 1e9 // Convert to GHz
-    theoreticalPts[i].X = deltaFrequency
-  }
+    // Calculate deltaK for lower and upper bounds
+    deltaKLower := (4 * math.Pi * uhna3IndexLower * deltaLambda) / (pumpWavelength * probeWavelength)
+    deltaKUpper := (4 * math.Pi * uhna3IndexUpper * deltaLambda) / (pumpWavelength * probeWavelength)
 
-  // Calculate scaling factor
-  scalingFactor := phaseMatchData[1][0] / theoreticalPts[0].Y
-  scalingFactor = 12
+    // Compute sinc² term for lower and upper bounds
+    sincTermLower := 1.0
+    sincTermUpper := 1.0
+    if deltaKLower != 0 {
+        sincTermLower = math.Pow(math.Sin(deltaKLower * lengthLower / 2) / (deltaKLower * lengthLower / 2), 2)
+    }
+    if deltaKUpper != 0 {
+        sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * lengthUpper / 2), 2)
+    }
 
-  // Apply scaling factor to theoretical points
-  for i := 0; i < numPoints; i++ {
-    theoreticalPts[i].Y *= scalingFactor
-  }
+    theoreticalPtsLower[i].Y = sincTermLower * scalingFactor
+    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactor
+
+    theoreticalPtsLower[i].X = frequencySeparation[i] / 1e9 // Convert to GHz for plotting
+    theoreticalPtsUpper[i].X = frequencySeparation[i] / 1e9 // Convert to GHz for plotting
+}
+
 
   /* Apply vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
@@ -2616,50 +2646,6 @@ func plotSinc(
   theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
   p.Legend.Add(theoreticalLegendLabel, line)
   p.Legend.Add("Experimental", scatter)
-
-
-  // Uncertainty bounds for theoretical line
-  uhna3IndexLower := 1.4447 // Lower bound of the refractive index
-  uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
-  lengthLower := length - .05*length
-  lengthUpper := length + .05*length
-
-  // Arrays to hold the upper and lower bound points
-  theoreticalPtsLower := make(plotter.XYs, numPoints)
-  theoreticalPtsUpper := make(plotter.XYs, numPoints)
-
-  for i := 0; i < numPoints; i++ {
-    probeWavelength, err := strconv.ParseFloat(probeLaser[i], 64)
-    if err != nil {
-        fmt.Println("Error converting string probeWavelength to float:", err)
-    }
-    probeWavelength *= 1e-9
-
-    deltaLambda := probeWavelength - pumpWavelength
-
-    // Calculate deltaK for lower and upper bounds
-    deltaKLower := (4 * math.Pi * uhna3IndexLower * deltaLambda) / (pumpWavelength * probeWavelength)
-    deltaKUpper := (4 * math.Pi * uhna3IndexUpper * deltaLambda) / (pumpWavelength * probeWavelength)
-
-    // Compute sinc² term for lower and upper bounds
-    sincTermLower := 1.0
-    sincTermUpper := 1.0
-    if deltaKLower != 0 {
-        sincTermLower = math.Pow(math.Sin(deltaKLower * lengthLower / 2) / (deltaKLower * lengthLower / 2), 2)
-    }
-    if deltaKUpper != 0 {
-        sincTermUpper = math.Pow(math.Sin(deltaKUpper * lengthUpper / 2) / (deltaKUpper * lengthUpper / 2), 2)
-    }
-
-    theoreticalPtsLower[i].Y = sincTermLower * scalingFactor
-    theoreticalPtsUpper[i].Y = sincTermUpper * scalingFactor
-
-    // Convert deltaLambda to deltaFrequency
-    probeFrequency := c / probeWavelength
-    deltaFrequency := (pumpFrequency - probeFrequency) / 1e9 // Convert to GHz
-    theoreticalPtsLower[i].X = deltaFrequency
-    theoreticalPtsUpper[i].X = deltaFrequency
-  }
 
   // Adjust the number of points to exclude from the beginning
   startIndex := 4 // Set this to the index where you want the shading to start
