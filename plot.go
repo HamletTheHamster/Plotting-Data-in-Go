@@ -352,13 +352,12 @@ func main() {
           initialParams = []float64{1, 5, .1, 0, 0}
       }
 
-      //optimizedParams := make([][]float64, len(cabsData))
       phaseMatchPeaks := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
       pumpProbeSep := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
 
       for _, set := range setsToPlotCABS {
 
-        optimizedParams[set] = FitFanoResonance(
+        optimizedParams[set] = FitLorentzian(
           // freq, sig, σ, guess
           cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
         )
@@ -1455,7 +1454,7 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
     logFile = append(logFile, fmt.Sprintf("\t\tq:   %v\n", optimizedParams[set][3]))
-    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
+    //logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
   }
 
   return logFile
@@ -1740,9 +1739,16 @@ func plotCABS(
     // Add fitted curve
     fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
     for i, f := range cabsData[set][0] {
-      A, f0, gamma, q, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
-      fittedCurve[i].X = f
-      fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, q, C)
+      if len(optimizedParams[set]) == 5 {
+        A, f0, gamma, q, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
+        fittedCurve[i].X = f
+        fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, q, C)
+      } else if len(optimizedParams[set]) == 4 {
+        A, f0, gamma, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
+        fittedCurve[i].X = f
+        fittedCurve[i].Y = Lorentzian(f, A, f0, gamma, C)
+      }
+
     }
 
     fittedLine, err := plotter.NewLine(fittedCurve)
