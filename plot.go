@@ -24,15 +24,16 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length, csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length,
+  csvToAvg := flags()
 
   logpath := logpath(note)
 
   date, label, setNums, startTime, endTime, asPowers, sPowers,
   pumpPowers, stokesPowers, probePowers, filepath, sigFilepath, freqFilepath,
   lockinRange, dwell, bandwidth, dataRate, order, startFrequency, stopFrequency,
-  step, numAvgs, asNotes, sNotes, pumpLaser, probeLaser, probeFilter, stokesFilter,
-  notes := readMeta(
+  step, numAvgs, asNotes, sNotes, pumpLaser, probeLaser, probeFilter,
+  stokesFilter, notes := readMeta(
     cabs, lock, temp, coolingExperiment,
   )
 
@@ -324,6 +325,9 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
 
+    // Initialize optimizedParams to store fitted parameters
+    optimizedParams := make([][]float64, len(cabsData))
+
     if multipleRuns, err := os.Stat("Data/1/Runs"); err == nil && multipleRuns.IsDir() {
       sigmaMultiple := 1.
       cabsData = σCABS(
@@ -348,7 +352,7 @@ func main() {
           initialParams = []float64{1, 5, .1, 0, 0}
       }
 
-      optimizedParams := make([][]float64, len(cabsData))
+      //optimizedParams := make([][]float64, len(cabsData))
       phaseMatchPeaks := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
       pumpProbeSep := make([]float64, setsToPlotCABS[len(setsToPlotCABS)-1]+1)
 
@@ -418,7 +422,8 @@ func main() {
       }
     }
     plotCABS(
-      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, slide,
+      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
+      length, slide, optimizedParams,
     )
   }
 
@@ -1541,6 +1546,7 @@ func plotCABS(
   sample, sigUnit, logpath string,
   length float64,
   slide bool,
+  optimizedParams [][]float64,
 ) {
 
   var l string
@@ -1572,7 +1578,6 @@ func plotCABS(
   }
 
   title := l + " " + sample + " CABS"
-  title = "Last Few Measurements with Largest Error"
   xlabel := "Frequency (GHz)"
   var ylabel string
   if contains(normalized, "Powers") {
@@ -1731,6 +1736,24 @@ func plotCABS(
 
       p.Add(plotSet, t, r)
     }
+
+    // Add fitted curve
+    fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
+    for i, f := range cabsData[set][0] {
+      A, f0, gamma, q, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
+      fittedCurve[i].X = f
+      fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, q, C)
+    }
+
+    fittedLine, err := plotter.NewLine(fittedCurve)
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+    fittedLine.LineStyle.Color = palette(set, false, "")
+    fittedLine.LineStyle.Width = vg.Points(2)
+
+    p.Add(fittedLine)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -3148,10 +3171,10 @@ func FitFanoResonance(
       log.Fatal("optimization failed:", err)
   }
 
-  // Ensure amplitude (A) is positive
+  /* Ensure amplitude (A) is positive
   if result.X[0] < 0 {
       result.X[0] = -result.X[0]
-  }
+  }*/
 
   return result.X
 }
@@ -3163,7 +3186,7 @@ func FanoFunction(
 ) {
     numerator := (q + 2*(f - f0)/gamma)
     denominator := (1 + 4*math.Pow(f - f0, 2)/math.Pow(gamma, 2))
-    return A * math.Pow(numerator, 2) / denominator + C
+    return -A * math.Pow(numerator, 2) / denominator + C
 }
 
 func FanoResiduals(
