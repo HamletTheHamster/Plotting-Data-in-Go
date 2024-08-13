@@ -317,7 +317,7 @@ func main() {
 
     //setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(30, 33)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -341,11 +341,11 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{25, 2.5, .08, 1, 0} //amp, cen, wid, q, C
+          initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, q, C
         case "UHNA3":
-          initialParams = []float64{10, 9.14, .1, 1, 0} // (q is Fano asymmetry)
+          initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
         default:
-          initialParams = []float64{1, 5, .1, 1, 0}
+          initialParams = []float64{1, 5, .1, 0, 0}
       }
 
       optimizedParams := make([][]float64, len(cabsData))
@@ -1449,7 +1449,8 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
-    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][3]))
+    logFile = append(logFile, fmt.Sprintf("\t\tq:   %v\n", optimizedParams[set][3]))
+    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
   }
 
   return logFile
@@ -3145,6 +3146,11 @@ func FitFanoResonance(
   result, err := lm.LM(problem, settings)
   if err != nil {
       log.Fatal("optimization failed:", err)
+  }
+
+  // Ensure amplitude (A) is positive
+  if result.X[0] < 0 {
+      result.X[0] = -result.X[0]
   }
 
   return result.X
