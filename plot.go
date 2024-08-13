@@ -2590,12 +2590,6 @@ func plotSinc(
 
     deltaK := (4 * math.Pi * uhna3Index * deltaLambda) / (pumpWavelength * probeWavelength)
 
-    if i == 0 {
-        fmt.Printf("probeWavelength = %e\n", probeWavelength)
-        fmt.Printf("pumpWavelength = %e\n", pumpWavelength)
-        fmt.Printf("%f\n", deltaK)
-    }
-
     sincTerm := 1.0
     if deltaK != 0 {
         sincTerm = math.Pow(math.Sin(deltaK * length / 2) / (deltaK * length / 2), 2)
@@ -2645,61 +2639,38 @@ func plotSinc(
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
   line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 150} // Red line for theoretical plot
-  line.Width = vg.Points(1)
+  line.Width = vg.Points(10)
 
   // Create legend entry for theoretical line
   theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
   p.Legend.Add(theoreticalLegendLabel, line)
   p.Legend.Add("Experimental", scatter)
 
-  // Create the shaded area between the theoretical line and the upper bound
-  fillUpper := make(plotter.XYs, 2*(numPoints-startIndex))
+  // Create the shaded area between the lower and upper bounds
+  fillBounds := make(plotter.XYs, 2*(numPoints-startIndex))
 
-  // Fill theoretical line points
+  // Fill lower bound points
   for i := startIndex; i < numPoints; i++ {
-    fillUpper[i-startIndex].X = theoreticalPts[i].X
-    fillUpper[i-startIndex].Y = theoreticalPts[i].Y
+    fillBounds[i-startIndex].X = theoreticalPtsLower[i].X
+    fillBounds[i-startIndex].Y = theoreticalPtsLower[i].Y
   }
 
   // Fill upper bound points in reverse order
   for i := startIndex; i < numPoints; i++ {
-    fillUpper[numPoints-startIndex+(i-startIndex)].X = theoreticalPtsUpper[numPoints-i+startIndex-1].X
-    fillUpper[numPoints-startIndex+(i-startIndex)].Y = theoreticalPtsUpper[numPoints-i+startIndex-1].Y
+    fillBounds[numPoints-startIndex+(i-startIndex)].X = theoreticalPtsUpper[numPoints-i+startIndex-1].X
+    fillBounds[numPoints-startIndex+(i-startIndex)].Y = theoreticalPtsUpper[numPoints-i+startIndex-1].Y
   }
 
-  // Create a polygon for the filled area between the theoretical line and upper bound
-  polygonUpper, err := plotter.NewPolygon(fillUpper)
+  // Create a polygon for the filled area between the lower and upper bounds
+  polygonBounds, err := plotter.NewPolygon(fillBounds)
   if err != nil {
     log.Fatalf("Could not create polygon for filled area: %v", err)
   }
-  polygonUpper.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
-  polygonUpper.LineStyle.Width = vg.Length(0) // No border
-
-  // Create the shaded area between the theoretical line and the lower bound
-  fillLower := make(plotter.XYs, 2*(numPoints-startIndex))
-
-  // Fill lower bound points
-  for i := startIndex; i < numPoints; i++ {
-    fillLower[i-startIndex].X = theoreticalPtsLower[i].X
-    fillLower[i-startIndex].Y = theoreticalPtsLower[i].Y
-  }
-
-  // Fill theoretical line points in reverse order
-  for i := startIndex; i < numPoints; i++ {
-    fillLower[numPoints-startIndex+(i-startIndex)].X = theoreticalPts[numPoints-i+startIndex-1].X
-    fillLower[numPoints-startIndex+(i-startIndex)].Y = theoreticalPts[numPoints-i+startIndex-1].Y
-  }
-
-  // Create a polygon for the filled area between the theoretical line and lower bound
-  polygonLower, err := plotter.NewPolygon(fillLower)
-  if err != nil {
-    log.Fatalf("Could not create polygon for filled area: %v", err)
-  }
-  polygonLower.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
-  polygonLower.LineStyle.Width = vg.Length(0) // No border
+  polygonBounds.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
+  polygonBounds.LineStyle.Width = vg.Length(0) // No border
 
   // Add the polygons, line, and scatter to the plot
-  p.Add(polygonUpper, polygonLower, line, scatter, t, r)
+  p.Add(polygonBounds, line, scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
