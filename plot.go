@@ -315,9 +315,9 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{1}
+    //setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(0, 74)
+    setsToPlotCABS := rangeInt(30, 33)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -341,11 +341,11 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{25, 2.5, .08, 0} //amp, cen, wid, C
+          initialParams = []float64{25, 2.5, .08, 1, 0} //amp, cen, wid, q, C
         case "UHNA3":
-          initialParams = []float64{10, 9.14, .1, 0} //amp, cen, wid, C
+          initialParams = []float64{10, 9.14, .1, 1, 0} // (q is Fano asymmetry)
         default:
-          initialParams = []float64{1, 5, .1, 0}
+          initialParams = []float64{1, 5, .1, 1, 0}
       }
 
       optimizedParams := make([][]float64, len(cabsData))
@@ -354,7 +354,7 @@ func main() {
 
       for _, set := range setsToPlotCABS {
 
-        optimizedParams[set] = FitLorentzian(
+        optimizedParams[set] = FitFanoResonance(
           // freq, sig, σ, guess
           cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
         )
@@ -2675,7 +2675,6 @@ func plotSinc(
   savePlot(p, "Phase-Match", logpath)
 }
 
-
 func bin(
   sets []int,
   as, s [][][]float64,
@@ -3102,6 +3101,76 @@ func residuals(
 
     for i, f := range frequencies {
         modelValue := Lorentzian(f, A, f0, gamma, C)
+        if len(uncertainties) > 0 && uncertainties[i] != 0 {
+            r[i] = (signals[i] - modelValue) / uncertainties[i]
+        } else {
+            r[i] = signals[i] - modelValue
+        }
+    }
+
+    return r
+}
+
+func FitFanoResonance(
+  frequencies, signals, uncertainties, initialParams []float64,
+) (
+  []float64,
+) {
+
+  // Define the residual function
+  resFunc := func(dst, params []float64) {
+      r := FanoResiduals(params, frequencies, signals, uncertainties)
+      for i := range r {
+          dst[i] = r[i]
+      }
+  }
+
+  // Define NumJac instance
+  nj := &lm.NumJac{Func: resFunc}
+
+  // Problem definition
+  problem := lm.LMProblem{
+      Dim:        5,
+      Size:       len(frequencies),
+      Func:       resFunc,
+      Jac:        nj.Jac, // Use the numerical Jacobian
+      InitParams: initialParams,
+      Tau:        1e-6,
+      Eps1:       1e-8,
+      Eps2:       1e-8,
+  }
+
+  settings := &lm.Settings{Iterations: 1000, ObjectiveTol: 1e-16}
+
+  result, err := lm.LM(problem, settings)
+  if err != nil {
+      log.Fatal("optimization failed:", err)
+  }
+
+  return result.X
+}
+
+func FanoFunction(
+  f, A, f0, gamma, q, C float64,
+) (
+  float64,
+) {
+    numerator := (q + 2*(f - f0)/gamma)
+    denominator := (1 + 4*math.Pow(f - f0, 2)/math.Pow(gamma, 2))
+    return A * math.Pow(numerator, 2) / denominator + C
+}
+
+func FanoResiduals(
+  params, frequencies, signals, uncertainties []float64,
+) (
+  []float64,
+) {
+
+    A, f0, gamma, q, C := params[0], params[1], params[2], params[3], params[4]
+    r := make([]float64, len(frequencies))
+
+    for i, f := range frequencies {
+        modelValue := FanoFunction(f, A, f0, gamma, q, C)
         if len(uncertainties) > 0 && uncertainties[i] != 0 {
             r[i] = (signals[i] - modelValue) / uncertainties[i]
         } else {
