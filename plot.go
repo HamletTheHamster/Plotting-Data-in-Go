@@ -357,12 +357,16 @@ func main() {
 
       for _, set := range setsToPlotCABS {
 
-        optimizedParams[set] = FitLorentzian(
+        optimizedParams[set] = FitFanoResonance(
           // freq, sig, σ, guess
           cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
         )
 
-        phaseMatchPeaks[set] = optimizedParams[set][0]
+        initialParams = optimizedParams[set]
+
+        //phaseMatchPeaks[set] = optimizedParams[set][0]
+        phaseMatchPeaks[set] = cabsData[set][1][72]
+
         probeValue, err := strconv.ParseFloat(probeLaser[set], 64)
         if err != nil {
           // handle error, maybe log it and/or return
@@ -1454,7 +1458,7 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
     logFile = append(logFile, fmt.Sprintf("\t\tq:   %v\n", optimizedParams[set][3]))
-    //logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
+    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
   }
 
   return logFile
@@ -3165,9 +3169,9 @@ func FitFanoResonance(
       Func:       resFunc,
       Jac:        nj.Jac, // Use the numerical Jacobian
       InitParams: initialParams,
-      Tau:        1e-6,
-      Eps1:       1e-8,
-      Eps2:       1e-8,
+      Tau:        1e-5,
+      Eps1:       1e-6,
+      Eps2:       1e-6,
   }
 
   settings := &lm.Settings{Iterations: 1000, ObjectiveTol: 1e-16}
@@ -3176,11 +3180,6 @@ func FitFanoResonance(
   if err != nil {
       log.Fatal("optimization failed:", err)
   }
-
-  /* Ensure amplitude (A) is positive
-  if result.X[0] < 0 {
-      result.X[0] = -result.X[0]
-  }*/
 
   return result.X
 }
