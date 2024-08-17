@@ -2950,8 +2950,24 @@ func plotTheoreticalSpectra(
     scatter.GlyphStyle.Color = color.RGBA{R: 255, G: 78, B: 96, A: 255} // Red color for visibility
 
     // Add tick marks and labels
-    p2.X.Tick.Marker = plot.DefaultTicks{}
-    p2.Y.Tick.Marker = plot.DefaultTicks{}
+    // Manually set the tick marks and labels to match the sinc^2 plot
+    tickPositionsX := []float64{5, 10, 15, 20, 25, 30, 35, 40}
+    tickLabelsX := []string{"5", "10", "15", "20", "25", "30", "35", "40"}
+    ticksX := make([]plot.Tick, len(tickPositionsX))
+    for i := range tickPositionsX {
+        ticksX[i] = plot.Tick{Value: tickPositionsX[i], Label: tickLabelsX[i]}
+    }
+
+    // Define custom y-axis ticks
+    tickPositionsY := []float64{0, 50, 100, 150, 200, 250}
+    tickLabelsY := []string{"0", "50", "100", "150", "200", "250"}
+    ticksY := make([]plot.Tick, len(tickPositionsY))
+    for i := range tickPositionsY {
+        ticksY[i] = plot.Tick{Value: tickPositionsY[i], Label: tickLabelsY[i]}
+    }
+
+    p2.X.Tick.Marker = plot.ConstantTicks(ticksX)
+    p2.Y.Tick.Marker = plot.ConstantTicks(ticksY)
 
     p2.Add(scatter, tAxis, rAxis)
 
