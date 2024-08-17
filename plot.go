@@ -2716,25 +2716,39 @@ func plotSinc(
 }
 
 func plotTheoreticalSpectra(
-  length float64,
+  L float64,
   sample, logpath string,
 ) {
-    var L, OmegaB, GammaB, Pp, Ps, Ppr float64
+
+    var OmegaB, GammaB, n, deltaLambda, lambdaPump,
+    lambdaProbe float64
     switch sample {
     case "UHNA3":
-        L = length
-        //coreRadius := 0.9e-6 // Core radius in meters (0.9 um)
-        //Aeff = math.Pi * math.Pow(coreRadius, 2)
-        //g0    = 1.0e-10   // Adjust according to your system (m^2/W)
+        n = 1.48            // Refractive index
         OmegaB = 9.145e9    // Brillouin shift (Hz)
         GammaB = 100.0e6    // Brillouin linewidth (Hz)
-        Pp    = 0.2    // Pump power (W)
-        Ps    = 0.5   // Stokes power (W)
-        Ppr   = 0.5    // Probe power (W)
     default:
         fmt.Println("Unknown sample type")
         return
     }
+
+    Pp := 0.2   // Pump power (W)
+    Ps := 0.5   // Stokes power (W)
+    Ppr := 0.5  // Probe power (W)
+
+    lambdaPump = 1548.754e-9 // Pump wavelength (in meters)
+    lambdaProbe = 1548.794e-9 // Probe wavelength (in meters)
+    deltaLambda = lambdaProbe - lambdaPump
+
+    // Calculate delta k using the new formula
+    deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
+    fmt.Printf("deltaK = %e\n", deltaK)
+
+    // Calculate the sinc^2 term
+    sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
+
+    // Calculate the peak scattered power (at OmegaB)
+    Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
 
     // Prepare data for plotting
     numPoints := 1000  // Reduced number of points for debugging
@@ -2742,8 +2756,8 @@ func plotTheoreticalSpectra(
     Y := make([]float64, numPoints)
 
     // Frequency range
-    startFreq := (OmegaB - 5.0e8) / 1e9  // Convert to GHz
-    stopFreq := (OmegaB + 5.0e8) / 1e9   // Convert to GHz
+    startFreq := 9.0
+    stopFreq := 9.3
     freqStep := (stopFreq - startFreq) / float64(numPoints)
 
     // Calculate the spectrum over the range of frequencies
@@ -2751,13 +2765,13 @@ func plotTheoreticalSpectra(
         freq := startFreq + float64(i)*freqStep
 
         // Convert GHz back to Hz for the calculation
-        freqHz := freq * 1e9
+        OmegaHz := freq * 1e9
 
         // Calculate GB using the original formula, but replacing g0/Aeff with 0.6
-        GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(freqHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
+        GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(OmegaHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
 
         // Calculate scattered power
-        Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr
+        Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
 
         // Store frequency and corresponding power in nW
         X[i] = freq
@@ -2767,8 +2781,8 @@ func plotTheoreticalSpectra(
     // Generate y-axis tick labels corresponding to the actual values in nW
     ytickLabels := []string{
         "",
-        fmt.Sprintf("%.0f", Y[numPoints/2] * 0.5),
-        fmt.Sprintf("%.0f", Y[numPoints/2]),
+        fmt.Sprintf("%.0f", Psig_peak * 1e9 * 0.5),
+        fmt.Sprintf("%.0f", Psig_peak * 1e9),
     }
 
     // Define the xtick labels to reflect actual frequency values
@@ -2780,12 +2794,12 @@ func plotTheoreticalSpectra(
     }
 
     // Use prepPlot to prepare the plot with uniform styling
-    title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", length*100, sample)
-    xlabel := "Frequency (GHz)"  // Updated to GHz
+    title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", L*100, sample)
+    xlabel := "Frequency (GHz)"
     ylabel := "Scattered Power (nW)"
     legend := ""
     xrange := []float64{startFreq, stopFreq}
-    yrange := []float64{0, Y[numPoints/2] * 1.2}  // Adjust as needed
+    yrange := []float64{0, Y[numPoints/2] * 1.2}
     ytick := []float64{0, Y[numPoints/2] * 0.5, Y[numPoints/2]}
 
     p, tAxis, rAxis := prepPlot(
