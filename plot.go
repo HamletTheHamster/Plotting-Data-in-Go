@@ -318,7 +318,7 @@ func main() {
 
     //setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(5, 75)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -2685,7 +2685,7 @@ func plotSinc(
   if err != nil {
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
-  line.Color = color.RGBA{R: 255, G: 0, B: 0, A: 150} // Red line for theoretical plot
+  line.Color = color.RGBA{R: 255, G: 78, B: 96, A: 255} // Red line for theoretical plot
   line.Width = vg.Points(10)
 
   // Create legend entry for theoretical line
@@ -2713,7 +2713,7 @@ func plotSinc(
   if err != nil {
     log.Fatalf("Could not create polygon for filled area: %v", err)
   }
-  polygonBounds.Color = color.RGBA{R: 255, G: 0, B: 0, A: 50} // Lighter red color for the fill
+  polygonBounds.Color = color.RGBA{R: 255, G: 153, B: 163, A: 255} // Lighter red color for the fill
   polygonBounds.LineStyle.Width = vg.Length(0) // No border
 
   // Add the polygons, line, and scatter to the plot
@@ -2789,7 +2789,7 @@ func plotTheoreticalSpectra(
 
         // Store the peak value and corresponding detuning
         peakValues[i] = Psig_peak * 1e12 // Convert to pW
-        detunings[i] = deltaLambda * 1e9 // Convert detuning to GHz
+        detunings[i] = 1e9 * deltaLambda / 0.008 // Convert detuning to GHz
 
         // Prepare data for plotting
         numPoints := 1000
@@ -2924,12 +2924,12 @@ func plotTheoreticalSpectra(
 
 
     // Theoretical spectra peak values vs P-Pr detunings
-    p2, _, _ := prepPlot(
+    p2, tAxis, rAxis := prepPlot(
         "Peak Scattered Power vs. Pump-Probe Detuning",
         "Pump-Probe Detuning (GHz)",
         "Scattered Power (pW)",
         "",
-        []float64{detunings[0], detunings[len(detunings)-1]},
+        []float64{0, detunings[len(detunings)-1]},
         []float64{0, findMax(peakValues) * 1.2},
         nil, nil,
         nil, nil, false,
@@ -2946,10 +2946,14 @@ func plotTheoreticalSpectra(
     }
 
     scatter.GlyphStyle.Shape = draw.CircleGlyph{}
-    scatter.GlyphStyle.Radius = vg.Points(3)
-    scatter.GlyphStyle.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red color for visibility
+    scatter.GlyphStyle.Radius = vg.Points(5)
+    scatter.GlyphStyle.Color = color.RGBA{R: 255, G: 78, B: 96, A: 255} // Red color for visibility
 
-    p2.Add(scatter)
+    // Add tick marks and labels
+    p2.X.Tick.Marker = plot.DefaultTicks{}
+    p2.Y.Tick.Marker = plot.DefaultTicks{}
+
+    p2.Add(scatter, tAxis, rAxis)
 
     // Save the peak values plot
     savePlot(p2, "Peak-Scattered-Power-vs-Detuning", logpath)
