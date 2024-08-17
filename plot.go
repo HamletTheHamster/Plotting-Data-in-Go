@@ -390,10 +390,6 @@ func main() {
         )
       }
 
-      if theoreticalSpectra {
-        plotTheoreticalSpectra(length, sample, logpath)
-      }
-
       binCabsSets := []int{}
       if len(binCabsSets) > 0 {
         binMHz := 11.
@@ -427,6 +423,11 @@ func main() {
         cabsData = binCabs(binCabsSets, cabsData, binMHz)
       }
     }
+
+    if theoreticalSpectra {
+      plotTheoreticalSpectra(length, sample, logpath)
+    }
+
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
       length, slide, optimizedParams,
