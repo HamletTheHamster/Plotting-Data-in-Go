@@ -316,9 +316,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    //setsToPlotCABS := []int{0}
 
-    //setsToPlotCABS := rangeInt(0, 75)
+    setsToPlotCABS := rangeInt(0, 5)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -430,7 +430,7 @@ func main() {
     if theoreticalSpectra {
       plotTheoreticalSpectra(
         length, sample, logpath,
-        label[0], setsToPlotCABS, pumpPowers, stokesPowers, probePowers,
+        label, setsToPlotCABS, pumpPowers, stokesPowers, probePowers,
         startFrequency, stopFrequency, pumpLaser, probeLaser,
     )
     }
@@ -2722,137 +2722,17 @@ func plotSinc(
   savePlot(p, "Phase-Match", logpath)
 }
 
-// func plotTheoreticalSpectra(
-//   L float64,
-//   sample, logpath string,
-// ) {
-//
-//     var OmegaB, GammaB, n, deltaLambda, lambdaPump,
-//     lambdaProbe float64
-//     switch sample {
-//     case "UHNA3":
-//         n = 1.48            // Refractive index
-//         OmegaB = 9.145e9    // Brillouin shift (Hz)
-//         GammaB = 100.0e6    // Brillouin linewidth (Hz)
-//     default:
-//         fmt.Println("Unknown sample type")
-//         return
-//     }
-//
-//     Pp := 57.8e-3     // Pump power (W)
-//     Ps := 25.61e-3    // Stokes power (W)
-//     Ppr := 41.09e-3   // Probe power (W)
-//     label := "5.0 GHz"   // Pump-Probe detuning
-//     lambdaPump = 1548.754e-9  // Pump wavelength (in meters)
-//     lambdaProbe = 1548.794e-9 // Probe wavelength (in meters)
-//     deltaLambda = lambdaProbe - lambdaPump
-//
-//     // Calculate delta k using the new formula
-//     deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
-//
-//     // Calculate the sinc^2 term
-//     sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
-//
-//     // Calculate the peak scattered power (at OmegaB)
-//     Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
-//
-//     fmt.Printf("Psig_peak: %e W\n", Psig_peak)
-//
-//     // Prepare data for plotting
-//     numPoints := 1000
-//     X := make([]float64, numPoints)
-//     Y := make([]float64, numPoints)
-//
-//     // Frequency range
-//     startFreq := 9.0
-//     stopFreq := 9.3
-//     freqStep := (stopFreq - startFreq) / float64(numPoints)
-//
-//     // Calculate the spectrum over the range of frequencies
-//     for i := 0; i < numPoints; i++ {
-//         freq := startFreq + float64(i)*freqStep
-//
-//         // Convert GHz back to Hz for the calculation
-//         OmegaHz := freq * 1e9
-//
-//         // Calculate GB using the original formula, but replacing g0/Aeff with 0.6
-//         GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(OmegaHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
-//
-//         // Calculate scattered power
-//         Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
-//
-//         // Store frequency and corresponding power in pW
-//         X[i] = freq
-//         Y[i] = Psig * 1e12  // Convert to pW (from Watts)
-//     }
-//
-//     // Generate y-axis tick labels corresponding to the actual values in pW
-//     ytickLabels := []string{
-//         "",
-//         fmt.Sprintf("%.0f", Psig_peak * 1e12 * 0.5), // in pW
-//         fmt.Sprintf("%.0f", Psig_peak * 1e12),       // in pW
-//     }
-//
-//     // Define the xtick labels to reflect actual frequency values
-//     xtick := []float64{startFreq, OmegaB / 1e9, stopFreq}
-//     xtickLabels := []string{
-//         fmt.Sprintf("%.3f GHz", startFreq),
-//         fmt.Sprintf("%.3f GHz", OmegaB / 1e9),
-//         fmt.Sprintf("%.3f GHz", stopFreq),
-//     }
-//
-//     // Use prepPlot to prepare the plot with uniform styling
-//     title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", L*100, sample)
-//     xlabel := "Frequency (GHz)"
-//     ylabel := "Scattered Power (pW)"
-//     legend := ""
-//     xrange := []float64{startFreq, stopFreq}
-//     yrange := []float64{0, Y[numPoints/2] * 1.2}
-//     ytick := []float64{0, Y[numPoints/2] * 0.5, Y[numPoints/2]}
-//
-//     p, tAxis, rAxis := prepPlot(
-//         title, xlabel, ylabel, legend,
-//         xrange, yrange, xtick, ytick,
-//         xtickLabels, ytickLabels, false,
-//     )
-//
-//     // Create a line plotter for the Lorentzian spectrum
-//     line, err := plotter.NewLine(plotter.XYs{})
-//     if err != nil {
-//         panic(err)
-//     }
-//
-//     // Correctly plotting all points
-//     for i := 0; i < numPoints; i++ {
-//         line.XYs = append(line.XYs, plotter.XY{X: X[i], Y: Y[i]})
-//     }
-//
-//     // Use palette helper function to set the color for set 0
-//     line.Color = palette(0, false, "")
-//     line.Width = vg.Points(5)
-//
-//     // Add the line plotter to the legend
-//     p.Legend.Add(label, line)
-//     p.Legend.XOffs = vg.Points(-125)
-//
-//     // Add the line plotter to the plot
-//     p.Add(line, tAxis, rAxis)
-//
-//     // Save the plot
-//     savePlot(p, "Theoretical-Spectra", logpath)
-// }
-
 func plotTheoreticalSpectra(
   L float64,
-  sample, logpath, label string,
+  sample, logpath string,
+  label []string,
   sets []int,
   pumpPowers, stokesPowers, probePowers []float64,
   startFrequency, stopFrequency []float64,
   pumpLaser, probeLaser []string,
 ) {
 
-    var OmegaB, GammaB, n, deltaLambda, lambdaPump,
-    lambdaProbe float64
+    var OmegaB, GammaB, n float64
     switch sample {
     case "UHNA3":
         n = 1.48            // Refractive index
@@ -2863,122 +2743,192 @@ func plotTheoreticalSpectra(
         return
     }
 
-    set := sets[0]
+    // Use the start and stop frequencies from the first set
+    xMin := startFrequency[sets[0]] / 1e9 // Convert to GHz
+    xMax := stopFrequency[sets[0]] / 1e9  // Convert to GHz
 
-    Pp := pumpPowers[set] * 1e-3   // Convert mW to W
-    Ps := stokesPowers[set] * 1e-3 // Convert mW to W
-    Ppr := probePowers[set] * 1e-3 // Convert mW to W
+    // Initialize yMax
+    yMax := 0.0
 
-    // Convert laser wavelengths from nm to meters
-    lambdaPump, err := strconv.ParseFloat(pumpLaser[set], 64)
-    if err != nil {
-        fmt.Println("Error parsing pump laser wavelength:", err)
-        return
-    }
-    lambdaPump *= 1e-9 // Convert nm to meters
+    // First loop to determine the maximum y value
+    for _, set := range sets {
 
-    lambdaProbe, err = strconv.ParseFloat(probeLaser[set], 64)
-    if err != nil {
-        fmt.Println("Error parsing probe laser wavelength:", err)
-        return
-    }
-    lambdaProbe *= 1e-9 // Convert nm to meters
+        Pp := pumpPowers[set] * 1e-3   // Convert mW to W
+        Ps := stokesPowers[set] * 1e-3 // Convert mW to W
+        Ppr := probePowers[set] * 1e-3 // Convert mW to W
 
-    deltaLambda = lambdaProbe - lambdaPump
+        // Convert laser wavelengths from nm to meters
+        lambdaPump, err := strconv.ParseFloat(pumpLaser[set], 64)
+        if err != nil {
+            fmt.Println("Error parsing pump laser wavelength:", err)
+            return
+        }
+        lambdaPump *= 1e-9 // Convert nm to meters
 
-    // Calculate delta k using the new formula
-    deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
+        lambdaProbe, err := strconv.ParseFloat(probeLaser[set], 64)
+        if err != nil {
+            fmt.Println("Error parsing probe laser wavelength:", err)
+            return
+        }
+        lambdaProbe *= 1e-9 // Convert nm to meters
 
-    // Calculate the sinc^2 term
-    sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
+        deltaLambda := lambdaProbe - lambdaPump
 
-    // Calculate the peak scattered power (at OmegaB)
-    Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
+        // Calculate delta k using the new formula
+        deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
 
-    fmt.Printf("Psig_peak: %e W\n", Psig_peak)
+        // Calculate the sinc^2 term
+        sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
 
-    // Prepare data for plotting
-    numPoints := 1000
-    X := make([]float64, numPoints)
-    Y := make([]float64, numPoints)
+        // Calculate the peak scattered power (at OmegaB)
+        Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
 
-    // Frequency range
-    startFreq := startFrequency[set] / 1e9 // Convert to GHz
-    stopFreq := stopFrequency[set] / 1e9   // Convert to GHz
-    freqStep := (stopFreq - startFreq) / float64(numPoints)
+        fmt.Printf("Set %d: Psig_peak: %e W\n", set, Psig_peak)
 
-    // Calculate the spectrum over the range of frequencies
-    for i := 0; i < numPoints; i++ {
-        freq := startFreq + float64(i)*freqStep
+        // Prepare data for plotting
+        numPoints := 1000
+        Y := make([]float64, numPoints)
 
-        // Convert GHz back to Hz for the calculation
-        OmegaHz := freq * 1e9
+        // Frequency range
+        startFreq := startFrequency[set] / 1e9 // Convert to GHz
+        stopFreq := stopFrequency[set] / 1e9   // Convert to GHz
+        freqStep := (stopFreq - startFreq) / float64(numPoints)
 
-        // Calculate GB using the original formula, but replacing g0/Aeff with 0.6
-        GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(OmegaHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
+        // Calculate the spectrum over the range of frequencies
+        for i := 0; i < numPoints; i++ {
+            freq := startFreq + float64(i)*freqStep
 
-        // Calculate scattered power
-        Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
+            // Convert GHz back to Hz for the calculation
+            OmegaHz := freq * 1e9
 
-        // Store frequency and corresponding power in pW
-        X[i] = freq
-        Y[i] = Psig * 1e12  // Convert to pW (from Watts)
-    }
+            // Calculate GB using the original formula, but replacing g0/Aeff with 0.6
+            GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(OmegaHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
 
-    // Generate y-axis tick labels corresponding to the actual values in pW
-    ytickLabels := []string{
-        "",
-        fmt.Sprintf("%.0f", Psig_peak * 1e12 * 0.5), // in pW
-        fmt.Sprintf("%.0f", Psig_peak * 1e12),       // in pW
-    }
+            // Calculate scattered power
+            Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
 
-    // Define the xtick labels to reflect actual frequency values
-    xtick := []float64{startFreq, OmegaB / 1e9, stopFreq}
-    xtickLabels := []string{
-        fmt.Sprintf("%.3f GHz", startFreq),
-        fmt.Sprintf("%.3f GHz", OmegaB / 1e9),
-        fmt.Sprintf("%.3f GHz", stopFreq),
+            // Store corresponding power in pW
+            Y[i] = Psig * 1e12  // Convert to pW (from Watts)
+        }
+
+        // Update yMax based on this set's data
+        maxY := findMax(Y)
+        if maxY > yMax {
+            yMax = maxY * 1.2
+        }
     }
 
-    // Use prepPlot to prepare the plot with uniform styling
-    title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", L*100, sample)
-    xlabel := "Frequency (GHz)"
-    ylabel := "Scattered Power (pW)"
-    legend := ""
-    xrange := []float64{startFreq, stopFreq}
-    yrange := []float64{0, Y[numPoints/2] * 1.2}
-    ytick := []float64{0, Y[numPoints/2] * 0.5, Y[numPoints/2]}
-
+    // Now that we have yMax, initialize the plot with correct ranges
     p, tAxis, rAxis := prepPlot(
-        title, xlabel, ylabel, legend,
-        xrange, yrange, xtick, ytick,
-        xtickLabels, ytickLabels, false,
+        fmt.Sprintf("Theoretical Spectra of %.2f cm %s", L*100, sample),
+        "Frequency (GHz)",
+        "Scattered Power (pW)",
+        "",
+        []float64{xMin, xMax}, []float64{0, yMax}, nil, nil,
+        nil, nil, false,
     )
 
-    // Create a line plotter for the Lorentzian spectrum
-    line, err := plotter.NewLine(plotter.XYs{})
-    if err != nil {
-        panic(err)
+    // Second loop to actually plot the data
+    for _, set := range sets {
+
+        Pp := pumpPowers[set] * 1e-3   // Convert mW to W
+        Ps := stokesPowers[set] * 1e-3 // Convert mW to W
+        Ppr := probePowers[set] * 1e-3 // Convert mW to W
+
+        // Convert laser wavelengths from nm to meters
+        lambdaPump, err := strconv.ParseFloat(pumpLaser[set], 64)
+        if err != nil {
+            fmt.Println("Error parsing pump laser wavelength:", err)
+            return
+        }
+        lambdaPump *= 1e-9 // Convert nm to meters
+
+        lambdaProbe, err := strconv.ParseFloat(probeLaser[set], 64)
+        if err != nil {
+            fmt.Println("Error parsing probe laser wavelength:", err)
+            return
+        }
+        lambdaProbe *= 1e-9 // Convert nm to meters
+
+        deltaLambda := lambdaProbe - lambdaPump
+
+        // Calculate delta k using the new formula
+        deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
+
+        // Calculate the sinc^2 term
+        sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
+
+        // Prepare data for plotting
+        numPoints := 1000
+        X := make([]float64, numPoints)
+        Y := make([]float64, numPoints)
+
+        // Frequency range
+        startFreq := startFrequency[set] / 1e9 // Convert to GHz
+        stopFreq := stopFrequency[set] / 1e9   // Convert to GHz
+        freqStep := (stopFreq - startFreq) / float64(numPoints)
+
+        // Calculate the spectrum over the range of frequencies
+        for i := 0; i < numPoints; i++ {
+            freq := startFreq + float64(i)*freqStep
+
+            // Convert GHz back to Hz for the calculation
+            OmegaHz := freq * 1e9
+
+            // Calculate GB using the original formula, but replacing g0/Aeff with 0.6
+            GB := 0.6 * math.Pow(GammaB/2, 2) / (math.Pow(OmegaHz-OmegaB, 2) + math.Pow(GammaB/2, 2))
+
+            // Calculate scattered power
+            Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
+
+            // Store frequency and corresponding power in pW
+            X[i] = freq
+            Y[i] = Psig * 1e12  // Convert to pW (from Watts)
+        }
+
+        // Create a line plotter for the Lorentzian spectrum
+        line, err := plotter.NewLine(plotter.XYs{})
+        if err != nil {
+            panic(err)
+        }
+
+        // Correctly plotting all points
+        for i := 0; i < numPoints; i++ {
+            line.XYs = append(line.XYs, plotter.XY{X: X[i], Y: Y[i]})
+        }
+
+        // Use palette helper function to set the color for the current set
+        line.Color = palette(set, false, "")
+        line.Width = vg.Points(5)
+
+        // Add the line plotter to the legend
+        p.Legend.Add(fmt.Sprintf("%s", label[set]), line)
+
+        // Add the line plotter to the plot
+        p.Add(line)
     }
 
-    // Correctly plotting all points
-    for i := 0; i < numPoints; i++ {
-        line.XYs = append(line.XYs, plotter.XY{X: X[i], Y: Y[i]})
-    }
-
-    // Use palette helper function to set the color for set 0
-    line.Color = palette(0, false, "")
-    line.Width = vg.Points(5)
-
-    // Add the line plotter to the legend
-    p.Legend.Add(label, line)
-    p.Legend.XOffs = vg.Points(-125)
-
-    // Add the line plotter to the plot
-    p.Add(line, tAxis, rAxis)
+    // Add tick labels and axes
+    p.X.Tick.Marker = plot.DefaultTicks{}
+    p.Y.Tick.Marker = plot.DefaultTicks{}
+    p.Add(tAxis, rAxis)
 
     // Save the plot
     savePlot(p, "Theoretical-Spectra", logpath)
+}
+
+func findMax(
+  values []float64,
+  ) (
+    float64,
+  ) {
+    max := values[0]
+    for _, v := range values {
+        if v > max {
+            max = v
+        }
+    }
+    return max
 }
 
 func bin(
