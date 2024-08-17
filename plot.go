@@ -318,7 +318,7 @@ func main() {
 
     //setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(0, 5)
+    setsToPlotCABS := rangeInt(5, 75)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -2743,6 +2743,10 @@ func plotTheoreticalSpectra(
         return
     }
 
+    // Store peak values and detunings
+    peakValues := make([]float64, len(sets))
+    detunings := make([]float64, len(sets))
+
     // Use the start and stop frequencies from the first set
     xMin := startFrequency[sets[0]] / 1e9 // Convert to GHz
     xMax := stopFrequency[sets[0]] / 1e9  // Convert to GHz
@@ -2751,7 +2755,7 @@ func plotTheoreticalSpectra(
     yMax := 0.0
 
     // First loop to determine the maximum y value
-    for _, set := range sets {
+    for i, set := range sets {
 
         Pp := pumpPowers[set] * 1e-3   // Convert mW to W
         Ps := stokesPowers[set] * 1e-3 // Convert mW to W
@@ -2783,7 +2787,9 @@ func plotTheoreticalSpectra(
         // Calculate the peak scattered power (at OmegaB)
         Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
 
-        fmt.Printf("Set %d: Psig_peak: %e W\n", set, Psig_peak)
+        // Store the peak value and corresponding detuning
+        peakValues[i] = Psig_peak * 1e12 // Convert to pW
+        detunings[i] = deltaLambda * 1e9 // Convert detuning to GHz
 
         // Prepare data for plotting
         numPoints := 1000
@@ -2829,7 +2835,7 @@ func plotTheoreticalSpectra(
     )
 
     // Second loop to actually plot the data
-    for _, set := range sets {
+    for i, set := range sets {
 
         Pp := pumpPowers[set] * 1e-3   // Convert mW to W
         Ps := stokesPowers[set] * 1e-3 // Convert mW to W
@@ -2898,7 +2904,7 @@ func plotTheoreticalSpectra(
         }
 
         // Use palette helper function to set the color for the current set
-        line.Color = palette(set, false, "")
+        line.Color = palette(i, false, "")
         line.Width = vg.Points(5)
 
         // Add the line plotter to the legend
@@ -2915,6 +2921,38 @@ func plotTheoreticalSpectra(
 
     // Save the plot
     savePlot(p, "Theoretical-Spectra", logpath)
+
+
+    // Theoretical spectra peak values vs P-Pr detunings
+    p2, _, _ := prepPlot(
+        "Peak Scattered Power vs. Pump-Probe Detuning",
+        "Pump-Probe Detuning (GHz)",
+        "Scattered Power (pW)",
+        "",
+        []float64{detunings[0], detunings[len(detunings)-1]},
+        []float64{0, findMax(peakValues) * 1.2},
+        nil, nil,
+        nil, nil, false,
+    )
+
+    // Create a scatter plot for the peak values
+    scatter, err := plotter.NewScatter(plotter.XYs{})
+    if err != nil {
+        panic(err)
+    }
+
+    for i := range peakValues {
+        scatter.XYs = append(scatter.XYs, plotter.XY{X: detunings[i], Y: peakValues[i]})
+    }
+
+    scatter.GlyphStyle.Shape = draw.CircleGlyph{}
+    scatter.GlyphStyle.Radius = vg.Points(3)
+    scatter.GlyphStyle.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red color for visibility
+
+    p2.Add(scatter)
+
+    // Save the peak values plot
+    savePlot(p2, "Peak-Scattered-Power-vs-Detuning", logpath)
 }
 
 func findMax(
