@@ -24,8 +24,8 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length,
-  csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, sample, coolingExperiment,
+  note, length, csvToAvg := flags()
 
   logpath := logpath(note)
 
@@ -383,12 +383,15 @@ func main() {
       }
 
       if sinc {
-
         plotSinc(
           setsToPlotCABS, [][]float64{pumpProbeSep, phaseMatchPeaks}, label,
           sample, logpath, length, slide,
           pumpPowers, stokesPowers, probePowers, pumpLaser, probeLaser,
         )
+      }
+
+      if theoreticalSpectra {
+        plotTheoreticalSpectra(length, sample, logpath)
       }
 
       binCabsSets := []int{}
@@ -436,10 +439,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, string, string, string, float64, int,
+  bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide, sinc bool
+  var cabs, lock, temp, slide, sinc, theoreticalSpectra bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -449,6 +452,7 @@ func flags() (
   flag.BoolVar(&temp, "temp", false, "contains temperature data in notes column")
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.BoolVar(&sinc, "sinc", false, "plot sinc^2 function (phase-matching data)")
+  flag.BoolVar(&theoreticalSpectra, "theoreticalSpectra", false, "plot theoretical CABS spectra")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -466,7 +470,8 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sinc, sample, coolingExperiment, note, length, avg
+  return cabs, lock, temp, slide, sinc, theoreticalSpectra, sample,
+  coolingExperiment, note, length, avg
 }
 
 func logpath(
@@ -2707,6 +2712,93 @@ func plotSinc(
   p.Add(polygonBounds, line, scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
+}
+
+func plotTheoreticalSpectra(
+  length float64,
+  sample, logpath string,
+  ) {
+
+    var L, g0, Aeff, OmegaB, GammaB, Pp, Ps, Ppr float64
+    switch sample {
+    case "UHNA3":
+        L = length
+        coreRadius := 0.9e-6 // Core radius in meters (0.9 um)
+        Aeff = math.Pi * math.Pow(coreRadius, 2)
+        g0    = 1.0e-10   // Adjust according to your system (m^2/W)
+        OmegaB = 9.145e9    // Brillouin shift (Hz)
+        GammaB = 100.0e6    // Brillouin linewidth (Hz)
+        Pp    = 0.2    // Pump power (W)
+        Ps    = 0.5   // Stokes power (W)
+        Ppr   = 0.5    // Probe power (W)
+    default:
+        fmt.Println("Unknown sample type")
+        return
+    }
+
+    fmt.Printf("Effective area (Aeff) for %s: %e m^2\n", sample, Aeff)
+
+    // Calculate GB (Brillouin gain)
+    GB := g0 / Aeff * math.Pow(GammaB/2, 2) / (math.Pow(OmegaB-OmegaB, 2) + math.Pow(GammaB/2, 2))
+    GB = 0.6
+
+    // Calculate on-resonance scattered power
+    Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr
+
+    // Print the calculated power for debugging
+    fmt.Printf("On-resonance scattered power: %e W\n", Psig)
+
+    // Convert Psig to nW
+    Psig_nW := Psig * 1e9
+
+    // Prepare data for plotting
+    X := []float64{OmegaB}
+    Y := []float64{Psig_nW}
+
+    // Generate y-axis tick labels corresponding to the actual values in µW
+    ytickLabels := []string{
+        fmt.Sprintf("%.2f", 0.0),
+        fmt.Sprintf("%.2f", Psig_nW * 0.5),
+        fmt.Sprintf("%.2f", Psig_nW),
+    }
+
+    // Use prepPlot to prepare the plot with uniform styling
+    title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", length*100, sample)
+    xlabel := "Frequency (Hz)"
+    ylabel := "Scattered Power (nW)"
+    legend := "On-resonance Power"
+    xrange := []float64{OmegaB - 5.0e8, OmegaB + 5.0e8}
+    yrange := []float64{0, Psig_nW * 1.1}
+    xtick := []float64{xrange[0], OmegaB, xrange[1]}
+    ytick := []float64{0, Psig_nW * 0.5, Psig_nW}
+    xtickLabels := []string{"-100 MHz", "0 MHz", "+100 MHz"}
+
+    p, tAxis, rAxis := prepPlot(
+        title, xlabel, ylabel, legend,
+        xrange, yrange, xtick, ytick,
+        xtickLabels, ytickLabels, false,
+    )
+
+    // Create a scatter plotter to add a visible marker
+    scatter, err := plotter.NewScatter(plotter.XYs{
+        {X[0], Y[0]},
+    })
+    if err != nil {
+        panic(err)
+    }
+
+    // Optionally, customize the marker style (size, shape, color)
+    scatter.GlyphStyle.Shape = draw.CrossGlyph{}
+    scatter.GlyphStyle.Radius = vg.Points(5)
+    scatter.GlyphStyle.Color = color.RGBA{R: 255, G: 0, B: 0, A: 255} // Red color for visibility
+
+    // Add the scatter plotter to the plot
+    p.Add(scatter, tAxis, rAxis)
+
+    // Save the plot
+    savePlot(p, "Theoretical-Spectra", logpath)
+
+    fmt.Println("Theoretical spectra plot saved as theoretical_spectra.png")
 }
 
 func bin(
