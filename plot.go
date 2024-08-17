@@ -2766,9 +2766,9 @@ func plotTheoreticalSpectra(
 
     // Generate y-axis tick labels corresponding to the actual values in nW
     ytickLabels := []string{
-        fmt.Sprintf("%.2f", 0.0),
-        fmt.Sprintf("%.2f", Y[numPoints/2] * 0.5),
-        fmt.Sprintf("%.2f", Y[numPoints/2]),
+        "",
+        fmt.Sprintf("%.0f", Y[numPoints/2] * 0.5),
+        fmt.Sprintf("%.0f", Y[numPoints/2]),
     }
 
     // Define the xtick labels to reflect actual frequency values
@@ -2783,7 +2783,7 @@ func plotTheoreticalSpectra(
     title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", length*100, sample)
     xlabel := "Frequency (GHz)"  // Updated to GHz
     ylabel := "Scattered Power (nW)"
-    legend := "Δk = 0"
+    legend := ""
     xrange := []float64{startFreq, stopFreq}
     yrange := []float64{0, Y[numPoints/2] * 1.2}  // Adjust as needed
     ytick := []float64{0, Y[numPoints/2] * 0.5, Y[numPoints/2]}
@@ -2810,7 +2810,8 @@ func plotTheoreticalSpectra(
     line.Width = vg.Points(5)
 
     // Add the line plotter to the legend
-    p.Legend.Add(legend, line)
+    p.Legend.Add("Δk = 0", line)
+    p.Legend.XOffs = vg.Points(-125)
 
     // Add the line plotter to the plot
     p.Add(line, tAxis, rAxis)
