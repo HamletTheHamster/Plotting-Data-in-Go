@@ -2732,17 +2732,16 @@ func plotTheoreticalSpectra(
         return
     }
 
-    Pp := 0.2   // Pump power (W)
-    Ps := 0.5   // Stokes power (W)
-    Ppr := 0.5  // Probe power (W)
-
-    lambdaPump = 1548.754e-9 // Pump wavelength (in meters)
+    Pp := 57.8e-3     // Pump power (W)
+    Ps := 25.61e-3    // Stokes power (W)
+    Ppr := 41.09e-3   // Probe power (W)
+    label := "5.0 GHz"   // Pump-Probe detuning
+    lambdaPump = 1548.754e-9  // Pump wavelength (in meters)
     lambdaProbe = 1548.794e-9 // Probe wavelength (in meters)
     deltaLambda = lambdaProbe - lambdaPump
 
     // Calculate delta k using the new formula
     deltaK := (4 * math.Pi * n * deltaLambda) / (lambdaPump * lambdaProbe)
-    fmt.Printf("deltaK = %e\n", deltaK)
 
     // Calculate the sinc^2 term
     sincTerm := math.Pow(math.Sin(deltaK * L / 2) / (deltaK * L / 2), 2)
@@ -2750,8 +2749,10 @@ func plotTheoreticalSpectra(
     // Calculate the peak scattered power (at OmegaB)
     Psig_peak := 0.25 * math.Pow(0.6*L, 2) * Pp * Ps * Ppr * sincTerm
 
+    fmt.Printf("Psig_peak: %e W\n", Psig_peak)
+
     // Prepare data for plotting
-    numPoints := 1000  // Reduced number of points for debugging
+    numPoints := 1000
     X := make([]float64, numPoints)
     Y := make([]float64, numPoints)
 
@@ -2773,16 +2774,16 @@ func plotTheoreticalSpectra(
         // Calculate scattered power
         Psig := 0.25 * math.Pow(GB*L, 2) * Pp * Ps * Ppr * sincTerm
 
-        // Store frequency and corresponding power in nW
+        // Store frequency and corresponding power in pW
         X[i] = freq
-        Y[i] = Psig * 1e9  // Convert to nW
+        Y[i] = Psig * 1e12  // Convert to pW (from Watts)
     }
 
-    // Generate y-axis tick labels corresponding to the actual values in nW
+    // Generate y-axis tick labels corresponding to the actual values in pW
     ytickLabels := []string{
         "",
-        fmt.Sprintf("%.0f", Psig_peak * 1e9 * 0.5),
-        fmt.Sprintf("%.0f", Psig_peak * 1e9),
+        fmt.Sprintf("%.0f", Psig_peak * 1e12 * 0.5), // in pW
+        fmt.Sprintf("%.0f", Psig_peak * 1e12),       // in pW
     }
 
     // Define the xtick labels to reflect actual frequency values
@@ -2796,7 +2797,7 @@ func plotTheoreticalSpectra(
     // Use prepPlot to prepare the plot with uniform styling
     title := fmt.Sprintf("Theoretical Spectra of %.2f cm %s", L*100, sample)
     xlabel := "Frequency (GHz)"
-    ylabel := "Scattered Power (nW)"
+    ylabel := "Scattered Power (pW)"  // Updated to pW
     legend := ""
     xrange := []float64{startFreq, stopFreq}
     yrange := []float64{0, Y[numPoints/2] * 1.2}
@@ -2824,7 +2825,7 @@ func plotTheoreticalSpectra(
     line.Width = vg.Points(5)
 
     // Add the line plotter to the legend
-    p.Legend.Add("Δk = 0", line)
+    p.Legend.Add(label, line)
     p.Legend.XOffs = vg.Points(-125)
 
     // Add the line plotter to the plot
