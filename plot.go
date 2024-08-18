@@ -2907,16 +2907,46 @@ func plotTheoreticalSpectra(
         line.Color = palette(i, false, "")
         line.Width = vg.Points(5)
 
-        // Add the line plotter to the legend
-        p.Legend.Add(fmt.Sprintf("%s", label[set]), line)
+        // Handle the legend abbreviation
+        if i < 4 || i == len(sets)-1 { // Show only first 3 and last
+            if i == 3 {
+              // Create an invisible plotter for the ellipsis
+              dummyLine, err := plotter.NewLine(plotter.XYs{})
+              if err != nil {
+                  panic(err)
+              }
+              dummyLine.Color = color.RGBA{0, 0, 0, 0} // Fully transparent line
+              p.Legend.Add(".\n.\n.", dummyLine) // Add vertical dots using three periods stacked
+            }
+            if i >= len(sets)-1 || i < 3 {
+                p.Legend.Add(fmt.Sprintf("%s", label[set]), line)
+            }
+        }
 
         // Add the line plotter to the plot
         p.Add(line)
     }
 
-    // Add tick labels and axes
-    p.X.Tick.Marker = plot.DefaultTicks{}
-    p.Y.Tick.Marker = plot.DefaultTicks{}
+    // Add tick marks and labels
+    // Manually set the tick marks and labels to match the sinc^2 plot
+    tickPositionsX := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
+    tickLabelsX := []string{"9", "", "9.1", "", "9.2", "", "9.3", ""}
+    ticksX := make([]plot.Tick, len(tickPositionsX))
+    for i := range tickPositionsX {
+        ticksX[i] = plot.Tick{Value: tickPositionsX[i], Label: tickLabelsX[i]}
+    }
+
+    // Define custom y-axis ticks
+    tickPositionsY := []float64{0, 50, 100, 150, 200, 250}
+    tickLabelsY := []string{"0", "50", "100", "150", "200", "250"}
+    ticksY := make([]plot.Tick, len(tickPositionsY))
+    for i := range tickPositionsY {
+        ticksY[i] = plot.Tick{Value: tickPositionsY[i], Label: tickLabelsY[i]}
+    }
+
+    p.X.Tick.Marker = plot.ConstantTicks(ticksX)
+    p.Y.Tick.Marker = plot.ConstantTicks(ticksY)
+
     p.Add(tAxis, rAxis)
 
     // Save the plot
@@ -2951,17 +2981,17 @@ func plotTheoreticalSpectra(
 
     // Add tick marks and labels
     // Manually set the tick marks and labels to match the sinc^2 plot
-    tickPositionsX := []float64{5, 10, 15, 20, 25, 30, 35, 40}
-    tickLabelsX := []string{"5", "10", "15", "20", "25", "30", "35", "40"}
-    ticksX := make([]plot.Tick, len(tickPositionsX))
+    tickPositionsX = []float64{5, 10, 15, 20, 25, 30, 35, 40}
+    tickLabelsX = []string{"5", "10", "15", "20", "25", "30", "35", "40"}
+    ticksX = make([]plot.Tick, len(tickPositionsX))
     for i := range tickPositionsX {
         ticksX[i] = plot.Tick{Value: tickPositionsX[i], Label: tickLabelsX[i]}
     }
 
     // Define custom y-axis ticks
-    tickPositionsY := []float64{0, 50, 100, 150, 200, 250}
-    tickLabelsY := []string{"0", "50", "100", "150", "200", "250"}
-    ticksY := make([]plot.Tick, len(tickPositionsY))
+    tickPositionsY = []float64{0, 50, 100, 150, 200, 250}
+    tickLabelsY = []string{"0", "50", "100", "150", "200", "250"}
+    ticksY = make([]plot.Tick, len(tickPositionsY))
     for i := range tickPositionsY {
         ticksY[i] = plot.Tick{Value: tickPositionsY[i], Label: tickLabelsY[i]}
     }
