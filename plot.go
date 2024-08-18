@@ -1934,11 +1934,11 @@ func axes(
     switch sample {
     case "1cmUHNA3":
       xrange := []float64{0, 45}
-      yrange := []float64{0, 3}
+      yrange := []float64{0, 3.5}
       xtick := []float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
-      ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3}
+      ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5}
       xtickLabel := []string{"", "5", "", "15", "", "25", "", "35", "", ""}
-      ytickLabel := []string{"", "0.5", "", "1.5", "", "2.5", ""}
+      ytickLabel := []string{"", "0.5", "", "1.5", "", "2.5", "", "3.5"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     }
@@ -2529,7 +2529,7 @@ func plotSinc(
 	title := l + " " + sample + " Phase-Matching Bandwidth"
   //title = "4. Negative Sloped Offset"
 	xlabel := "Pump-Probe Separation (GHz)"
-	ylabel := "Peak Spectral Density"
+	ylabel := "Peak Spectral Density (mV)"
   legend := ""
 
   /* Auto Axes
@@ -2612,14 +2612,14 @@ func plotSinc(
 
   // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
-  uhna3Index := 1.463705 // middle of range
-  //length = 0.01
+  uhna3Index := 1.47 // middle of range
+  length = 0.0094
 
   scalingFactor := 12.0
 
   // Uncertainty bounds for theoretical line
-  uhna3IndexLower := 1.4447 // Lower bound of the refractive index
-  uhna3IndexUpper := 1.48271 // Upper bound of the refractive index
+  uhna3IndexLower := 1.46 // Lower bound of the refractive index
+  uhna3IndexUpper := 1.48 // Upper bound of the refractive index
   lengthLower := length - .05*length
   lengthUpper := length + .05*length
 
@@ -2924,8 +2924,8 @@ func plotTheoreticalSpectra(
         line.Width = vg.Points(5)
 
         // Handle the legend abbreviation
-        if i < 4 || i == len(sets)-1 { // Show only first 3 and last
-            if i == 3 {
+        if i < 10 || i == len(sets)-1 { // Show only first 3 and last
+            if i == 9 {
               // Create an invisible plotter for the ellipsis
               dummyLine, err := plotter.NewLine(plotter.XYs{})
               if err != nil {
@@ -2999,7 +2999,7 @@ func plotTheoreticalSpectra(
     // Add tick marks and labels
     // Manually set the tick marks and labels to match the sinc^2 plot
     tickPositionsX = []float64{5, 10, 15, 20, 25, 30, 35, 40}
-    tickLabelsX = []string{"5", "10", "15", "20", "25", "30", "35", "40"}
+    tickLabelsX = []string{"5", "", "15", "", "25", "", "35", ""}
     ticksX = make([]plot.Tick, len(tickPositionsX))
     for i := range tickPositionsX {
         ticksX[i] = plot.Tick{Value: tickPositionsX[i], Label: tickLabelsX[i]}
