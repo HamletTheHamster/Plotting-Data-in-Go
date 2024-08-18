@@ -1603,14 +1603,14 @@ func plotCABS(
   }
   legend := ""
 
-  /* Manual Axes
+  // Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }*/
+  }//
 
-  // Auto Axes
+  /* Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1697,7 +1697,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")//
+  ytickLabels = append(ytickLabels, "")*/
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1840,12 +1840,12 @@ func axes(
   case "CABS":
     switch sample {
     case "UHNA3":
-      xrange := []float64{8.7, 9.6}
-      yrange := []float64{0, 225}
-      xtick := []float64{8.7, 8.8, 8.9, 9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6}
-      ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200, 225}
-      xtickLabel := []string{"", "8.8", "", "9", "", "9.2", "", "9.4", "", "9.6"}
-      ytickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200", ""}
+      xrange := []float64{9.0, 9.3}
+      yrange := []float64{0, 3.25}
+      xtick := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
+      ytick := []float64{0, .25, .50, .75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.5, 2.75, 3, 3.25}
+      xtickLabel := []string{"9", "", "9.1", "", "9.2", "", "9.3"}
+      ytickLabel := []string{"0", "", ".5", "", "1", "", "1.5", "", "2", "", "2.5", "", "3", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
@@ -2753,7 +2753,7 @@ func plotTheoreticalSpectra(
     case "UHNA3":
         n = 1.48            // Refractive index
         OmegaB = 9.145e9    // Brillouin shift (Hz)
-        GammaB = 100.0e6    // Brillouin linewidth (Hz)
+        GammaB = 82.0e6     // Brillouin linewidth (Hz)
     default:
         fmt.Println("Unknown sample type")
         return
