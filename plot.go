@@ -1840,11 +1840,11 @@ func axes(
   case "CABS":
     switch sample {
     case "UHNA3":
-      xrange := []float64{9.0, 9.3}
+      xrange := []float64{9.0, 9.28}
       yrange := []float64{0, 3.25}
-      xtick := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
+      xtick := []float64{9, 9.035, 9.07, 9.105, 9.14, 9.175, 9.21, 9.245, 9.28}
       ytick := []float64{0, .25, .50, .75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.5, 2.75, 3, 3.25}
-      xtickLabel := []string{"9", "", "9.1", "", "9.2", "", "9.3"}
+      xtickLabel := []string{"9", "", "9.07", "", "9.14", "", "9.21", "", "9.28"}
       ytickLabel := []string{"0", "", ".5", "", "1", "", "1.5", "", "2", "", "2.5", "", "3", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
@@ -2946,8 +2946,8 @@ func plotTheoreticalSpectra(
 
     // Add tick marks and labels
     // Manually set the tick marks and labels to match the sinc^2 plot
-    tickPositionsX := []float64{9, 9.05, 9.1, 9.15, 9.2, 9.25, 9.3}
-    tickLabelsX := []string{"9", "", "9.1", "", "9.2", "", "9.3", ""}
+    tickPositionsX := []float64{9, 9.035, 9.07, 9.105, 9.14, 9.175, 9.21, 9.245, 9.28}
+    tickLabelsX := []string{"9", "", "9.07", "", "9.14", "", "9.21", "", "9.28"}
     ticksX := make([]plot.Tick, len(tickPositionsX))
     for i := range tickPositionsX {
         ticksX[i] = plot.Tick{Value: tickPositionsX[i], Label: tickLabelsX[i]}
