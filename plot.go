@@ -1706,7 +1706,7 @@ func plotCABS(
     slide,
   )
 
-  for _, set := range sets {
+  for i, set := range sets {
 
     pts := buildData(cabsData[set])
 
@@ -1788,7 +1788,23 @@ func plotCABS(
     l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
-    p.Legend.Add(label[set], l)
+
+    // Handle the legend abbreviation
+    if i < 10 || i == len(sets)-1 { // Show only first 3 and last
+        if i == 9 {
+          // Create an invisible plotter for the ellipsis
+          dummyLine, err := plotter.NewLine(plotter.XYs{})
+          if err != nil {
+              panic(err)
+          }
+          dummyLine.Color = color.RGBA{0, 0, 0, 0} // Fully transparent line
+          p.Legend.Add("•", dummyLine)
+          p.Legend.Add("•", dummyLine)
+          p.Legend.Add("•", dummyLine)
+        } else {
+            p.Legend.Add(label[set], l)
+        }
+    }
   }
 
   /* Guide Line
@@ -2916,11 +2932,10 @@ func plotTheoreticalSpectra(
                   panic(err)
               }
               dummyLine.Color = color.RGBA{0, 0, 0, 0} // Fully transparent line
-              p.Legend.Add(".", dummyLine)
-              p.Legend.Add(".", dummyLine)
-              p.Legend.Add(".", dummyLine)
-            }
-            if i >= len(sets)-1 || i < 3 {
+              p.Legend.Add("•", dummyLine)
+              p.Legend.Add("•", dummyLine)
+              p.Legend.Add("•", dummyLine)
+            } else {
                 p.Legend.Add(fmt.Sprintf("%s", label[set]), line)
             }
         }
