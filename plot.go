@@ -2916,7 +2916,9 @@ func plotTheoreticalSpectra(
                   panic(err)
               }
               dummyLine.Color = color.RGBA{0, 0, 0, 0} // Fully transparent line
-              p.Legend.Add(".\n.\n.", dummyLine) // Add vertical dots using three periods stacked
+              p.Legend.Add(".", dummyLine)
+              p.Legend.Add(".", dummyLine)
+              p.Legend.Add(".", dummyLine)
             }
             if i >= len(sets)-1 || i < 3 {
                 p.Legend.Add(fmt.Sprintf("%s", label[set]), line)
