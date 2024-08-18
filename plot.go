@@ -2610,7 +2610,7 @@ func plotSinc(
   scatter.Shape = draw.CircleGlyph{}
 
 
-  // Plot theoretical sinc^2
+  /* Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
   uhna3Index := 1.47 // middle of range
   length = 0.0094
@@ -2692,7 +2692,7 @@ func plotSinc(
   /* Apply slanted vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
     theoreticalPts[i].Y -= 0.0015*float64(i)*75/1000
-  }*/
+  }*//*
 
   // Adjust the number of points to exclude from the beginning
   startIndex := 45
@@ -2733,7 +2733,9 @@ func plotSinc(
   polygonBounds.LineStyle.Width = vg.Length(0) // No border
 
   // Add the polygons, line, and scatter to the plot
-  p.Add(polygonBounds, line, scatter, t, r)
+  p.Add(polygonBounds, line, scatter, t, r)*/
+
+  p.Add(scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
@@ -2751,7 +2753,8 @@ func plotTheoreticalSpectra(
     var OmegaB, GammaB, n float64
     switch sample {
     case "UHNA3":
-        n = 1.48            // Refractive index
+        L = 0.0094
+        n = 1.47            // Refractive index
         OmegaB = 9.145e9    // Brillouin shift (Hz)
         GammaB = 82.0e6     // Brillouin linewidth (Hz)
     default:
@@ -2975,7 +2978,7 @@ func plotTheoreticalSpectra(
         "Peak Scattered Power vs. Pump-Probe Detuning",
         "Pump-Probe Detuning (GHz)",
         "Scattered Power (pW)",
-        "",
+        "\nn=1.47, L=9.4mm",
         []float64{0, detunings[len(detunings)-1]},
         []float64{0, findMax(peakValues) * 1.2},
         nil, nil,
