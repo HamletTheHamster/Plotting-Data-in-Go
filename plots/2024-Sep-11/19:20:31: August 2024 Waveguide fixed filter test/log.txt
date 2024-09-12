@@ -1,0 +1,39 @@
+Sample: Waveguide
+Runtime note: August 2024 Waveguide fixed filter test
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-09-11
+	Label: pak1chip3-20um4
+	Start Time (h:m:s): 17:19:03
+	End Time(h:m:s): 18:27:26
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.086 nm
+	Probe Filter: 1549.118 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10400000000.00 Hz
+	Stop Frequency: 11000000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 10
+	Data Collection Note: SMF28 is clear - waveguide signal indistinguishable
+
+	Fit Parameters:
+		Amp: 5.6527284569007846e-05
+		Cen: 10.641322257586372
+		Wid: 0.13553581115979996
+		q:   45.433333164117194
+		C:   0.18224998818807367
+
