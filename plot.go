@@ -349,7 +349,7 @@ func main() {
         case "UHNA3":
           initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
         case "Waveguide":
-          initialParams = []float64{1, 10.7, .1, 0, 0}
+          initialParams = []float64{1, 10.9, .1, 0, 0}
         default:
           initialParams = []float64{1, 5, .1, 0, 0}
       }
