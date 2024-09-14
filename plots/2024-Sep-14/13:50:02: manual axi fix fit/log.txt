@@ -1,0 +1,39 @@
+Sample: pak1chip3-20um4
+Runtime note: manual axi fix fit
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-09-13
+	Label: pak1chip3-20um4
+	Start Time (h:m:s): 16:57:11
+	End Time(h:m:s): 22:12:58
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.04 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1549.086 nm
+	Probe Filter: 1549.138 nm
+	Pump Power: 3.200 mW
+	Stokes Power: 6.000 mW
+	Probe Power: 6.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11300000000.00 Hz
+	Step Size: 1004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: very high snr broken up peak
+
+	Fit Parameters:
+		Amp: 221.03324299937447
+		Cen: 10.811045937097079
+		Wid: 0.046087491163276435
+		q:   0.010775072603802265
+		C:   226.37056040203942
+

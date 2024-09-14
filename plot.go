@@ -348,7 +348,7 @@ func main() {
           initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, q, C
         case "UHNA3":
           initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
-        case "Waveguide":
+        case "pak1chip3-20um4":
           initialParams = []float64{1, 10.8, .1, 0, 0}
         default:
           initialParams = []float64{1, 5, .1, 0, 0}
