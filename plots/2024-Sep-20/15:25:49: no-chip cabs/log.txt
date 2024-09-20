@@ -1,0 +1,39 @@
+Sample: no-chip
+Runtime note: no-chip cabs
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-09-20
+	Label: pak1chip3-20um4
+	Start Time (h:m:s): 13:59:38
+	End Time(h:m:s): 15:02:43
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.04 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1549.86 nm
+	Probe Filter: 1549.138 nm
+	Pump Power: 20.000 mW
+	Stokes Power: 20.000 mW
+	Probe Power: 73.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11300000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: chip feature is gone. single peak
+
+	Fit Parameters:
+		Amp: -2.7966702774337318
+		Cen: 10.822823616055318
+		Wid: -0.05249175246127315
+		q:   14.041383105929436
+		C:   9.160711650832775
+

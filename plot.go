@@ -350,6 +350,8 @@ func main() {
           initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{1, 10.8, .1, 0, 0}
+        case "no-chip":
+          initialParams = []float64{1, 10.8, .1, 0, 0}
         default:
           initialParams = []float64{1, 5, .1, 0, 0}
       }
@@ -1938,6 +1940,15 @@ func axes(
       ytick := []float64{0, 50, 100, 150, 200, 250, 300}
       xtickLabel := []string{"", "10.65", "", "10.75", "", "10.85", "", "10.95", "", "11.05", "", "11.15", "", "11.25"}
       ytickLabel := []string{"0", "", "100", "", "200", "", ""}
+
+      return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
+    case "no-chip":
+      xrange := []float64{10.6, 11.3}
+      yrange := []float64{0, 600}
+      xtick := []float64{10.6, 10.65, 10.7, 10.75, 10.8, 10.85, 10.9, 10.95, 11.0, 11.05, 11.1, 11.15, 11.2, 11.25}
+      ytick := []float64{0, 150, 300, 450, 600}
+      xtickLabel := []string{"", "10.65", "", "10.75", "", "10.85", "", "10.95", "", "11.05", "", "11.15", "", "11.25"}
+      ytickLabel := []string{"0", "", "300", "", "600"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
   }
