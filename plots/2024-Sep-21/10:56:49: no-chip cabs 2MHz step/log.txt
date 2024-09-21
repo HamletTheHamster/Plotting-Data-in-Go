@@ -1,0 +1,39 @@
+Sample: no-chip
+Runtime note: no-chip cabs 2MHz step
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 24-09-20
+	Label: no-chip (pak1chip3-20um4)
+	Start Time (h:m:s): 16:41:56
+	End Time(h:m:s): 18:12:11
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.04 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1549.86 nm
+	Probe Filter: 1549.138 nm
+	Pump Power: 60.000 mW
+	Stokes Power: 35.000 mW
+	Probe Power: 80.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11000000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: chip feature is gone. power instability causing nonsmooth features (probe is 80mW+/-20mW)
+
+	Fit Parameters:
+		Amp: 549.8858915523913
+		Cen: 10.820565581426017
+		Wid: -0.056624965069494035
+		q:   -0.03802792094168104
+		C:   549.0461147679385
+
