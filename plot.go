@@ -316,7 +316,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{1}
 
     //setsToPlotCABS := rangeInt(0, 75)
 
@@ -351,7 +351,7 @@ func main() {
         case "pak1chip3-20um4":
           initialParams = []float64{1, 10.8, .1, 0, 0}
         case "no-chip":
-          initialParams = []float64{1, 10.8, .1, 0, 0}
+          initialParams = []float64{5, 10.8, .1, 0, 0}
         default:
           initialParams = []float64{1, 5, .1, 0, 0}
       }
@@ -1607,14 +1607,14 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
+  /* Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }//
+  }*/
 
-  /* Auto Axes
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1701,7 +1701,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
+  ytickLabels = append(ytickLabels, "")//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
