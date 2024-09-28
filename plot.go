@@ -316,7 +316,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0}
 
     //setsToPlotCABS := rangeInt(0, 75)
 
@@ -369,10 +369,10 @@ func main() {
         initialParams = optimizedParams[set]
 
         // Fano Fit peak values
-        //phaseMatchPeaks[set] = optimizedParams[set][0]
+        phaseMatchPeaks[set] = optimizedParams[set][0]
 
         // Fixed-frequency peak values
-        phaseMatchPeaks[set] = cabsData[set][1][72]
+        //phaseMatchPeaks[set] = cabsData[set][1][72]
 
         probeValue, err := strconv.ParseFloat(probeLaser[set], 64)
         if err != nil {
@@ -1607,14 +1607,14 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
+  /* Manual Axes
   xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
-  }//
+  }*/
 
-  /* Auto Axes
+  // Auto Axes
   xmax := 0.
   xmin := cabsData[0][0][0]
   for _, set := range sets {
@@ -1701,7 +1701,7 @@ func plotCABS(
     }
   }
   yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
+  ytickLabels = append(ytickLabels, "")//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
