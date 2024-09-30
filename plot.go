@@ -316,7 +316,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1}
+    setsToPlotCABS := []int{0,1}
 
     //setsToPlotCABS := rangeInt(0, 75)
 
@@ -349,7 +349,7 @@ func main() {
         case "UHNA3":
           initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
-          initialParams = []float64{1, 10.8, .1, 0, 0}
+          initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         default:
