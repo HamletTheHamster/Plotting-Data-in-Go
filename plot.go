@@ -1780,7 +1780,7 @@ func plotCABS(
     fittedLine.LineStyle.Color = palette(set, false, "")
     fittedLine.LineStyle.Width = vg.Points(2)
 
-    p.Add(fittedLine)
+    //p.Add(fittedLine)
 
     // Legend
     l, err := plotter.NewScatter(pts)
