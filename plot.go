@@ -24,7 +24,7 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, sample,
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, sample,
   coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
@@ -345,7 +345,7 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, q, C
+          initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
           initialParams = []float64{175, 9.16, .1, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
@@ -361,10 +361,17 @@ func main() {
 
       for _, set := range setsToPlotCABS {
 
-        optimizedParams[set] = FitFanoResonance(
-          // freq, sig, σ, guess
-          cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
-        )
+        if fano {
+          optimizedParams[set] = FitFanoResonance(
+            // freq, sig, σ, guess
+            cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+          )
+        } else {
+          optimizedParams[set] = FitLorentzian(
+            // freq, sig, σ, guess
+            cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+          )
+        }
 
         initialParams = optimizedParams[set]
 
@@ -411,6 +418,7 @@ func main() {
         pumpPowers, stokesPowers, probePowers, lockinRange, dwell, bandwidth,
         dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep,
         pumpLaser, probeLaser, probeFilter, stokesFilter, notes, optimizedParams,
+        fano,
       )
     } else {
 
@@ -441,7 +449,7 @@ func main() {
 
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
-      length, manual, slide, optimizedParams,
+      length, manual, fano, slide, optimizedParams,
     )
   }
 
@@ -451,10 +459,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
+  bool, bool, bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual bool
+  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -466,6 +474,7 @@ func flags() (
   flag.BoolVar(&sinc, "sinc", false, "plot sinc^2 function (phase-matching data)")
   flag.BoolVar(&theoreticalSpectra, "theoreticalSpectra", false, "plot theoretical CABS spectra")
   flag.BoolVar(&manual, "manual", false, "use manual axes defined for sample")
+  flag.BoolVar(&fano, "fano", false, "use Fano function to fit data")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -483,7 +492,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, sample,
+  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, sample,
   coolingExperiment, note, length, avg
 }
 
@@ -1443,6 +1452,7 @@ func logPlots(
   bandwidth, dataRate, order, startFrequency, stopFrequency, step, pumpProbeSep []float64,
   pumpLaser, probeLaser, probeFilter, stokesFilter, notes []string,
   optimizedParams [][]float64,
+  fano bool,
 ) (
   []string,
 ) {
@@ -1471,12 +1481,16 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\tStep Size: %.2f Hz\n", step[set]))
     logFile = append(logFile, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
     logFile = append(logFile, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
-    logFile = append(logFile, fmt.Sprintf("\tFit Parameters:\n"))
+    logFile = append(logFile, fmt.Sprintf("\tFit Parameters (Fano=%t):\n\n", fano))
     logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
-    logFile = append(logFile, fmt.Sprintf("\t\tq:   %v\n", optimizedParams[set][3]))
-    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n\n", optimizedParams[set][4]))
+    logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n", optimizedParams[set][3]))
+    if fano {
+      logFile = append(logFile, fmt.Sprintf("\t\tq:   %v\n\n", optimizedParams[set][4]))
+    } else {
+
+    }
   }
 
   return logFile
@@ -1566,7 +1580,7 @@ func plotCABS(
   label, normalized []string,
   sample, sigUnit, logpath string,
   length float64,
-  manual, slide bool,
+  manual, fano, slide bool,
   optimizedParams [][]float64,
 ) {
 
@@ -1762,16 +1776,15 @@ func plotCABS(
     // Add fitted curve
     fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
     for i, f := range cabsData[set][0] {
-      if len(optimizedParams[set]) == 5 {
-        A, f0, gamma, q, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
+      if fano {
+        A, f0, gamma, C, q := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
         fittedCurve[i].X = f
-        fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, q, C)
-      } else if len(optimizedParams[set]) == 4 {
+        fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, C, q)
+      } else {
         A, f0, gamma, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
         fittedCurve[i].X = f
         fittedCurve[i].Y = Lorentzian(f, A, f0, gamma, C)
       }
-
     }
 
     fittedLine, err := plotter.NewLine(fittedCurve)
@@ -3539,7 +3552,7 @@ func FitFanoResonance(
 }
 
 func FanoFunction(
-  f, A, f0, gamma, q, C float64,
+  f, A, f0, gamma, C, q float64,
 ) (
   float64,
 ) {
@@ -3554,11 +3567,11 @@ func FanoResiduals(
   []float64,
 ) {
 
-    A, f0, gamma, q, C := params[0], params[1], params[2], params[3], params[4]
+    A, f0, gamma, C, q := params[0], params[1], params[2], params[3], params[4]
     r := make([]float64, len(frequencies))
 
     for i, f := range frequencies {
-        modelValue := FanoFunction(f, A, f0, gamma, q, C)
+        modelValue := FanoFunction(f, A, f0, gamma, C, q)
         if len(uncertainties) > 0 && uncertainties[i] != 0 {
             r[i] = (signals[i] - modelValue) / uncertainties[i]
         } else {
