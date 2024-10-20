@@ -24,8 +24,8 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, theoreticalSpectra, sample, coolingExperiment,
-  note, length, csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, sample,
+  coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
 
@@ -347,7 +347,7 @@ func main() {
         case "CS2":
           initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, q, C
         case "UHNA3":
-          initialParams = []float64{1, 9.14, .1, 0, 0} // (q is Fano asymmetry)
+          initialParams = []float64{175, 9.16, .1, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
@@ -441,7 +441,7 @@ func main() {
 
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
-      length, slide, optimizedParams,
+      length, manual, slide, optimizedParams,
     )
   }
 
@@ -451,10 +451,10 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
+  bool, bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide, sinc, theoreticalSpectra bool
+  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -465,6 +465,7 @@ func flags() (
   flag.BoolVar(&slide, "slide", false, "format figures for slide presentation")
   flag.BoolVar(&sinc, "sinc", false, "plot sinc^2 function (phase-matching data)")
   flag.BoolVar(&theoreticalSpectra, "theoreticalSpectra", false, "plot theoretical CABS spectra")
+  flag.BoolVar(&manual, "manual", false, "use manual axes defined for sample")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -482,7 +483,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sinc, theoreticalSpectra, sample,
+  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, sample,
   coolingExperiment, note, length, avg
 }
 
@@ -1565,7 +1566,7 @@ func plotCABS(
   label, normalized []string,
   sample, sigUnit, logpath string,
   length float64,
-  slide bool,
+  manual, slide bool,
   optimizedParams [][]float64,
 ) {
 
@@ -1607,101 +1608,102 @@ func plotCABS(
   }
   legend := ""
 
-  // Manual Axes
-  xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("CABS", sample, "")
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }//
-
-  /* Auto Axes
-  xmax := 0.
-  xmin := cabsData[0][0][0]
-  for _, set := range sets {
-    if cabsData[set][0][0] < xmin {
-      xmin = cabsData[set][0][0]
+  var xrange, yrange, xticks, yticks []float64
+  var xtickLabels, ytickLabels []string
+  if manual {
+    // Manual Axes
+    var err error
+    xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err = axes("CABS", sample, "")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
     }
-    if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
-      xmax = cabsData[set][0][len(cabsData[set][0])-1]
-    }
-  }
-
-  xrange := []float64{xmin, xmax}
-  xtick := 0.
-  displayDigits := 2
-  switch {
-    case (xmax - xmin)/8 > 0.25:
-      xtick = 0.5
-      displayDigits = 1
-    case (xmax - xmin)/8 > 0.1:
-      xtick = 0.25
-    case (xmax - xmin)/8 > 0.075:
-      xtick = 0.075
-    case (xmax - xmin)/8 > 0.05:
-      xtick = 0.05
-    case (xmax - xmin)/8 > 0.025:
-      xtick = 0.025
-    case (xmax - xmin)/8 > 0.01:
-      xtick = 0.02
-    case (xmax - xmin)/8 > 0.0075:
-      xtick = 0.0075
-    case (xmax - xmin)/8 > 0.005:
-      xtick = 0.005
-    case (xmax - xmin)/8 > 0.0025:
-      xtick = 0.0025
-    case (xmax - xmin)/8 > 0.001:
-      xtick = 0.001
-  }
-
-  firstTick := 0.
-  for m := float64(int(xmin)); m <= xmin; m += xtick {
-    firstTick = m
-  }
-  //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
-  //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
-  xticks := []float64{}
-  xtickLabels := []string{}
-  for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
-    xticks = append(xticks, firstTick + xtick*i)
-    if int(i)%2 != 0 {
-      xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
-    } else {
-      xtickLabels = append(xtickLabels, "")
-    }
-  }
-
-  ymax := 0.
-  ymin := 10000.
-  for _, set := range sets {
-    for i, v := range cabsData[set][1] {
-      if len(cabsData[set]) > 2 && v + cabsData[set][2][i]/2 > ymax {
-        ymax = v + cabsData[set][2][i]/2
-      } else if len(cabsData[set]) < 3 && v > ymax {
-        ymax = v
+  } else {
+    // Auto Axes
+    xmax := 0.
+    xmin := cabsData[0][0][0]
+    for _, set := range sets {
+      if cabsData[set][0][0] < xmin {
+        xmin = cabsData[set][0][0]
       }
-      if len(cabsData[set]) > 2 && v - cabsData[set][2][i]/2 < ymin {
-        ymin = v - cabsData[set][2][i]/2
-      } else if len(cabsData[set]) < 3 && v < ymin {
-        ymin = v
+      if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
+        xmax = cabsData[set][0][len(cabsData[set][0])-1]
       }
     }
-  }
-  ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/1000 //16
-  ymin -= (ymax - ymin)/32
-  yrange := []float64{ymin, ymax}
-  ytick := ((ymax - ymin)/8)
-  yticks := []float64{}
-  ytickLabels := []string{}
-  for i := 0.; i < 11; i++ {
-    yticks = append(yticks, ytick*i + ymin)
-    if int(i)%2 != 0 {
-      ytickLabels = append(ytickLabels, strconv.FormatFloat(ytick*i + ymin, 'f', 2, 64))
-    } else {
-      ytickLabels = append(ytickLabels, "")
+
+    xrange = []float64{xmin, xmax}
+    xtick := 0.
+    displayDigits := 2
+    switch {
+      case (xmax - xmin)/8 > 0.25:
+        xtick = 0.5
+        displayDigits = 1
+      case (xmax - xmin)/8 > 0.1:
+        xtick = 0.25
+      case (xmax - xmin)/8 > 0.075:
+        xtick = 0.075
+      case (xmax - xmin)/8 > 0.05:
+        xtick = 0.05
+      case (xmax - xmin)/8 > 0.025:
+        xtick = 0.025
+      case (xmax - xmin)/8 > 0.01:
+        xtick = 0.02
+      case (xmax - xmin)/8 > 0.0075:
+        xtick = 0.0075
+      case (xmax - xmin)/8 > 0.005:
+        xtick = 0.005
+      case (xmax - xmin)/8 > 0.0025:
+        xtick = 0.0025
+      case (xmax - xmin)/8 > 0.001:
+        xtick = 0.001
     }
+
+    firstTick := 0.
+    for m := float64(int(xmin)); m <= xmin; m += xtick {
+      firstTick = m
+    }
+    //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
+    //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
+    for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
+      xticks = append(xticks, firstTick + xtick*i)
+      if int(i)%2 != 0 {
+        xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
+      } else {
+        xtickLabels = append(xtickLabels, "")
+      }
+    }
+
+    ymax := 0.
+    ymin := 10000.
+    for _, set := range sets {
+      for i, v := range cabsData[set][1] {
+        if len(cabsData[set]) > 2 && v + cabsData[set][2][i]/2 > ymax {
+          ymax = v + cabsData[set][2][i]/2
+        } else if len(cabsData[set]) < 3 && v > ymax {
+          ymax = v
+        }
+        if len(cabsData[set]) > 2 && v - cabsData[set][2][i]/2 < ymin {
+          ymin = v - cabsData[set][2][i]/2
+        } else if len(cabsData[set]) < 3 && v < ymin {
+          ymin = v
+        }
+      }
+    }
+    ymax += (ymax - ymin)/4 + (ymax - ymin)*float64(len(sets))/1000 //16
+    ymin -= (ymax - ymin)/32
+    yrange = []float64{ymin, ymax}
+    ytick := ((ymax - ymin)/8)
+    for i := 0.; i < 11; i++ {
+      yticks = append(yticks, ytick*i + ymin)
+      if int(i)%2 != 0 {
+        ytickLabels = append(ytickLabels, strconv.FormatFloat(ytick*i + ymin, 'f', 2, 64))
+      } else {
+        ytickLabels = append(ytickLabels, "")
+      }
+    }
+    yticks = append(yticks, ymax)
+    ytickLabels = append(ytickLabels, "")
   }
-  yticks = append(yticks, ymax)
-  ytickLabels = append(ytickLabels, "")*/
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -1780,7 +1782,7 @@ func plotCABS(
     fittedLine.LineStyle.Color = palette(set, false, "")
     fittedLine.LineStyle.Width = vg.Points(2)
 
-    //p.Add(fittedLine)
+    p.Add(fittedLine)
 
     // Legend
     l, err := plotter.NewScatter(pts)
@@ -1844,12 +1846,12 @@ func axes(
   case "CABS":
     switch sample {
     case "UHNA3":
-      xrange := []float64{9.0, 9.28}
-      yrange := []float64{0, 3.25}
-      xtick := []float64{9, 9.035, 9.07, 9.105, 9.14, 9.175, 9.21, 9.245, 9.28}
-      ytick := []float64{0, .25, .50, .75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.5, 2.75, 3, 3.25}
-      xtickLabel := []string{"9", "", "9.07", "", "9.14", "", "9.21", "", "9.28"}
-      ytickLabel := []string{"0", "", ".5", "", "1", "", "1.5", "", "2", "", "2.5", "", "3", ""}
+      xrange := []float64{8.75, 9.6}
+      yrange := []float64{0, 200}
+      xtick := []float64{8.75, 8.875, 9., 9.125, 9.25, 9.375, 9.5, 9.6}
+      ytick := []float64{0, 25, 50, 75, 100, 125, 150, 175, 200}
+      xtickLabel := []string{"8.75", "", "9", "", "9.25", "", "9.5", "", "9.6"}
+      ytickLabel := []string{"0", "", "50", "", "100", "", "150", "", "200"}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "CS2":
@@ -3545,6 +3547,17 @@ func FanoFunction(
     denominator := (1 + 4*math.Pow(f - f0, 2)/math.Pow(gamma, 2))
     return -A * math.Pow(numerator, 2) / denominator + C
 }
+
+/*func FanoFunction(
+  f, A, f0, gamma, q, C float64,
+) (
+  float64,
+) {
+    epsilon := (f - f0) / (gamma / 2)
+    numerator := q + epsilon
+    denominator := 1 + epsilon * epsilon
+    return A * (numerator * numerator) / denominator + C
+}*/
 
 func FanoResiduals(
   params, frequencies, signals, uncertainties []float64,
