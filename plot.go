@@ -345,9 +345,9 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{25, 2.5, .08, 0, 0} //amp, cen, wid, C, q
+          initialParams = []float64{25, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
-          initialParams = []float64{175, 9.16, .1, 0, 0} // (q is Fano asymmetry)
+          initialParams = []float64{.170, 9.16, .08, 0, 1} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
@@ -3556,9 +3556,9 @@ func FanoFunction(
 ) (
   float64,
 ) {
-    numerator := (q + 2*(f - f0)/gamma)
+    numerator := (q + 2*(f0 - f)/gamma)
     denominator := (1 + 4*math.Pow(f - f0, 2)/math.Pow(gamma, 2))
-    return -A * math.Pow(numerator, 2) / denominator + C
+    return A * math.Pow(numerator, 2) / denominator + C
 }
 
 func FanoResiduals(
