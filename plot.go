@@ -347,7 +347,7 @@ func main() {
         case "CS2":
           initialParams = []float64{25, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
-          initialParams = []float64{.170, 9.16, .08, 0, 1} // (q is Fano asymmetry)
+          initialParams = []float64{200, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
@@ -1482,7 +1482,7 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
     logFile = append(logFile, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
     logFile = append(logFile, fmt.Sprintf("\tFit Parameters (Fano=%t):\n\n", fano))
-    logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", 1e3*optimizedParams[set][0]))
+    logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
     logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n", optimizedParams[set][3]))
