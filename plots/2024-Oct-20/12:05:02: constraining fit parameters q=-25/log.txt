@@ -1,0 +1,39 @@
+Sample: UHNA3
+Runtime note: constraining fit parameters q=-25
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-10-19
+	Label: 1cm uhna3
+	Start Time (h:m:s): 12:41:54
+	End Time(h:m:s): 12:53:35
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.073 nm
+	Probe Filter: 1549.109 nm
+	Pump Power: 89.480 mW
+	Stokes Power: 203.400 mW
+	Probe Power: 243.700 mW
+	Lock-in Range: 0.80
+	Dwell Time: 0.500000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 8750000000.00 Hz
+	Stop Frequency: 9600000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 180 mV matches highest ever measured
+
+	Fit Parameters:
+		Amp: 174.99846343241197
+		Cen: 9.158227099606432
+		Wid: 0.01820965867664665
+		q:   -50.00001810191304
+		C:   -0.0015522389225993856
+

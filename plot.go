@@ -3548,17 +3548,6 @@ func FanoFunction(
     return -A * math.Pow(numerator, 2) / denominator + C
 }
 
-/*func FanoFunction(
-  f, A, f0, gamma, q, C float64,
-) (
-  float64,
-) {
-    epsilon := (f - f0) / (gamma / 2)
-    numerator := q + epsilon
-    denominator := 1 + epsilon * epsilon
-    return A * (numerator * numerator) / denominator + C
-}*/
-
 func FanoResiduals(
   params, frequencies, signals, uncertainties []float64,
 ) (
