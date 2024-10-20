@@ -347,7 +347,7 @@ func main() {
         case "CS2":
           initialParams = []float64{25, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
-          initialParams = []float64{200, 9.145, .08, 0, 0} // (q is Fano asymmetry)
+          initialParams = []float64{.2, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
@@ -377,6 +377,8 @@ func main() {
 
         // Fano Fit peak values
         phaseMatchPeaks[set] = optimizedParams[set][0]
+        fmt.Printf("optimizedParams[set][0]: %f\n\n",optimizedParams[set][0])
+        fmt.Printf("peak signal point cabsData[set][1][83]: %f\n\n", cabsData[set][1][83])
 
         // Fixed-frequency peak values
         //phaseMatchPeaks[set] = cabsData[set][1][72]
@@ -3518,6 +3520,8 @@ func FitFanoResonance(
   []float64,
 ) {
 
+  fmt.Printf("Peak signal point inside FitFanoResonance: %f\n\n", signals[83])
+
   // Define the residual function
   resFunc := func(dst, params []float64) {
       r := FanoResiduals(params, frequencies, signals, uncertainties)
@@ -3547,6 +3551,8 @@ func FitFanoResonance(
   if err != nil {
       log.Fatal("optimization failed:", err)
   }
+
+  fmt.Printf("result.X[0]: %f\n\n", result.X[0])
 
   return result.X
 }
