@@ -1482,7 +1482,7 @@ func logPlots(
     logFile = append(logFile, fmt.Sprintf("\tNumber of Averages: %d\n", numAvgs[set]))
     logFile = append(logFile, fmt.Sprintf("\tData Collection Note: %s\n\n", notes[set]))
     logFile = append(logFile, fmt.Sprintf("\tFit Parameters (Fano=%t):\n\n", fano))
-    logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", optimizedParams[set][0]))
+    logFile = append(logFile, fmt.Sprintf("\t\tAmp: %v\n", 1e3*optimizedParams[set][0]))
     logFile = append(logFile, fmt.Sprintf("\t\tCen: %v\n", optimizedParams[set][1]))
     logFile = append(logFile, fmt.Sprintf("\t\tWid: %v\n", optimizedParams[set][2]))
     logFile = append(logFile, fmt.Sprintf("\t\tC:   %v\n", optimizedParams[set][3]))
