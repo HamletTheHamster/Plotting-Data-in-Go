@@ -3565,9 +3565,8 @@ func FanoFunction(
   float64,
 ) {
     epsilon := 2*(f - f0)/gamma
-    epsilon0 := 2*f0/gamma
     fano := math.Pow(epsilon + q, 2) / (1 + math.Pow(epsilon, 2)) + C
-    fanoNormalized := fano / (math.Pow(epsilon0 + q, 2) / (1 + math.Pow(epsilon0, 2)) + C)
+    fanoNormalized := fano / (1 + math.Pow(q, 2))
     return A * fanoNormalized
 }
 
