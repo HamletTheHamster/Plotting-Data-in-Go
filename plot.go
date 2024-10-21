@@ -347,7 +347,7 @@ func main() {
         case "CS2":
           initialParams = []float64{25, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
-          initialParams = []float64{.2, 9.145, .08, 0, 0} // (q is Fano asymmetry)
+          initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "no-chip":
@@ -1774,6 +1774,8 @@ func plotCABS(
 
       p.Add(plotSet, t, r)
     }
+
+    fmt.Printf("optimizedParams[set][0]: %f", optimizedParams[set][0])
 
     // Add fitted curve
     fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
@@ -3562,9 +3564,11 @@ func FanoFunction(
 ) (
   float64,
 ) {
-    numerator := (q + 2*(f0 - f)/gamma)
-    denominator := (1 + 4*math.Pow(f - f0, 2)/math.Pow(gamma, 2))
-    return A * math.Pow(numerator, 2) / denominator + C
+    epsilon := 2*(f - f0)/gamma
+    epsilon0 := 2*f0/gamma
+    fano := math.Pow(epsilon + q, 2) / (1 + math.Pow(epsilon, 2)) + C
+    fanoNormalized := fano / (math.Pow(epsilon0 + q, 2) / (1 + math.Pow(epsilon0, 2)) + C)
+    return A * fanoNormalized
 }
 
 func FanoResiduals(
@@ -3578,6 +3582,10 @@ func FanoResiduals(
 
     for i, f := range frequencies {
         modelValue := FanoFunction(f, A, f0, gamma, C, q)
+        if i == 83 {
+          r[i] = (signals[i] - modelValue) / uncertainties[i]
+          //fmt.Printf("r[83] = %f\nsignals[83]: %f\nmodelValue: %f\n\n", r[83], signals[83], modelValue)
+        }
         if len(uncertainties) > 0 && uncertainties[i] != 0 {
             r[i] = (signals[i] - modelValue) / uncertainties[i]
         } else {
