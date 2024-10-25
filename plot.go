@@ -4701,8 +4701,8 @@ func palette(
 
   if dark {
     darkColor := make([]color.RGBA, 17)
-    darkColor[1] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
-    darkColor[0] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
+    darkColor[0] = color.RGBA{R: 27, G: 170, B: 139, A: 255}
+    darkColor[1] = color.RGBA{R: 201, G: 104, B: 146, A: 255}
     darkColor[2] = color.RGBA{R: 99, G: 124, B: 198, A: 255}
     darkColor[12] = color.RGBA{R: 183, G: 139, B: 89, A: 255}
     darkColor[15] = color.RGBA{R: 18, G: 102, B: 99, A: 255}
@@ -4723,8 +4723,8 @@ func palette(
   }
 
   col := make([]color.RGBA, 17)
-  col[1] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
-  col[0] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
+  col[0] = color.RGBA{R: 31, G: 211, B: 172, A: 255}
+  col[1] = color.RGBA{R: 255, G: 122, B: 180, A: 255}
   col[2] = color.RGBA{R: 122, G: 156, B: 255, A: 255}
   col[12] = color.RGBA{R: 255, G: 193, B: 122, A: 255}
   col[15] = color.RGBA{R: 27, G: 150, B: 146, A: 255}

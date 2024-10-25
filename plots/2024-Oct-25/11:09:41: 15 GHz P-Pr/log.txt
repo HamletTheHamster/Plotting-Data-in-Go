@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: 15 GHz P-Pr
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-10-25
+	Label: pak1chip3-20um4 15 GHz P-Pr
+	Start Time (h:m:s): 08:45:40
+	End Time(h:m:s): 10:38:14
+	Pump Laser: 1548.75 nm
+	Probe Laser: 1548.970 nm
+	Pump-Probe Separation: 27.50 GHz
+	Stokes Filter: 1548.837 nm
+	Probe Filter: 1549.073 nm
+	Pump Power: 1.800 mW
+	Stokes Power: 5.400 mW
+	Probe Power: 5.500 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: wow the chip candidate feature is totally absolutely way more pronounced while the smf spectra is diminished
+
+	Fit Parameters (Fano=false):
+
+		Amp: 7.226676549800672
+		Cen: 10.835261084797702
+		Wid: 0.1846285583056909
+		C:   0.4154185926870294
