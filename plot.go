@@ -1777,8 +1777,6 @@ func plotCABS(
       p.Add(plotSet, t, r)
     }
 
-    fmt.Printf("optimizedParams[set][0]: %f", optimizedParams[set][0])
-
     if lorentz || fano {
       // Add fitted curve
       fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
@@ -3526,7 +3524,7 @@ func FitFanoResonance(
   []float64,
 ) {
 
-  fmt.Printf("Peak signal point inside FitFanoResonance: %f\n\n", signals[83])
+  //fmt.Printf("Peak signal point inside FitFanoResonance: %f\n\n", signals[83])
 
   // Define the residual function
   resFunc := func(dst, params []float64) {

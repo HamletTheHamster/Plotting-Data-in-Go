@@ -1,2 +1,2 @@
 Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
-24-10-25,pak1chip3-20um4 15 GHz P-Pr,1,08:45:40,10:38:14,1.8,5.4,5.5,1/frequency.csv,1/signal.csv,0.8,1,100,1.842000e+09,8,1.060000e+10,1.110000e+10,2.004567e+06,20,1548.75,1548.970,1548.837,1549.073,wow the chip candidate feature is totally absolutely way more pronounced while the smf spectra is diminished
+24-10-25,pak1chip3-20um4 20 GHz P-Pr,1,11:06:08,12:58:06,1.8,5.4,5.5,1/frequency.csv,1/signal.csv,0.8,1,100,1.842000e+09,8,1.060000e+10,1.110000e+10,2.004567e+06,20,1548.75,1549.01,1548.837,1549.113,aaand it's fano
