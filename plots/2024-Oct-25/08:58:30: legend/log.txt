@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: legend
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-10-24
+	Label: pak1chip3-20um4 10 GHz P-Pr
+	Start Time (h:m:s): 18:23:47
+	End Time(h:m:s): 20:16:13
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.08 nm
+	Pump-Probe Separation: 10.00 GHz
+	Stokes Filter: 1549.086 nm
+	Probe Filter: 1549.179 nm
+	Pump Power: 2.450 mW
+	Stokes Power: 5.200 mW
+	Probe Power: 10.600 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: yeah actually the chip candidate feature is more pronounced
+
+	Fit Parameters (Fano=false):
+
+		Amp: 35.85683505029563
+		Cen: 10.825869978495252
+		Wid: 0.07269476300238267
+		C:   -1.8049681659548906
