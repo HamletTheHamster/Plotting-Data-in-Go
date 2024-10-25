@@ -1,0 +1,2 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
+24-10-19,1cm uhna3,1,12:41:54,12:53:35,89.48,203.4,243.7,1/frequency.csv,1/signal.csv,0.8,0.5,100,1.842000e+09,8,8.750000e+09,9.600000e+09,5.004567e+06,5,1549,1549.02,1549.073,1549.109,180 mV matches highest ever measured

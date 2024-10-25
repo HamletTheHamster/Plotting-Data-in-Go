@@ -24,8 +24,8 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, sample,
-  coolingExperiment, note, length, csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz,
+  sample, coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
 
@@ -451,7 +451,7 @@ func main() {
 
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
-      length, manual, fano, slide, optimizedParams,
+      length, manual, fano, lorentz, slide, optimizedParams,
     )
   }
 
@@ -461,10 +461,11 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, bool, bool, string, string, string, float64, int,
+  bool, bool, bool, bool, bool, bool, bool, bool, bool,
+  string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano bool
+  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -477,6 +478,7 @@ func flags() (
   flag.BoolVar(&theoreticalSpectra, "theoreticalSpectra", false, "plot theoretical CABS spectra")
   flag.BoolVar(&manual, "manual", false, "use manual axes defined for sample")
   flag.BoolVar(&fano, "fano", false, "use Fano function to fit data")
+  flag.BoolVar(&lorentz, "lorentz", false, "use Lorentzian function to fit data")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -494,8 +496,8 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, sample,
-  coolingExperiment, note, length, avg
+  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano,
+  lorentz, sample, coolingExperiment, note, length, avg
 }
 
 func logpath(
@@ -1582,7 +1584,7 @@ func plotCABS(
   label, normalized []string,
   sample, sigUnit, logpath string,
   length float64,
-  manual, fano, slide bool,
+  manual, fano, lorentz, slide bool,
   optimizedParams [][]float64,
 ) {
 
@@ -1777,29 +1779,31 @@ func plotCABS(
 
     fmt.Printf("optimizedParams[set][0]: %f", optimizedParams[set][0])
 
-    // Add fitted curve
-    fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
-    for i, f := range cabsData[set][0] {
-      if fano {
-        A, f0, gamma, C, q := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
-        fittedCurve[i].X = f
-        fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, C, q)
-      } else {
-        A, f0, gamma, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
-        fittedCurve[i].X = f
-        fittedCurve[i].Y = Lorentzian(f, A, f0, gamma, C)
+    if lorentz || fano {
+      // Add fitted curve
+      fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
+      for i, f := range cabsData[set][0] {
+        if fano {
+          A, f0, gamma, C, q := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
+          fittedCurve[i].X = f
+          fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, C, q)
+        } else {
+          A, f0, gamma, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
+          fittedCurve[i].X = f
+          fittedCurve[i].Y = Lorentzian(f, A, f0, gamma, C)
+        }
       }
-    }
 
-    fittedLine, err := plotter.NewLine(fittedCurve)
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
-    fittedLine.LineStyle.Color = palette(set, false, "")
-    fittedLine.LineStyle.Width = vg.Points(2)
+      fittedLine, err := plotter.NewLine(fittedCurve)
+      if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+      }
+      fittedLine.LineStyle.Color = palette(set, false, "")
+      fittedLine.LineStyle.Width = vg.Points(2)
 
-    p.Add(fittedLine)
+      p.Add(fittedLine)
+    }
 
     // Legend
     l, err := plotter.NewScatter(pts)
