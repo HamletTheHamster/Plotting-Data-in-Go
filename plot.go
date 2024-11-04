@@ -377,8 +377,8 @@ func main() {
 
         // Fano Fit peak values
         phaseMatchPeaks[set] = optimizedParams[set][0]
-        fmt.Printf("optimizedParams[set][0]: %f\n\n",optimizedParams[set][0])
-        fmt.Printf("peak signal point cabsData[set][1][83]: %f\n\n", cabsData[set][1][83])
+        //fmt.Printf("optimizedParams[set][0]: %f\n\n",optimizedParams[set][0])
+        //fmt.Printf("peak signal point cabsData[set][1][83]: %f\n\n", cabsData[set][1][83])
 
         // Fixed-frequency peak values
         //phaseMatchPeaks[set] = cabsData[set][1][72]
