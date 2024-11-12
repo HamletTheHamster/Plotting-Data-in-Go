@@ -1,0 +1,2 @@
+Date,Label,Run,Data,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency, Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
+24-11-12,,1,Signal,08:15:08,08:43:35,,,,,1/frequency.csv,1/signal.csv,0.8,1,100,1.842000e+09,8,1.060000e+10,1.110000e+10,2.004567e+06,5,,,,,
