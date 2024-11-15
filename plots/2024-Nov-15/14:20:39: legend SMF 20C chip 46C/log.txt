@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: legend SMF 20C chip 46C
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-11-12
+	Label: SMF 20C chip 46C
+	Start Time (h:m:s): 14:38:30
+	End Time(h:m:s): 15:06:49
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.04 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.143 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: lab halfway warmed back up - SMF 20C chip 46C
+
+	Fit Parameters (Fano=false):
+
+		Amp: 255.08402123094476
+		Cen: 10.80584197013185
+		Wid: 0.07524092099867438
+		C:   5.077748591812366
