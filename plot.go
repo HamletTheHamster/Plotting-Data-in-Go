@@ -316,9 +316,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{18}
+    //setsToPlotCABS := []int{0}
 
-    //setsToPlotCABS := rangeInt(0, 18)
+    setsToPlotCABS := rangeInt(0, 19)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
