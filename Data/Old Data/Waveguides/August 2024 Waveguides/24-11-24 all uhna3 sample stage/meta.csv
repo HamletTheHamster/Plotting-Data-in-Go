@@ -1,0 +1,2 @@
+Date,Label,Sets,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Num Avgs,Pump Laser,Probe Laser,Stokes Filter,Probe Filter,Notes
+24-11-24,all uhna3 sample stage,1,13:50:51,14:18:58,1,1,1,1/frequency.csv,1/signal.csv,0.8,1,100,1.842000e+09,8,1.060000e+10,1.110000e+10,2.004567e+06,5,1549,1549.04,1549.087,1549.143,still 10.85! (no chip just uhna3 from PBS1 -> PBS2)
