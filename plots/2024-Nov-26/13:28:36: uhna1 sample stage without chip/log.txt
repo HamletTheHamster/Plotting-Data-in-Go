@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: uhna1 sample stage without chip
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 2
+	Data taken: 24-11-23
+	Label: no chip just UHNA1 sample stage
+	Start Time (h:m:s): 17:13:09
+	End Time(h:m:s): 17:41:20
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.046 nm
+	Pump-Probe Separation: 5.75 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.149 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: welp UHNA1 resonance is same as SMF28. cool.
+
+	Fit Parameters (Fano=false):
+
+		Amp: 1.2393751754022122
+		Cen: 10.848506338768086
+		Wid: 0.1238407429750814
+		C:   0.11177158294915082

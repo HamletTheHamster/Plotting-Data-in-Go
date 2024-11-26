@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: uhna1 sample stage
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 1
+	Data taken: 24-11-23
+	Label: chip with UHNA1 sample stage
+	Start Time (h:m:s): 16:30:45
+	End Time(h:m:s): 16:58:56
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.046 nm
+	Pump-Probe Separation: 5.75 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.149 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: with chip but poor alignment of chip and right PBS
+
+	Fit Parameters (Fano=false):
+
+		Amp: 1.4232868891984636
+		Cen: 10.842047873326434
+		Wid: 0.08550578785537087
+		C:   -0.007125863329045135

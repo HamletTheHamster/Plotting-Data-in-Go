@@ -1,0 +1,38 @@
+Sample: pak1chip3-20um4
+Runtime note: static axes 8p5 GHz
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 14
+	Data taken: 24-11-16
+	Label: 8.5 GHz
+	Start Time (h:m:s): 14:18:15
+	End Time(h:m:s): 14:25:04
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.068 nm
+	Pump-Probe Separation: 8.50 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.143 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 0.80
+	Dwell Time: 0.250000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 3
+	Data Collection Note: 
+
+	Fit Parameters (Fano=false):
+
+		Amp: 291.3028607222483
+		Cen: 10.79833672473234
+		Wid: 0.09336225877997076
+		C:   -5.516145821382978

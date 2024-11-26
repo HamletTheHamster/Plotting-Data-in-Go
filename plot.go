@@ -316,9 +316,9 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{1}
 
-    setsToPlotCABS := rangeInt(0, 19)
+    //setsToPlotCABS := rangeInt(0, 19)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -1955,12 +1955,12 @@ func axes(
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "pak1chip3-20um4":
-      xrange := []float64{10.6, 11.}
-      yrange := []float64{0, 800}
+      xrange := []float64{10.6, 11.1}
+      yrange := []float64{0, 1000}
       xtick := []float64{10.6, 10.65, 10.7, 10.75, 10.8, 10.85, 10.9, 10.95, 11.0}
-      ytick := []float64{0, 150, 300, 450, 600, 750}
+      ytick := []float64{0, 125, 250, 375, 500, 625, 750, 875}
       xtickLabel := []string{"", "10.65", "", "10.75", "", "10.85", "", "10.95", ""}
-      ytickLabel := []string{"0", "", "300", "", "600", ""}
+      ytickLabel := []string{"0", "", "250", "", "500", "", "750", ""}
 
       return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
     case "no-chip":
