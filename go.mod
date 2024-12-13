@@ -1,4 +1,4 @@
-module gonum.org/v1/plot/...
+module github.com/HamletTheHamster/Plotting-Data-in-Go
 
 go 1.16
 
