@@ -3079,6 +3079,14 @@ func plotTheoreticalSpectra(
     savePlot(p2, "Peak-Scattered-Power-vs-Detuning", logpath)
 }
 
+// small helper to produce no ticks
+type noTicks struct{}
+
+func (noTicks) Ticks(min, max float64) []plot.Tick {
+    return []plot.Tick{} // no ticks
+}
+
+// The revised function:
 func plotStackedCABS(
     sets []int,
     cabsData [][][]float64, // cabsData[set][0]=freq, [1]=sig, [2]=err (optional)
@@ -3086,13 +3094,13 @@ func plotStackedCABS(
     length float64,
     logpath string,
 ) {
+    // 1) Identify (setIndex, maxAmplitude)
     type setInfoT struct {
         idx    int
         maxVal float64
     }
     var setInfo []setInfoT
 
-    // 1) Identify (setIndex, maxAmplitude)
     for _, s := range sets {
         maxVal := 0.0
         for _, y := range cabsData[s][1] {
@@ -3102,7 +3110,6 @@ func plotStackedCABS(
         }
         setInfo = append(setInfo, setInfoT{s, maxVal})
     }
-
     if len(setInfo) == 0 {
         return
     }
@@ -3114,39 +3121,51 @@ func plotStackedCABS(
 
     // 3) Create the plot
     p := plot.New()
-    p.Title.Text = fmt.Sprintf("%.3g m %s (Stacked Overlap)", length, sample)
+    //p.Title.Text = fmt.Sprintf("1 cm %s", sample)
+
+    // X-Axis: show ticks with 2 decimals
     p.X.Label.Text = "Frequency (GHz)"
+    p.X.Tick.Marker = plot.TickerFunc(func(min, max float64) []plot.Tick {
+        // get default positions
+        defaultTicks := plot.DefaultTicks{}.Ticks(min, max)
+        // re-label them
+        for i := range defaultTicks {
+            if defaultTicks[i].Label != "" {
+                defaultTicks[i].Label = fmt.Sprintf("%.2f", defaultTicks[i].Value)
+            }
+        }
+        return defaultTicks
+    })
+
+    // Y-Axis: remove label, ticks, and axis line
     p.Y.Label.Text = ""
+    p.Y.LineStyle.Width = 0
+    p.Y.Tick.Marker = noTicks{}
+
+    // White background
     p.BackgroundColor = color.White
 
-    // 4) Exaggeration and offset setup
-    //
-    //    - exaggerationFactor makes each spectrum taller
-    //    - offsetFrac is how large the offset is, relative to the largest amplitude
-    //
-    exaggerationFactor := 10.0  // e.g. double the height
-    offsetFrac := 0.25           // e.g. 6% of largest amplitude (instead of 0.1)
+    // 4) Exaggeration / offset
+    exaggerationFactor := 10.0
+    offsetFrac := 0.25
     largestGlobal := setInfo[0].maxVal
     offsetStep := offsetFrac * largestGlobal
 
-    // 5) Draw from largest amplitude (in the back) to smallest (in front)
+    // 5) Draw from largest amplitude in back to smallest in front
     for i, info := range setInfo {
         setNum := info.idx
         freqArr := cabsData[setNum][0]
         sigArr  := cabsData[setNum][1]
 
-        // layerIndex so i=0 => top offset, i=last => offset=0
         layerIndex := len(setInfo) - 1 - i
         offsetY := float64(layerIndex) * offsetStep
 
-        // Build XY, scaling amplitude
         pts := make(plotter.XYs, len(freqArr))
         for k := range freqArr {
             pts[k].X = freqArr[k]
             pts[k].Y = sigArr[k]*exaggerationFactor + offsetY
         }
 
-        // Polygon fill
         fillPoly := make(plotter.XYs, 0, len(pts)+2)
         fillPoly = append(fillPoly, plotter.XY{X: freqArr[0], Y: offsetY})
         fillPoly = append(fillPoly, pts...)
@@ -3156,11 +3175,12 @@ func plotStackedCABS(
         if err != nil {
             panic(err)
         }
+        // fill with white, no outline
         poly.Color = color.White
         poly.LineStyle.Width = 0
         p.Add(poly)
 
-        // Black line on top
+        // black line on top
         line, err := plotter.NewLine(pts)
         if err != nil {
             panic(err)
@@ -3185,8 +3205,6 @@ func plotStackedCABS(
     p.X.Min = minFreq
     p.X.Max = maxFreq
 
-    // The top offset is offsetStep*(len(sets)-1).
-    // The largest amplitude is setInfo[0].maxVal * exaggerationFactor
     topOffset := float64(len(setInfo)-1) * offsetStep
     p.Y.Min = 0
     p.Y.Max = topOffset + setInfo[0].maxVal*exaggerationFactor + 0.1*largestGlobal
