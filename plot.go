@@ -20,6 +20,8 @@ import (
   "time"
   "flag"
   "log"
+
+  "sort"
 )
 
 func main() {
@@ -316,9 +318,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    //setsToPlotCABS := []int{0}
 
-    //setsToPlotCABS := rangeInt(0, 19)
+    setsToPlotCABS := rangeInt(0, 75)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -452,6 +454,15 @@ func main() {
     plotCABS(
       setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
       length, manual, fano, lorentz, slide, optimizedParams,
+    )
+
+    stackedSets := rangeInt(0, 75) // or whichever sets you want
+    plotStackedCABS(
+      stackedSets,
+      cabsData,
+      sample,
+      length,
+      logpath,
     )
   }
 
@@ -3068,6 +3079,122 @@ func plotTheoreticalSpectra(
     savePlot(p2, "Peak-Scattered-Power-vs-Detuning", logpath)
 }
 
+func plotStackedCABS(
+    sets []int,
+    cabsData [][][]float64, // cabsData[set][0]=freq, [1]=sig, [2]=err (optional)
+    sample string,
+    length float64,
+    logpath string,
+) {
+    type setInfoT struct {
+        idx    int
+        maxVal float64
+    }
+    var setInfo []setInfoT
+
+    // 1) Identify (setIndex, maxAmplitude)
+    for _, s := range sets {
+        maxVal := 0.0
+        for _, y := range cabsData[s][1] {
+            if y > maxVal {
+                maxVal = y
+            }
+        }
+        setInfo = append(setInfo, setInfoT{s, maxVal})
+    }
+
+    if len(setInfo) == 0 {
+        return
+    }
+
+    // 2) Sort descending so largest amplitude is first
+    sort.Slice(setInfo, func(i, j int) bool {
+        return setInfo[i].maxVal > setInfo[j].maxVal
+    })
+
+    // 3) Create the plot
+    p := plot.New()
+    p.Title.Text = fmt.Sprintf("%.3g m %s (Stacked Overlap)", length, sample)
+    p.X.Label.Text = "Frequency (GHz)"
+    p.Y.Label.Text = ""
+    p.BackgroundColor = color.White
+
+    // 4) Exaggeration and offset setup
+    //
+    //    - exaggerationFactor makes each spectrum taller
+    //    - offsetFrac is how large the offset is, relative to the largest amplitude
+    //
+    exaggerationFactor := 10.0  // e.g. double the height
+    offsetFrac := 0.25           // e.g. 6% of largest amplitude (instead of 0.1)
+    largestGlobal := setInfo[0].maxVal
+    offsetStep := offsetFrac * largestGlobal
+
+    // 5) Draw from largest amplitude (in the back) to smallest (in front)
+    for i, info := range setInfo {
+        setNum := info.idx
+        freqArr := cabsData[setNum][0]
+        sigArr  := cabsData[setNum][1]
+
+        // layerIndex so i=0 => top offset, i=last => offset=0
+        layerIndex := len(setInfo) - 1 - i
+        offsetY := float64(layerIndex) * offsetStep
+
+        // Build XY, scaling amplitude
+        pts := make(plotter.XYs, len(freqArr))
+        for k := range freqArr {
+            pts[k].X = freqArr[k]
+            pts[k].Y = sigArr[k]*exaggerationFactor + offsetY
+        }
+
+        // Polygon fill
+        fillPoly := make(plotter.XYs, 0, len(pts)+2)
+        fillPoly = append(fillPoly, plotter.XY{X: freqArr[0], Y: offsetY})
+        fillPoly = append(fillPoly, pts...)
+        fillPoly = append(fillPoly, plotter.XY{X: freqArr[len(freqArr)-1], Y: offsetY})
+
+        poly, err := plotter.NewPolygon(fillPoly)
+        if err != nil {
+            panic(err)
+        }
+        poly.Color = color.White
+        poly.LineStyle.Width = 0
+        p.Add(poly)
+
+        // Black line on top
+        line, err := plotter.NewLine(pts)
+        if err != nil {
+            panic(err)
+        }
+        line.Color = color.Black
+        line.Width = vg.Points(2.0)
+        p.Add(line)
+    }
+
+    // 6) Auto axis
+    minFreq := math.Inf(1)
+    maxFreq := math.Inf(-1)
+    for _, s := range sets {
+        freqs := cabsData[s][0]
+        if freqs[0] < minFreq {
+            minFreq = freqs[0]
+        }
+        if freqs[len(freqs)-1] > maxFreq {
+            maxFreq = freqs[len(freqs)-1]
+        }
+    }
+    p.X.Min = minFreq
+    p.X.Max = maxFreq
+
+    // The top offset is offsetStep*(len(sets)-1).
+    // The largest amplitude is setInfo[0].maxVal * exaggerationFactor
+    topOffset := float64(len(setInfo)-1) * offsetStep
+    p.Y.Min = 0
+    p.Y.Max = topOffset + setInfo[0].maxVal*exaggerationFactor + 0.1*largestGlobal
+
+    // 7) Save
+    saveJoyDivisionPlot(p, "JoyDivisionCabs", logpath)
+}
+
 func findMax(
   values []float64,
   ) (
@@ -4779,6 +4906,48 @@ func savePlot(
   }
 
   if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+}
+
+func saveJoyDivisionPlot(
+  p *plot.Plot,
+  name, logpath string,
+) {
+
+  date := time.Now()
+
+  // Make current date folder if it doesn't already exist
+  if _, err := os.Stat("plots/" + date.Format("2006-Jan-02")); os.IsNotExist(err) {
+    if err := os.Mkdir("plots/" + date.Format("2006-Jan-02"), 0755); err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+  }
+
+  // Make current time folder if it doesn't already exist
+  if _, err := os.Stat(logpath); os.IsNotExist(err) {
+    if err := os.Mkdir(logpath, 0755); err != nil {
+      fmt.Println(err)
+      fmt.Println(logpath)
+      os.Exit(1)
+    }
+  }
+
+  path := logpath + "/" + name
+
+  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".png"); err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".svg"); err != nil {
+    fmt.Println(err)
+    os.Exit(1)
+  }
+
+  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".pdf"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
