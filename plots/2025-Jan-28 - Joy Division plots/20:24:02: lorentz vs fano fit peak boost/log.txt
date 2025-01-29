@@ -1,0 +1,40 @@
+Sample: CS2
+Runtime note: lorentz vs fano fit peak boost
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+
+Run 17
+	Data taken: 23-10-27
+	Label: 14 GHz
+	Start Time (h:m:s): 15:57:34
+	End Time(h:m:s): 16:03:06
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.920 nm
+	Pump-Probe Separation: 14.00 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.956 nm
+	Pump Power: 70.100 mW
+	Stokes Power: 29.720 mW
+	Probe Power: 49.760 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters (Fano=true):
+
+		Amp: 21.41544707570809
+		Cen: 2.5433058159373414
+		Wid: 0.11585698500232096
+		C:   10.490097215190563
+		q:   -2.0565232511991325
+

@@ -26,7 +26,7 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz,
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz, joy,
   sample, coolingExperiment, note, length, csvToAvg := flags()
 
   logpath := logpath(note)
@@ -318,9 +318,9 @@ func main() {
 
   } else if cabs {
 
-    //setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{0}
 
-    setsToPlotCABS := rangeInt(0, 75)
+    //setsToPlotCABS := rangeInt(0, 20)
 
     normalized := []string{} // "Powers"
     cabsData, sigUnit := getCABSData(
@@ -347,7 +347,7 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{25, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
+          initialParams = []float64{10, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
         case "UHNA3":
           initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
@@ -456,14 +456,15 @@ func main() {
       length, manual, fano, lorentz, slide, optimizedParams,
     )
 
-    stackedSets := rangeInt(0, 75) // or whichever sets you want
-    plotStackedCABS(
-      stackedSets,
-      cabsData,
-      sample,
-      length,
-      logpath,
-    )
+    if joy {
+      plotJoyDivisionCABS(
+        setsToPlotCABS,
+        cabsData,
+        sample,
+        length,
+        logpath,
+      )
+    }
   }
 
   writeLog(logpath, logFile)
@@ -472,11 +473,12 @@ func main() {
 //----------------------------------------------------------------------------//
 
 func flags() (
-  bool, bool, bool, bool, bool, bool, bool, bool, bool,
+  bool, bool, bool, bool, bool, bool, bool, bool, bool, bool,
   string, string, string, float64, int,
 ) {
 
-  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz bool
+  var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz,
+  joy bool
   var sample, coolingExperiment, note string
   var length float64
   var avg int
@@ -490,6 +492,7 @@ func flags() (
   flag.BoolVar(&manual, "manual", false, "use manual axes defined for sample")
   flag.BoolVar(&fano, "fano", false, "use Fano function to fit data")
   flag.BoolVar(&lorentz, "lorentz", false, "use Lorentzian function to fit data")
+  flag.BoolVar(&joy, "joy", false, "produce Joy Division style plot of cabs spectra")
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
@@ -508,7 +511,7 @@ func flags() (
   }
 
   return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano,
-  lorentz, sample, coolingExperiment, note, length, avg
+  lorentz, joy, sample, coolingExperiment, note, length, avg
 }
 
 func logpath(
@@ -3086,8 +3089,7 @@ func (noTicks) Ticks(min, max float64) []plot.Tick {
     return []plot.Tick{} // no ticks
 }
 
-// The revised function:
-func plotStackedCABS(
+func plotJoyDivisionCABS(
     sets []int,
     cabsData [][][]float64, // cabsData[set][0]=freq, [1]=sig, [2]=err (optional)
     sample string,
@@ -3124,6 +3126,13 @@ func plotStackedCABS(
     //p.Title.Text = fmt.Sprintf("1 cm %s", sample)
 
     // X-Axis: show ticks with 2 decimals
+    p.X.Label.TextStyle.Font.Typeface = "liberation"
+    p.X.Tick.Label.Font.Variant = "Sans"
+    p.X.Tick.Label.Font.Size = 16
+    p.X.LineStyle.Width = vg.Points(1.5)
+    p.X.Tick.LineStyle.Width = vg.Points(1.5)
+    p.X.Label.TextStyle.Font.Variant = "Sans"
+    p.X.Label.TextStyle.Font.Size = 18
     p.X.Label.Text = "Frequency (GHz)"
     p.X.Tick.Marker = plot.TickerFunc(func(min, max float64) []plot.Tick {
         // get default positions
@@ -3146,8 +3155,17 @@ func plotStackedCABS(
     p.BackgroundColor = color.White
 
     // 4) Exaggeration / offset
-    exaggerationFactor := 10.0
+    exaggerationFactor := 1.0
     offsetFrac := 0.25
+    switch sample {
+      case "UHNA3":
+        exaggerationFactor = 10.0
+        offsetFrac = 0.25
+      case "CS2":
+        exaggerationFactor = 1.0
+        offsetFrac = 0.15
+    }
+
     largestGlobal := setInfo[0].maxVal
     offsetStep := offsetFrac * largestGlobal
 
@@ -4955,17 +4973,18 @@ func saveJoyDivisionPlot(
 
   path := logpath + "/" + name
 
-  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".png"); err != nil {
+  // if UHNA3 8.5x18, if CS2 8.5x11
+  if err := p.Save(8.5*vg.Inch, 11*vg.Inch, path + ".png"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
 
-  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".svg"); err != nil {
+  if err := p.Save(8.5*vg.Inch, 11*vg.Inch, path + ".svg"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
 
-  if err := p.Save(8.5*vg.Inch, 18*vg.Inch, path + ".pdf"); err != nil {
+  if err := p.Save(8.5*vg.Inch, 11*vg.Inch, path + ".pdf"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
