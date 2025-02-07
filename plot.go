@@ -318,7 +318,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0}
+    setsToPlotCABS := []int{4,7}
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -3203,7 +3203,13 @@ func plotJoyDivisionCABS(
         if err != nil {
             panic(err)
         }
-        line.Color = color.Black
+        if i == 3 {
+          line.Color = color.RGBA{255, 0, 0, 255} // Red
+        } else if i == 14 {
+          line.Color = color.RGBA{0, 255, 0, 255} // Green
+        } else {
+          line.Color = color.Black
+        }
         line.Width = vg.Points(2.0)
         p.Add(line)
     }
