@@ -318,7 +318,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{4,7}
+    setsToPlotCABS := []int{4,12}
 
     //setsToPlotCABS := rangeInt(0, 20)
 
