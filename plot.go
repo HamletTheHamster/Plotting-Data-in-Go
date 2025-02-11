@@ -318,7 +318,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{12} // 4,12
+    setsToPlotCABS := []int{4,12} // 4,12
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -455,8 +455,7 @@ func main() {
     }
 
     plotCABS(
-      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath,
-      length, manual, fano, lorentz, slide, optimizedParams,
+      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, manual, fano, lorentz, slide, optimizedParams,
     )
 
     if joy {
@@ -1645,7 +1644,68 @@ func plotCABS(
 
   var xrange, yrange, xticks, yticks []float64
   var xtickLabels, ytickLabels []string
-  if manual {
+  if contains(normalized, "Peak") && !manual {
+
+    ylabel = "Spectral Density (relative)"
+    yrange = []float64{0, 1.1}
+    yticks = []float64{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1}
+    ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
+
+    // Auto x-axes
+    xmax := 0.
+    xmin := cabsData[0][0][0]
+    for _, set := range sets {
+      if cabsData[set][0][0] < xmin {
+        xmin = cabsData[set][0][0]
+      }
+      if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
+        xmax = cabsData[set][0][len(cabsData[set][0])-1]
+      }
+    }
+
+    xrange = []float64{xmin, xmax}
+    xtick := 0.
+    displayDigits := 2
+    switch {
+      case (xmax - xmin)/8 > 0.25:
+        xtick = 0.5
+        displayDigits = 1
+      case (xmax - xmin)/8 > 0.1:
+        xtick = 0.25
+      case (xmax - xmin)/8 > 0.075:
+        xtick = 0.075
+      case (xmax - xmin)/8 > 0.05:
+        xtick = 0.05
+      case (xmax - xmin)/8 > 0.025:
+        xtick = 0.025
+      case (xmax - xmin)/8 > 0.01:
+        xtick = 0.02
+      case (xmax - xmin)/8 > 0.0075:
+        xtick = 0.0075
+      case (xmax - xmin)/8 > 0.005:
+        xtick = 0.005
+      case (xmax - xmin)/8 > 0.0025:
+        xtick = 0.0025
+      case (xmax - xmin)/8 > 0.001:
+        xtick = 0.001
+    }
+
+    firstTick := 0.
+    for m := float64(int(xmin)); m <= xmin; m += xtick {
+      firstTick = m
+    }
+    //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
+    //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
+    for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
+      xticks = append(xticks, firstTick + xtick*i)
+      if int(i)%2 != 0 {
+        xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
+      } else {
+        xtickLabels = append(xtickLabels, "")
+      }
+    }
+
+  } else if manual {
     // Manual Axes
     var err error
     xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err = axes("CABS", sample, "")
@@ -1771,9 +1831,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set, false, "")
+      e.LineStyle.Color = palette(set+1, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set, false, "")
+      plotSet.GlyphStyle.Color = palette(set+1, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -1827,7 +1887,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set, false, "")
+    l.GlyphStyle.Color = palette(set+1, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
 
@@ -3551,22 +3611,18 @@ func σCABS(
         stdDev[i] = σ(v)*sigmaMultiple
       }
 
-      // only scale to appropriate unit if not being normalized later
-      if !(len(normalized) > 0) {
-        for i := range stdDev {
+      // Always convert the errors to match the chosen sigUnit:
+      for i := range stdDev {
           switch sigUnit {
           case "mV":
-            stdDev[i] *= 1e3
+              stdDev[i] *= 1e3
           case "μV":
-            stdDev[i] *= 1e6
+              stdDev[i] *= 1e6
           case "nV":
-            stdDev[i] *= 1e9
+              stdDev[i] *= 1e9
           case "pV":
-            stdDev[i] *= 1e12
-          default:
-            fmt.Printf("Warning: Unrecognized signal unit '%s' for standard deviation scaling.\n", sigUnit)
+              stdDev[i] *= 1e12
           }
-        }
       }
 
       cabsData[set] = append(cabsData[set], stdDev)
@@ -3637,10 +3693,6 @@ func normalizeByPeak(
 			}
 		}
 	}
-
-	// if globalMax == 0 {
-	// 	return cabsData, fmt.Errorf("cannot normalize data: global maximum is zero")
-	// }
 
 	for _, set := range setsToPlotCABS {
 
