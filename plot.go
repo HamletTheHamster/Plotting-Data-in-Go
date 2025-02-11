@@ -318,11 +318,11 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{4,12}
+    setsToPlotCABS := []int{12} // 4,12
 
     //setsToPlotCABS := rangeInt(0, 20)
 
-    normalized := []string{} // "Powers"
+    normalized := []string{"Peak"} // "Powers", "Peak"
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
     )
@@ -340,7 +340,10 @@ func main() {
         cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
         fmt.Println("*Data normalized by " + normalized[0] + "*\n")
         logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
-
+      } else if contains(normalized, "Peak") {
+        cabsData = normalizeByPeak(setsToPlotCABS, cabsData)
+        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
       }
 
       // Fit data / Sinc
@@ -3616,6 +3619,43 @@ func normalizeByPowers(
   }
 
   return cabsData
+}
+
+func normalizeByPeak(
+	setsToPlotCABS []int,
+	cabsData [][][]float64,
+) (
+  [][][]float64,
+  ) {
+
+	// Find the maximum signal amplitude across all sets to plot
+	var globalMax float64 = 0.
+	for _, set := range setsToPlotCABS {
+		for _, v := range cabsData[set][1] {
+			if v > globalMax {
+				globalMax = v
+			}
+		}
+	}
+
+	// if globalMax == 0 {
+	// 	return cabsData, fmt.Errorf("cannot normalize data: global maximum is zero")
+	// }
+
+	for _, set := range setsToPlotCABS {
+
+		// sig
+		for i, v := range cabsData[set][1] {
+			cabsData[set][1][i] = v / globalMax
+		}
+
+		// σ
+		for i, v := range cabsData[set][2] {
+			cabsData[set][2][i] = v / globalMax
+		}
+	}
+
+	return cabsData
 }
 
 func FitLorentzian(
