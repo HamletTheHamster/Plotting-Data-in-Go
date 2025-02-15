@@ -26,8 +26,8 @@ import (
 
 func main() {
 
-  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz, joy,
-  sample, coolingExperiment, note, length, csvToAvg := flags()
+  cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz, joy, sample, coolingExperiment, note, length, csvToAvg,
+  normalize := flags()
 
   logpath := logpath(note)
 
@@ -322,9 +322,8 @@ func main() {
 
     //setsToPlotCABS := rangeInt(0, 20)
 
-    normalized := []string{"Peak"} // "Powers", "Peak"
     cabsData, sigUnit := getCABSData(
-      setsToPlotCABS, lock, sigFilepath, freqFilepath, normalized,
+      setsToPlotCABS, lock, sigFilepath, freqFilepath, normalize,
     )
 
     // Initialize optimizedParams to store fitted parameters
@@ -333,24 +332,24 @@ func main() {
     if multipleRuns, err := os.Stat("Data/1/Runs"); err == nil && multipleRuns.IsDir() {
       sigmaMultiple := 1.
       cabsData = σCABS(
-        setsToPlotCABS, numAvgs, cabsData, sigUnit, sigmaMultiple, normalized,
+        setsToPlotCABS, numAvgs, cabsData, sigUnit, normalize, sigmaMultiple,
       )
 
-      if contains(normalized, "Powers") {
+      if normalize == "Powers" {
         cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
-        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
-        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
-      } else if contains(normalized, "Peak") {
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
+      } else if normalize == "Peak" {
         cabsData = normalizeByPeak(setsToPlotCABS, cabsData)
-        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
-        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
       }
 
       // Fit data / Sinc
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{10, 2.5, 0.08, 0, 0} //amp, cen, wid, C, q
+          initialParams = []float64{1, 2.52, 0.1, 0, 1} //amp, cen, wid, C, q
         case "UHNA3":
           initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
@@ -429,10 +428,10 @@ func main() {
       )
     } else {
 
-      if contains(normalized, "Powers") {
+      if normalize == "Powers" {
         cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
-        fmt.Println("*Data normalized by " + normalized[0] + "*\n")
-        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalized[0]))
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
 
       }
 
@@ -454,8 +453,9 @@ func main() {
     )
     }
 
-    plotCABS(
-      setsToPlotCABS, cabsData, label, normalized, sample, sigUnit, logpath, length, manual, fano, lorentz, slide, optimizedParams,
+    logFile = plotCABS(
+      setsToPlotCABS, cabsData, label, logFile, sample, sigUnit,
+      logpath, normalize, length, manual, fano, lorentz, slide, optimizedParams,
     )
 
     if joy {
@@ -476,12 +476,12 @@ func main() {
 
 func flags() (
   bool, bool, bool, bool, bool, bool, bool, bool, bool, bool,
-  string, string, string, float64, int,
+  string, string, string, float64, int, string,
 ) {
 
   var cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz,
   joy bool
-  var sample, coolingExperiment, note string
+  var sample, coolingExperiment, note, normalize string
   var length float64
   var avg int
 
@@ -498,6 +498,7 @@ func flags() (
   flag.StringVar(&sample, "sample", "", "sample: LCOF, UHNA3, CS2, Te, TeO2, glass slide")
   flag.StringVar(&coolingExperiment, "cooling", "", "Cooling data: pump-probe or pump-only")
   flag.StringVar(&note, "note", "", "note to append folder name")
+  flag.StringVar(&normalize, "normalize", "", "by 'Powers' or 'Peak'")
   flag.Float64Var(&length, "len", 0, "length of sample in meters")
   flag.IntVar(&avg, "avg", 0, "number of CSV files to average")
   flag.Parse()
@@ -512,8 +513,7 @@ func flags() (
     os.Exit(1)
   }
 
-  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano,
-  lorentz, joy, sample, coolingExperiment, note, length, avg
+  return cabs, lock, temp, slide, sinc, theoreticalSpectra, manual, fano, lorentz, joy, sample, coolingExperiment, note, length, avg, normalize
 }
 
 func logpath(
@@ -1155,7 +1155,8 @@ func getCoolingData(
 func getCABSData(
   sets []int,
   lock bool,
-  sigFileNames, freqFileNames, normalized []string,
+  sigFileNames, freqFileNames []string,
+  normalize string,
 ) (
   [][][]float64, string,
 ) {
@@ -1172,8 +1173,8 @@ func getCABSData(
       cabsDataPreUnit = append(cabsDataPreUnit, lockData)
     }
 
-    // if not going to be normalized
-    if !contains(normalized, "Powers") {
+    // if not going to be normalized by powers
+    if normalize != "Powers" {
 
       // Check for most appropriate signal unit (preference of larger)
       largestSig := 0.
@@ -1597,11 +1598,13 @@ func plotRaw(
 func plotCABS(
   sets []int,
   cabsData [][][]float64,
-  label, normalized []string,
-  sample, sigUnit, logpath string,
+  label, logFile []string,
+  sample, sigUnit, logpath, normalize string,
   length float64,
   manual, fano, lorentz, slide bool,
   optimizedParams [][]float64,
+) (
+  []string,
 ) {
 
   var l string
@@ -1635,7 +1638,7 @@ func plotCABS(
   title := l + " " + sample + " CABS"
   xlabel := "Frequency (GHz)"
   var ylabel string
-  if contains(normalized, "Powers") {
+  if normalize == "Powers" {
     ylabel = "Normalized by Powers (V/W³)"
   } else {
     ylabel = "Spectral Density (" + sigUnit + ")"
@@ -1644,7 +1647,7 @@ func plotCABS(
 
   var xrange, yrange, xticks, yticks []float64
   var xtickLabels, ytickLabels []string
-  if contains(normalized, "Peak") && !manual {
+  if normalize == "Peak" && !manual {
 
     ylabel = "Spectral Density (relative)"
     yrange = []float64{0, 1.1}
@@ -1855,18 +1858,118 @@ func plotCABS(
     }
 
     if lorentz || fano {
-      // Add fitted curve
-      fittedCurve := make(plotter.XYs, len(cabsData[set][0]))
-      for i, f := range cabsData[set][0] {
+
+      //--------------finding fit parameters with finer array-----------------//
+
+      // 1. Generate a dense frequency array
+      freqMin := cabsData[set][0][0]
+      freqMax := cabsData[set][0][len(cabsData[set][0]) - 1]
+
+      // Decide how many fine steps:
+      nSteps := 1000
+      df := (freqMax - freqMin) / float64(nSteps-1)
+
+      // Make arrays
+      fineFreqs := make([]float64, nSteps)
+      for j := 0; j < nSteps; j++ {
+          fineFreqs[j] = freqMin + df*float64(j)
+      }
+
+      // 2. Evaluate your fitted function
+      fineY := make([]float64, nSteps)
+      var A, f0, gamma, c, q float64
+      if fano {
+        A, f0, gamma, c, q = optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
+      } else if lorentz {
+        A, f0, gamma, c = optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
+      }
+      for j, ff := range fineFreqs {
         if fano {
-          A, f0, gamma, C, q := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3], optimizedParams[set][4]
-          fittedCurve[i].X = f
-          fittedCurve[i].Y = FanoFunction(f, A, f0, gamma, C, q)
+          fineY[j] = FanoFunction(ff, A, f0, gamma, c, q)
         } else {
-          A, f0, gamma, C := optimizedParams[set][0], optimizedParams[set][1], optimizedParams[set][2], optimizedParams[set][3]
-          fittedCurve[i].X = f
-          fittedCurve[i].Y = Lorentzian(f, A, f0, gamma, C)
+          fineY[j] = Lorentzian(ff, A, f0, gamma, c)
         }
+      }
+
+      // 3. Find the true maximum and baseline
+      maxVal := -1e9
+      maxIndex := -1
+
+      // Also track minVal to see if your baseline is actually below C:
+      minVal := 1e9
+
+      for j, y := range fineY {
+          if y > maxVal {
+              maxVal = y
+              maxIndex = j
+          }
+          if y < minVal {
+              minVal = y
+          }
+      }
+
+      // baseline can be your fitted offset or use minVal:
+      baseline := math.Min(c, minVal)
+
+      // 4. Compute amplitude
+      peakAmplitude := maxVal - baseline
+
+      // 5. Find the center frequency
+      centerFreq := fineFreqs[maxIndex]
+
+      // 6. Comupte the width via half maximum
+      half := baseline + peakAmplitude/2
+
+      leftIndex := -1
+      rightIndex := -1
+
+      // Search to the left
+      for j := maxIndex; j >= 0; j-- {
+          if fineY[j] < half {
+              leftIndex = j
+              break
+          }
+      }
+      // Search to the right
+      for j := maxIndex; j < len(fineY); j++ {
+          if fineY[j] < half {
+              rightIndex = j
+              break
+          }
+      }
+
+      var fwhm float64
+      if leftIndex < 0 || rightIndex < 0 {
+          // If you never cross half on one side, handle gracefully:
+          fwhm = -1 // or some fallback
+      } else {
+          leftFreq := fineFreqs[leftIndex]
+          rightFreq := fineFreqs[rightIndex]
+          fwhm = rightFreq - leftFreq
+      }
+
+      // 7. Save and print these desired values
+      fmt.Printf(
+        "Derived from fitted curve:\n"+
+        "  Peak amplitude: %.4f\n"+
+        "  Center freq:    %.4f GHz\n"+
+        "  FWHM:           %.4f GHz\n",
+        peakAmplitude,
+        centerFreq,
+        fwhm,
+      )
+      logFile = append(logFile, fmt.Sprintf(
+        "Run %d derived:\n  Amp=%.4f, Center=%.4f, FWHM=%.4f\n",
+        set+1, peakAmplitude, centerFreq, fwhm,
+      ))
+
+      //----------------------------------------------------------------------//
+
+      // Add fitted curve
+      fittedCurve := make(plotter.XYs, nSteps)
+      for j := 0; j < nSteps; j++ {
+        fittedCurve[j].X = fineFreqs[j]
+        fittedCurve[j].Y = fineY[j]
       }
 
       fittedLine, err := plotter.NewLine(fittedCurve)
@@ -1874,7 +1977,7 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      fittedLine.LineStyle.Color = palette(set, false, "")
+      fittedLine.LineStyle.Color = palette(set+1, false, "")
       fittedLine.LineStyle.Width = vg.Points(2)
 
       p.Add(fittedLine)
@@ -1930,6 +2033,8 @@ func plotCABS(
   */
 
   savePlot(p, "CABS", logpath)
+
+  return logFile
 }
 
 func axes(
@@ -3379,9 +3484,8 @@ func bin(
 func σCABS(
   setsToPlotCABS, numAvgs []int,
   cabsData [][][]float64,
-  sigUnit string,
+  sigUnit, normalize string,
   sigmaMultiple float64,
-  normalized []string,
 ) (
   [][][]float64,
 ) {
@@ -3528,7 +3632,7 @@ func σCABS(
         σSigMinusBg[i] += math.Sqrt(math.Pow(v, 2) + math.Pow(σCombinedAcrossRunsBg[i], 2))
 
         // only scale to appropriate unit if not being normalized later
-        if len(normalized) > 0 {
+        if normalize != "" {
           switch sigUnit {
           case "mV":
             σSigMinusBg[i] *= 1e3
@@ -3823,14 +3927,19 @@ func FitFanoResonance(
 }
 
 func FanoFunction(
-  f, A, f0, gamma, C, q float64,
+  f, A, f0, γ, C, q float64,
 ) (
   float64,
 ) {
-    epsilon := 2*(f - f0)/gamma
-    fano := math.Pow(epsilon + q, 2) / (1 + math.Pow(epsilon, 2)) + C
-    fanoNormalized := fano / (1 + math.Pow(q, 2))
-    return A * fanoNormalized
+
+  // “epsilon” is the dimensionless detuning
+  ε := (f - f0) / (γ/2)
+
+  // Standard Fano peak shape:
+  fanoPeak := ((ε + q)*(ε + q)) / (1 + ε*ε)
+
+  // Then scale and offset it:
+  return C + A*fanoPeak
 }
 
 func FanoResiduals(
@@ -3844,10 +3953,10 @@ func FanoResiduals(
 
     for i, f := range frequencies {
         modelValue := FanoFunction(f, A, f0, gamma, C, q)
-        if i == 83 {
-          r[i] = (signals[i] - modelValue) / uncertainties[i]
-          //fmt.Printf("r[83] = %f\nsignals[83]: %f\nmodelValue: %f\n\n", r[83], signals[83], modelValue)
-        }
+        // if i == 83 {
+        //   r[i] = (signals[i] - modelValue) / uncertainties[i]
+        //   //fmt.Printf("r[83] = %f\nsignals[83]: %f\nmodelValue: %f\n\n", r[83], signals[83], modelValue)
+        // }
         if len(uncertainties) > 0 && uncertainties[i] != 0 {
             r[i] = (signals[i] - modelValue) / uncertainties[i]
         } else {
