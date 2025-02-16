@@ -326,8 +326,9 @@ func main() {
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalize,
     )
 
-    // Initialize optimizedParams to store fitted parameters
+    // Initialize to store fitted parameters and chi2 results
     optimizedParams := make([][]float64, len(cabsData))
+    chi2Vals := make([]float64, len(cabsData)) // # of sets
 
     if multipleRuns, err := os.Stat("Data/1/Runs"); err == nil && multipleRuns.IsDir() {
       sigmaMultiple := 1.
@@ -385,6 +386,10 @@ func main() {
 
           fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
           logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+
+          // store for plotting value
+          chi2Vals[set] = chi2
+
         } else {
           trim := true
           if trim {
@@ -421,6 +426,10 @@ func main() {
             // Print or log the value:
             fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
             logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+
+            // Store for plotting value
+            chi2Vals[set] = chi2
+
           } else {
             optimizedParams[set] = FitLorentzian(
               // freq, sig, σ, guess
@@ -442,6 +451,10 @@ func main() {
             // Print or log the value:
             fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
             logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+
+            // store for plotting value
+            chi2Vals[set] = chi2
+
           }
         }
 
@@ -523,7 +536,7 @@ func main() {
 
     logFile = plotCABS(
       setsToPlotCABS, cabsData, label, logFile, sample, sigUnit,
-      logpath, normalize, length, manual, fano, lorentz, slide, optimizedParams,
+      logpath, normalize, length, manual, fano, lorentz, slide, optimizedParams, chi2Vals,
     )
 
     if joy {
@@ -1670,6 +1683,7 @@ func plotCABS(
   length float64,
   manual, fano, lorentz, slide bool,
   optimizedParams [][]float64,
+  chi2Vals []float64,
 ) (
   []string,
 ) {
@@ -2074,7 +2088,10 @@ func plotCABS(
           p.Legend.Add("•", dummyLine)
           p.Legend.Add("•", dummyLine)
         } else {
-            p.Legend.Add(label[set], l)
+            p.Legend.Add(
+              fmt.Sprintf("%s (χ²=%.2f)", label[set], chi2Vals[set]),
+              l,
+            )
         }
     }
   }
