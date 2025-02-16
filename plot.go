@@ -349,7 +349,7 @@ func main() {
       var initialParams []float64
       switch sample {
         case "CS2":
-          initialParams = []float64{1, 2.52, 0.1, 0, 1} //amp, cen, wid, C, q
+          initialParams = []float64{0.9, 2.5, 0.05, 0, 1} //amp, cen, wid, C, q
         case "UHNA3":
           initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
@@ -370,11 +370,73 @@ func main() {
             // freq, sig, σ, guess
             cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
           )
-        } else {
-          optimizedParams[set] = FitLorentzian(
-            // freq, sig, σ, guess
-            cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+
+          chi2 := reducedChiSquared(
+              cabsData[set][0],
+              cabsData[set][1],
+              cabsData[set][2],
+              optimizedParams[set],
+              func(x float64, p []float64) float64 {
+                  // The same Fano function used in the solver:
+                  return FanoFunction(x, p[0], p[1], p[2], p[3], p[4])
+              },
+              5, // number of fit parameters in the Fano model
           )
+
+          fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
+          logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+        } else {
+          trim := false
+          if trim {
+            trimFreq, trimSig, trimUnc := trimMiddleByIndex(
+                cabsData[set][0],
+                cabsData[set][1],
+                cabsData[set][2],
+            )
+
+            // Now do the solver on the trimmed subset
+            optimizedParams[set] = FitLorentzian(
+                trimFreq, trimSig, trimUnc,
+                initialParams,
+            )
+
+            chi2 := reducedChiSquared(
+                cabsData[set][0],             // x data (freq)
+                cabsData[set][1],             // y data (signal)
+                cabsData[set][2],             // err data (σ)
+                optimizedParams[set],         // best-fit parameters
+                func(x float64, p []float64) float64 {
+                    // The same Lorentzian model used in the solver:
+                    return Lorentzian(x, p[0], p[1], p[2], p[3])
+                },
+                4, // number of fit parameters
+            )
+
+            // Print or log the value:
+            fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
+            logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+          } else {
+            optimizedParams[set] = FitLorentzian(
+              // freq, sig, σ, guess
+              cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
+            )
+
+            chi2 := reducedChiSquared(
+              cabsData[set][0],             // x data (freq)
+              cabsData[set][1],             // y data (signal)
+              cabsData[set][2],             // err data (σ)
+              optimizedParams[set],         // best-fit parameters
+              func(x float64, p []float64) float64 {
+                  // The same Lorentzian model used in the solver:
+                  return Lorentzian(x, p[0], p[1], p[2], p[3])
+              },
+              4, // number of fit parameters
+            )
+
+            // Print or log the value:
+            fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
+            logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+          }
         }
 
         initialParams = optimizedParams[set]
@@ -3858,8 +3920,8 @@ func Lorentzian(
 ) (
   float64,
 ) {
-    return .25 * A * math.Pow(gamma, 2) / (math.Pow(f - f0, 2) + (.25 * math.Pow(gamma, 2))) + C
-    //return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2))) + C
+  return A * math.Pow(gamma, 2) / (math.Pow(f - f0, 2) + (math.Pow(gamma, 2))) + C
+  //return (A / math.Pi) * (gamma / (math.Pow(f-f0, 2) + math.Pow(gamma, 2))) + C
 }
 
 func residuals(
@@ -3881,6 +3943,29 @@ func residuals(
     }
 
     return r
+}
+
+func trimMiddleByIndex(
+  freq, sig, unc []float64,
+) (
+  fOut, sOut, uOut []float64,
+) {
+    // Used to apply lorentz fit to fano-distorted data
+
+    n := len(freq)
+    if n < 4 {
+        // If we have too few points, do nothing
+        return freq, sig, unc
+    }
+
+    startIndex := n / 4      // skip lowest points
+    //endIndex   := (4 * n) / 5 // skip highest points
+    endIndex := n
+
+    fOut = freq[startIndex:endIndex]
+    sOut = sig[startIndex:endIndex]
+    uOut = unc[startIndex:endIndex]
+    return fOut, sOut, uOut
 }
 
 func FitFanoResonance(
@@ -3965,6 +4050,44 @@ func FanoResiduals(
     }
 
     return r
+}
+
+func reducedChiSquared(
+  x, y, err, params []float64,
+  modelFunc func(float64, []float64) float64,
+  numParams int,
+) (
+  float64,
+) {
+
+    n := len(x)
+    if n == 0 || n != len(y) || n != len(err) {
+        // Invalid or mismatched data
+        return 0
+    }
+    if numParams >= n {
+        // Edge case: more params than data
+        return 0
+    }
+
+    var chisq float64
+    for i := 0; i < n; i++ {
+        if err[i] == 0 {
+            // Avoid division by zero; skip or handle appropriately
+            continue
+        }
+        modelVal := modelFunc(x[i], params)
+        residual := (y[i] - modelVal) / err[i]
+        chisq += residual * residual
+    }
+
+    // degrees of freedom = N - p
+    dof := float64(n - numParams)
+    if dof <= 0 {
+        // again, avoid dividing by zero
+        return 0
+    }
+    return chisq / dof
 }
 
 func binCabs(
