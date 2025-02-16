@@ -386,7 +386,7 @@ func main() {
           fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
           logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
         } else {
-          trim := false
+          trim := true
           if trim {
             trimFreq, trimSig, trimUnc := trimMiddleByIndex(
                 cabsData[set][0],
@@ -400,10 +400,19 @@ func main() {
                 initialParams,
             )
 
+            fmt.Println("len freq   =", len(cabsData[set][0]))
+            fmt.Println("len signal =", len(cabsData[set][1]))
+            fmt.Println("len error  =", len(cabsData[set][2]))
+            for i := 0; i < len(cabsData[set][2]); i++ {
+                if cabsData[set][2][i] == 0 {
+                    fmt.Printf("err[%d] == 0!\n", i)
+                }
+            }
+
             chi2 := reducedChiSquared(
-                cabsData[set][0],             // x data (freq)
-                cabsData[set][1],             // y data (signal)
-                cabsData[set][2],             // err data (σ)
+                trimFreq,             // x data (freq)
+                trimSig,             // y data (signal)
+                trimUnc,             // err data (σ)
                 optimizedParams[set],         // best-fit parameters
                 func(x float64, p []float64) float64 {
                     // The same Lorentzian model used in the solver:
@@ -1330,7 +1339,7 @@ func getData(
       }
     }
   } else {
-    for i := 1; i < len(dataStr); i++ {
+    for i := 0; i < len(dataStr); i++ {
       frequencyStrT = append(frequencyStrT, strings.ReplaceAll(dataStr[i][0]," ",""))
       signalStrT = append(signalStrT, strings.ReplaceAll(dataStr[i][2]," ",""))
     }
