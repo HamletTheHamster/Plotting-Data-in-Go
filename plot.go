@@ -400,9 +400,6 @@ func main() {
                 initialParams,
             )
 
-            fmt.Println("len freq   =", len(cabsData[set][0]))
-            fmt.Println("len signal =", len(cabsData[set][1]))
-            fmt.Println("len error  =", len(cabsData[set][2]))
             for i := 0; i < len(cabsData[set][2]); i++ {
                 if cabsData[set][2][i] == 0 {
                     fmt.Printf("err[%d] == 0!\n", i)
@@ -1493,7 +1490,6 @@ func getLockData(
     sigUnit = "uV"
   }*/
 
-
   return [][]float64{frequency, signal}
 }
 
@@ -1502,15 +1498,15 @@ func readCSV(
 ) (
   [][]string, error,
 ) {
-  // Skip first row (line)
-  row1, err := bufio.NewReader(rs).ReadSlice('\n')
-  if err != nil {
-    return nil, err
-  }
-  _, err = rs.Seek(int64(len(row1)), io.SeekStart)
-  if err != nil {
-    return nil, err
-  }
+  // // Skip first row (line)
+  // row1, err := bufio.NewReader(rs).ReadSlice('\n')
+  // if err != nil {
+  //   return nil, err
+  // }
+  // _, err = rs.Seek(int64(len(row1)), io.SeekStart)
+  // if err != nil {
+  //   return nil, err
+  // }
 
   // Read remaining rows
   r := csv.NewReader(rs)
@@ -4014,8 +4010,6 @@ func FitFanoResonance(
   if err != nil {
       log.Fatal("optimization failed:", err)
   }
-
-  fmt.Printf("result.X[0]: %f\n\n", result.X[0])
 
   return result.X
 }
