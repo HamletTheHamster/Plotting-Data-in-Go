@@ -318,7 +318,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{4,12} // 4,12
+    setsToPlotCABS := []int{0,1} // 4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -355,6 +355,8 @@ func main() {
           initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
+        case "wiggly":
+          initialParams = []float64{25, 10.85, .1, 0, 0}
         case "no-chip":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         default:
@@ -392,7 +394,7 @@ func main() {
 
         } else {
           trim := true
-          if trim {
+          if trim && lorentz {
             trimFreq, trimSig, trimUnc := trimMiddleByIndex(
                 cabsData[set][0],
                 cabsData[set][1],
@@ -436,25 +438,26 @@ func main() {
               cabsData[set][0], cabsData[set][1], cabsData[set][2], initialParams,
             )
 
-            chi2 := reducedChiSquared(
-              cabsData[set][0],             // x data (freq)
-              cabsData[set][1],             // y data (signal)
-              cabsData[set][2],             // err data (σ)
-              optimizedParams[set],         // best-fit parameters
-              func(x float64, p []float64) float64 {
-                  // The same Lorentzian model used in the solver:
-                  return Lorentzian(x, p[0], p[1], p[2], p[3])
-              },
-              4, // number of fit parameters
-            )
+            if lorentz {
+              chi2 := reducedChiSquared(
+                cabsData[set][0],             // x data (freq)
+                cabsData[set][1],             // y data (signal)
+                cabsData[set][2],             // err data (σ)
+                optimizedParams[set],         // best-fit parameters
+                func(x float64, p []float64) float64 {
+                    // The same Lorentzian model used in the solver:
+                    return Lorentzian(x, p[0], p[1], p[2], p[3])
+                },
+                4, // number of fit parameters
+              )
 
-            // Print or log the value:
-            fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
-            logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
+              // Print or log the value:
+              fmt.Printf("Set %d: Reduced χ² = %.4f\n", set, chi2)
+              logFile = append(logFile, fmt.Sprintf("Set %d: Reduced χ² = %.4f\n", set, chi2))
 
-            // store for plotting value
-            chi2Vals[set] = chi2
-
+              // store for plotting value
+              chi2Vals[set] = chi2
+            }
           }
         }
 
@@ -2077,7 +2080,7 @@ func plotCABS(
 
     // Handle the legend abbreviation
     if i < 10 || i == len(sets)-1 { // Show only first 3 and last
-        if i == 9 {
+      if i == 9 {
           // Create an invisible plotter for the ellipsis
           dummyLine, err := plotter.NewLine(plotter.XYs{})
           if err != nil {
@@ -2087,12 +2090,16 @@ func plotCABS(
           p.Legend.Add("•", dummyLine)
           p.Legend.Add("•", dummyLine)
           p.Legend.Add("•", dummyLine)
-        } else {
-            p.Legend.Add(
-              fmt.Sprintf("%s (χ²=%.2f)", label[set], chi2Vals[set]),
-              l,
-            )
-        }
+      } else if lorentz || fano {
+        p.Legend.Add(
+          fmt.Sprintf("%s (χ²=%.2f)", label[set], chi2Vals[set]),
+            l,
+          )
+      } else {
+        p.Legend.Add(
+          fmt.Sprintf("%s", label[set]), l,
+        )
+      }
     }
   }
 
