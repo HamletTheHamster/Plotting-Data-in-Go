@@ -20,7 +20,6 @@ import (
   "time"
   "flag"
   "log"
-
   "sort"
 )
 
@@ -118,7 +117,7 @@ func main() {
 
       var asAmps, asLinewidths []float64
 
-      fitAntiStokes := []int{0,1,2,3}
+      fitAntiStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitAntiStokes) > 0 {
 
         // as
@@ -138,6 +137,12 @@ func main() {
             amp, wid, cen, c := guess[0], guess[1], guess[2], guess[3]
 
             for i := range as[set][0] {
+
+              if i >= len(dst) {
+                fmt.Printf("Oops, i=%d is out of range of dst\n", i)
+                panic("out of range in residual function")
+              }
+
               x := as[set][0][i]
               y := as[set][1][i]
               dst[i] = (.25 * amp * math.Pow(wid, 2) / (math.Pow(x - cen, 2) + (.25 * math.Pow(wid, 2))) - y) * (1./σas[set][i]) + c
@@ -198,7 +203,7 @@ func main() {
         )
       }
 
-      fitStokes := []int{0,1,2,3}
+      fitStokes := []int{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14}
       if len(fitStokes) > 0 {
 
         header := "\nStokes\nSet \t Power \t\t Width \t\t Peak \t\t Center \n"
@@ -709,13 +714,6 @@ func readMeta(
       probeFilter = append(probeFilter, v[probeFilterCol])
       notes = append(notes, v[notesCol])
 
-      if numAvg, err := strconv.Atoi(v[numAvgsCol]); err == nil {
-        numAvgs = append(numAvgs, numAvg)
-      } else {
-        fmt.Println(err)
-        os.Exit(1)
-      }
-
       if coolingExperiment != "" {
         if strings.Contains(v[labelCol], "ras") {
           if v, err := strconv.ParseFloat(strings.Split(v[labelCol], " ")[0], 64); err == nil {
@@ -758,6 +756,13 @@ func readMeta(
           }
         }
       } else if cabs {
+
+        if numAvg, err := strconv.Atoi(v[numAvgsCol]); err == nil {
+          numAvgs = append(numAvgs, numAvg)
+        } else {
+          fmt.Println(err)
+          os.Exit(1)
+        }
 
         if v[pumpCol] == "" {
           pumpPowers = append(pumpPowers, 0)
@@ -963,7 +968,7 @@ func avgCSVs(
     fmt.Println(err)
     os.Exit(1)
   }
-  peek, err := readCSV(f)
+  peek, err := readCoolingCSV(f)
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1011,7 +1016,7 @@ func avgCSVs(
             os.Exit(1)
           }
 
-          data, err := readCSV(f)
+          data, err := readCoolingCSV(f)
           newDataCSV = data
 
           for j := 1; j < len(data); j++ {
@@ -1203,13 +1208,13 @@ func getCoolingData(
       }
 
       if strings.Contains(labels[i], "bas") {
-        bas = append(bas, getData(lock, sig, fileNames[i]))
+        bas = append(bas, getCoolingCoolingData(lock, sig, fileNames[i]))
       } else if strings.Contains(labels[i], "bs") {
-        bs = append(bs, getData(lock, sig, fileNames[i]))
+        bs = append(bs, getCoolingCoolingData(lock, sig, fileNames[i]))
       } else if strings.Contains(labels[i], "ras") {
-        ras = append(ras, getData(lock, sig, fileNames[i]))
+        ras = append(ras, getCoolingCoolingData(lock, sig, fileNames[i]))
       } else if strings.Contains(labels[i], "rs") {
-        rs = append(rs, getData(lock, sig, fileNames[i]))
+        rs = append(rs, getCoolingCoolingData(lock, sig, fileNames[i]))
       }
     }
   } else {
@@ -1222,13 +1227,13 @@ func getCoolingData(
       }
 
       if strings.Contains(labels[i], "bas") {
-        bas = append(bas, getData(lock, sig, fileName))
+        bas = append(bas, getCoolingCoolingData(lock, sig, fileName))
       } else if strings.Contains(labels[i], "bs") {
-        bs = append(bs, getData(lock, sig, fileName))
+        bs = append(bs, getCoolingCoolingData(lock, sig, fileName))
       } else if strings.Contains(labels[i], "ras") {
-        ras = append(ras, getData(lock, sig, fileName))
+        ras = append(ras, getCoolingCoolingData(lock, sig, fileName))
       } else if strings.Contains(labels[i], "rs") {
-        rs = append(rs, getData(lock, sig, fileName))
+        rs = append(rs, getCoolingCoolingData(lock, sig, fileName))
       }
     }
   }
@@ -1318,7 +1323,7 @@ func getCABSData(
   return cabsData, sigUnit
 }
 
-func getData(
+func getCoolingCoolingData(
   lock, sig bool,
   csvName string,
 ) (
@@ -1332,7 +1337,7 @@ func getData(
     os.Exit(1)
   }
   defer f.Close()
-  dataStr, err := readCSV(f)
+  dataStr, err := readCoolingCSV(f)
   if err != nil {
     fmt.Println(err)
     os.Exit(1)
@@ -1507,6 +1512,30 @@ func getLockData(
   }*/
 
   return [][]float64{frequency, signal}
+}
+
+func readCoolingCSV(
+  rs io.ReadSeeker,
+) (
+  [][]string, error,
+) {
+
+    // Wrap rs in one bufio.Reader so we can call ReadSlice on the same stream:
+    br := bufio.NewReader(rs)
+
+    // Skip the first line
+    if _, err := br.ReadSlice('\n'); err != nil {
+        return nil, err
+    }
+    // Skip the second line
+    if _, err := br.ReadSlice('\n'); err != nil {
+        return nil, err
+    }
+
+    // read remaining rows
+    r := csv.NewReader(br)
+
+    return r.ReadAll()
 }
 
 func readCSV(
@@ -2267,7 +2296,7 @@ func axes(
         xtick := []float64{2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.3, 2.35, 2.4, 2.45, 2.5}
         ytick := []float64{0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150}
         xtickLabel := []string{"2", "", "2.1", "", "2.2", "", "2.3", "", "2.4", "", "2.5"}
-        ytickLabel := []string{"0", "", "20", "", "40", "", "60", "", "80", "", "100", ""}
+        ytickLabel := []string{"0", "", "20", "", "40", "", "60", "", "80", "", "100", "", "120", "", "140", ""}
 
         return xrange, yrange, xtick, ytick, xtickLabel, ytickLabel, nil
       } else if coolingExperiment == "pump-probe" {
