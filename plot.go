@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0,1} // 4,12 CS2 phase-matching
+    setsToPlotCABS := []int{0} // 4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
