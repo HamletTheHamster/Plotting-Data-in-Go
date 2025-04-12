@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0} // 4,12 CS2 phase-matching
+    setsToPlotCABS := []int{1} // 4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -650,6 +650,15 @@ func readMeta(
   var startFrequencyCol, stopFrequencyCol, stepCol, numAvgsCol, notesCol int
   var pumpLaserCol, probeLaserCol, probeFilterCol, stokesFilterCol int
 
+  lockinRangeCol = -1
+  dwellCol = -1
+  bandwidthCol = -1
+  dataRateCol = -1
+  orderCol = -1
+  startFrequencyCol = -1
+  stopFrequencyCol = -1
+  stepCol = -1
+  numAvgsCol = -1
   for col, heading := range meta[0] {
     switch heading {
     case "Date":
@@ -657,6 +666,8 @@ func readMeta(
     case "Label":
       labelCol = col
     case "Sets":
+      setCol = col
+    case "Run":
       setCol = col
     case "Start Time":
       startTimeCol = col
@@ -757,12 +768,19 @@ func readMeta(
         }
       } else if cabs {
 
-        if numAvg, err := strconv.Atoi(v[numAvgsCol]); err == nil {
-          numAvgs = append(numAvgs, numAvg)
+        if numAvgsCol == -1 || v[numAvgsCol] == "" {
+            // Old CSV or blank cell => default to 1
+            numAvgs = append(numAvgs, 1)
         } else {
-          fmt.Println(err)
-          os.Exit(1)
+            // Has a Num Avgs column
+            if val, err := strconv.Atoi(v[numAvgsCol]); err == nil {
+                numAvgs = append(numAvgs, val)
+            } else {
+                fmt.Println("Cannot parse Num Avgs:", err)
+                os.Exit(1)
+            }
         }
+
 
         if v[pumpCol] == "" {
           pumpPowers = append(pumpPowers, 0)
@@ -800,77 +818,117 @@ func readMeta(
           sigFilepath = append(sigFilepath, v[setCol] + "/signal.csv")
           freqFilepath = append(freqFilepath, v[setCol] + "/frequency.csv")
 
-          if v[lockinRangeCol] == "" {
+          if lockinRangeCol == -1 {
+            // older CSV
             lockinRange = append(lockinRange, 0)
-          } else if v, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
-            lockinRange = append(lockinRange, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta lockinRange string -> float error")
-            os.Exit(1)
+            // Then parse v[lockinRangeCol], if not empty
+            if v[lockinRangeCol] == "" {
+              lockinRange = append(lockinRange, 0)
+            } else if val, err := strconv.ParseFloat(v[lockinRangeCol], 64); err == nil {
+              lockinRange = append(lockinRange, val)
+            } else {
+              fmt.Println("readMeta lockinRange string -> float error:", err)
+              os.Exit(1)
+            }
           }
-          if v[dwellCol] == "" {
+          if dwellCol == -1 {
+            // older CSV
             dwell = append(dwell, 0)
-          } else if v, err := strconv.ParseFloat(v[dwellCol], 64); err == nil {
-            dwell = append(dwell, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta dwell string -> float error")
-            os.Exit(1)
+            if v[dwellCol] == "" {
+              dwell = append(dwell, 0)
+            } else if v, err := strconv.ParseFloat(v[dwellCol], 64); err == nil {
+              dwell = append(dwell, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta dwell string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[bandwidthCol] == "" {
+          if bandwidthCol == -1 {
+            // older CSV
             bandwidth = append(bandwidth, 0)
-          } else if v, err := strconv.ParseFloat(v[bandwidthCol], 64); err == nil {
-            bandwidth = append(bandwidth, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta bandwidth string -> float error")
-            os.Exit(1)
+            if v[bandwidthCol] == "" {
+              bandwidth = append(bandwidth, 0)
+            } else if v, err := strconv.ParseFloat(v[bandwidthCol], 64); err == nil {
+              bandwidth = append(bandwidth, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta bandwidth string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[dataRateCol] == "" {
+          if dataRateCol == -1 {
+            // older CSV
             dataRate = append(dataRate, 0)
-          } else if v, err := strconv.ParseFloat(v[dataRateCol], 64); err == nil {
-            dataRate = append(dataRate, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta dataRate string -> float error")
-            os.Exit(1)
+            if v[dataRateCol] == "" {
+              dataRate = append(dataRate, 0)
+            } else if v, err := strconv.ParseFloat(v[dataRateCol], 64); err == nil {
+              dataRate = append(dataRate, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta dataRate string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[orderCol] == "" {
+          if orderCol == -1 {
+            // older CSV
             order = append(order, 0)
-          } else if v, err := strconv.ParseFloat(v[orderCol], 64); err == nil {
-            order = append(order, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta order string -> float error")
-            os.Exit(1)
+            if v[orderCol] == "" {
+              order = append(order, 0)
+            } else if v, err := strconv.ParseFloat(v[orderCol], 64); err == nil {
+              order = append(order, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta order string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[startFrequencyCol] == "" {
+          if startFrequencyCol == -1 {
+            // older CSV
             startFrequency = append(startFrequency, 0)
-          } else if v, err := strconv.ParseFloat(v[startFrequencyCol], 64); err == nil {
-            startFrequency = append(startFrequency, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta startFrequency string -> float error")
-            os.Exit(1)
+            if v[startFrequencyCol] == "" {
+              startFrequency = append(startFrequency, 0)
+            } else if v, err := strconv.ParseFloat(v[startFrequencyCol], 64); err == nil {
+              startFrequency = append(startFrequency, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta startFrequency string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[stopFrequencyCol] == "" {
+          if stopFrequencyCol == -1 {
+            // older CSV
             stopFrequency = append(stopFrequency, 0)
-          } else if v, err := strconv.ParseFloat(v[stopFrequencyCol], 64); err == nil {
-            stopFrequency = append(stopFrequency, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta stopFrequency string -> float error")
-            os.Exit(1)
+            if v[stopFrequencyCol] == "" {
+              stopFrequency = append(stopFrequency, 0)
+            } else if v, err := strconv.ParseFloat(v[stopFrequencyCol], 64); err == nil {
+              stopFrequency = append(stopFrequency, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta stopFrequency string -> float error")
+              os.Exit(1)
+            }
           }
-          if v[stepCol] == "" {
+          if stepCol == -1 {
+            // older CSV
             step = append(step, 0)
-          } else if v, err := strconv.ParseFloat(v[stepCol], 64); err == nil {
-            step = append(step, v)
           } else {
-            fmt.Println(err)
-            fmt.Println("readMeta step string -> float error")
-            os.Exit(1)
+            if v[stepCol] == "" {
+              step = append(step, 0)
+            } else if v, err := strconv.ParseFloat(v[stepCol], 64); err == nil {
+              step = append(step, v)
+            } else {
+              fmt.Println(err)
+              fmt.Println("readMeta step string -> float error")
+              os.Exit(1)
+            }
           }
 
         } else {
@@ -1947,9 +2005,9 @@ func plotCABS(
         fmt.Println(err)
         os.Exit(1)
       }
-      e.LineStyle.Color = palette(set+1, false, "")
+      e.LineStyle.Color = palette(set, false, "")
 
-      plotSet.GlyphStyle.Color = palette(set+1, false, "")
+      plotSet.GlyphStyle.Color = palette(set, false, "")
       plotSet.GlyphStyle.Radius = vg.Points(5) //3
       plotSet.Shape = draw.CircleGlyph{}
 
@@ -2103,7 +2161,7 @@ func plotCABS(
       os.Exit(1)
     }
 
-    l.GlyphStyle.Color = palette(set+1, false, "")
+    l.GlyphStyle.Color = palette(set, false, "")
     l.GlyphStyle.Radius = vg.Points(8) //6
     l.Shape = draw.CircleGlyph{}
 

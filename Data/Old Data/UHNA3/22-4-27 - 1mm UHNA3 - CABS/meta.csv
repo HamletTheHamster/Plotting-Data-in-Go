@@ -1,4 +1,0 @@
-Date,Label,Run,Pump,Stokes,Probe,Frequency,Signal,Notes
-22-4-27,5GHz lowres,1,205.54,72.29,39.26,1/frequency.csv,1/signal.csv,mW@sample Probe - Pump = 5 GHz
-,5GHz,1,197.12,72.03,37.21,2/frequency.csv,2/signal.csv,mW@sample Probe - Pump = 5 GHz
-,25GHz,1,211.37,76.40,38.04,3/frequency.csv,3/signal.csv,mW@sample Probe - Pump = 25 GHz
