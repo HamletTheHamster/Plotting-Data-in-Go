@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0} // 4,12 CS2 phase-matching
+    setsToPlotCABS := []int{1} // 4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -1810,7 +1810,7 @@ func plotCABS(
   }
 
   title := l + " " + sample + " CoBS"
-  xlabel := "Frequency (GHz)"
+  xlabel := "Frequency (Ω/2π) (GHz)"
   var ylabel string
   if normalize == "Powers" {
     ylabel = "Normalized by Powers (V/W³)"
@@ -1832,6 +1832,88 @@ func plotCABS(
     yticks = []float64{0, 0.2, 0.4, 0.6, 0.8, 1.0}
     ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
 
+    // Auto x-axes
+    xmax := 0.0
+    xmin := cabsData[0][0][0]
+
+    // Find overall min/max across all sets
+    for _, set := range sets {
+        if cabsData[set][0][0] < xmin {
+            xmin = cabsData[set][0][0]
+        }
+        lastIdx := len(cabsData[set][0]) - 1
+        if cabsData[set][0][lastIdx] > xmax {
+            xmax = cabsData[set][0][lastIdx]
+        }
+    }
+
+    // Decide main tick spacing (xtick) and # of decimals (displayDigits)
+    xrange = []float64{xmin, xmax}
+    xtick := 0.0
+    displayDigits := 2
+
+    switch {
+    case (xmax - xmin)/5 > 0.25:
+        xtick = 0.5
+        displayDigits = 1
+    case (xmax - xmin)/5 > 0.1:
+        xtick = 0.25
+    case (xmax - xmin)/5 > 0.075:
+        xtick = 0.075
+    case (xmax - xmin)/5 > 0.05:
+        xtick = 0.05
+    case (xmax - xmin)/5 > 0.025:
+        xtick = 0.025
+    case (xmax - xmin)/5 > 0.01:
+        xtick = 0.02
+    case (xmax - xmin)/5 > 0.0075:
+        xtick = 0.0075
+    case (xmax - xmin) > 0.005:
+        xtick = 0.005
+    case (xmax - xmin) > 0.0025:
+        xtick = 0.0025
+    case (xmax - xmin) > 0.001:
+        xtick = 0.001
+    default:
+        xtick = 0.001
+    }
+
+    // Use half of xtick for unlabeled in-between ticks
+    minorTick := xtick / 5
+
+    // Start at or just below xmin, in multiples of minorTick
+    firstTick := math.Floor(xmin / minorTick) * minorTick
+    for firstTick > xmin {
+        firstTick -= minorTick
+    }
+
+    // Prepare a printf format for the labeled ticks
+    format := "%." + strconv.Itoa(displayDigits) + "f"
+
+    // Generate ticks at minorTick steps, labeling every other one
+    i := 0
+    for x := firstTick; x <= xmax+1e-9; x += minorTick {
+        xticks = append(xticks, x)
+
+        if i%5 == 0 {
+            // Every other tick gets a label
+            xtickLabels = append(xtickLabels, fmt.Sprintf(format, x))
+        } else {
+            // In-between ticks are unlabeled
+            xtickLabels = append(xtickLabels, "")
+        }
+        i++
+    }
+
+  } else if manual {
+    // Manual Axes
+    var err error
+    xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err = axes("CABS", sample, "")
+    if err != nil {
+      fmt.Println(err)
+      os.Exit(1)
+    }
+  } else {
     // Auto x-axes
     xmax := 0.0
     xmin := cabsData[0][0][0]
@@ -1905,69 +1987,6 @@ func plotCABS(
         i++
     }
 
-  } else if manual {
-    // Manual Axes
-    var err error
-    xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err = axes("CABS", sample, "")
-    if err != nil {
-      fmt.Println(err)
-      os.Exit(1)
-    }
-  } else {
-    // Auto Axes
-    xmax := 0.
-    xmin := cabsData[0][0][0]
-    for _, set := range sets {
-      if cabsData[set][0][0] < xmin {
-        xmin = cabsData[set][0][0]
-      }
-      if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
-        xmax = cabsData[set][0][len(cabsData[set][0])-1]
-      }
-    }
-
-    xrange = []float64{xmin, xmax}
-    xtick := 0.
-    displayDigits := 2
-    switch {
-      case (xmax - xmin)/8 > 0.25:
-        xtick = 0.5
-        displayDigits = 1
-      case (xmax - xmin)/8 > 0.1:
-        xtick = 0.25
-      case (xmax - xmin)/8 > 0.075:
-        xtick = 0.075
-      case (xmax - xmin)/8 > 0.05:
-        xtick = 0.05
-      case (xmax - xmin)/8 > 0.025:
-        xtick = 0.025
-      case (xmax - xmin)/8 > 0.01:
-        xtick = 0.02
-      case (xmax - xmin)/8 > 0.0075:
-        xtick = 0.0075
-      case (xmax - xmin)/8 > 0.005:
-        xtick = 0.005
-      case (xmax - xmin)/8 > 0.0025:
-        xtick = 0.0025
-      case (xmax - xmin)/8 > 0.001:
-        xtick = 0.001
-    }
-
-    firstTick := 0.
-    for m := float64(int(xmin)); m <= xmin; m += xtick {
-      firstTick = m
-    }
-    //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
-    //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
-    for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
-      xticks = append(xticks, firstTick + xtick*i)
-      if int(i)%2 != 0 {
-        xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
-      } else {
-        xtickLabels = append(xtickLabels, "")
-      }
-    }
-
     ymax := 0.
     ymin := 10000.
     for _, set := range sets {
@@ -2034,8 +2053,9 @@ func plotCABS(
       e.LineStyle.Color = palette(set, false, "")
 
       plotSet.GlyphStyle.Color = palette(set, false, "")
-      plotSet.GlyphStyle.Radius = vg.Points(5) //3
-      plotSet.Shape = draw.CircleGlyph{}
+      plotSet.GlyphStyle.Radius = vg.Points(7) //3
+      plotSet.GlyphStyle.Shape = draw.CircleGlyph{}
+      //plotSet.GlyphStyle.FillColor = color.RGBA{R: 31, G: 211, B: 172, A: 100}
 
       p.Add(e, plotSet, t, r)
 
@@ -2188,8 +2208,9 @@ func plotCABS(
     }
 
     l.GlyphStyle.Color = palette(set, false, "")
-    l.GlyphStyle.Radius = vg.Points(8) //6
-    l.Shape = draw.CircleGlyph{}
+    //l.GlyphStyle.Fill = color.RGBA{R: 31, G: 211, B: 172, A: 100}
+    l.GlyphStyle.Radius = vg.Points(7) //6
+    l.GlyphStyle.Shape = draw.CircleGlyph{}
 
     // Handle the legend abbreviation
     if i < 10 || i == len(sets)-1 { // Show only first 3 and last
@@ -5182,11 +5203,8 @@ func prepPlot(
     p := plot.New()
     p.BackgroundColor = color.RGBA{A: 0}
     p.Title.Text = title
-    p.Title.TextStyle.Font.Typeface = "liberation"
+    p.Title.TextStyle.Font.Typeface = "liberation Bold"
     p.Title.TextStyle.Font.Variant = "Sans"
-
-    // Remove outer margin:
-    // p.Padding = 0
 
     // X Axis
     p.X.Label.Text = xlabel
@@ -5194,10 +5212,10 @@ func prepPlot(
     p.X.LineStyle.Width = vg.Points(2.5)
     p.X.Min = xrange[0]
     p.X.Max = xrange[1]
-    p.X.Tick.LineStyle.Width = vg.Points(1.5)
+    p.X.Tick.LineStyle.Width = vg.Points(2.5)
     p.X.Tick.Label.Font.Variant = "Sans"
     // Remove horizontal padding so the left/right edges line up:
-    p.X.Padding = 0
+    p.X.Padding = -5
 
     // Build manual X ticks
     xticksVals := []plot.Tick{}
@@ -5216,10 +5234,11 @@ func prepPlot(
     p.Y.LineStyle.Width = vg.Points(2.5)
     p.Y.Min = yrange[0]
     p.Y.Max = yrange[1]
-    p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+    p.Y.Tick.LineStyle.Width = vg.Points(2.5)
     p.Y.Tick.Label.Font.Variant = "Sans"
+    p.Y.Tick.Length = -8
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = 0
+    p.Y.Padding = -5
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
@@ -5242,35 +5261,36 @@ func prepPlot(
     p.Legend.YOffs = vg.Points(0)
     p.Legend.Padding = vg.Points(10)
     p.Legend.ThumbnailWidth = vg.Points(50)
+    //addLegendBox(p)
     p.Legend.Add(legend)
 
     // Adjust font sizes depending on slide or not
     if slide {
-        p.Title.TextStyle.Font.Size = 80
-        p.Title.Padding = font.Length(80)
+        p.Title.TextStyle.Font.Size = 60
+        p.Title.Padding = font.Length(5)
 
         p.X.Label.TextStyle.Font.Size = 56
-        p.X.Label.Padding = font.Length(40)
+        p.X.Label.Padding = font.Length(5)
         p.X.Tick.Label.Font.Size = 56
 
         p.Y.Label.TextStyle.Font.Size = 56
-        p.Y.Label.Padding = font.Length(40)
+        p.Y.Label.Padding = font.Length(5)
         p.Y.Tick.Label.Font.Size = 56
 
         p.Legend.TextStyle.Font.Size = 56
     } else {
-        p.Title.TextStyle.Font.Size = 50
-        p.Title.Padding = font.Length(50)
+        p.Title.TextStyle.Font.Size = 40
+        p.Title.Padding = font.Length(5)
 
-        p.X.Label.TextStyle.Font.Size = 36
-        p.X.Label.Padding = font.Length(20)
-        p.X.Tick.Label.Font.Size = 36
+        p.X.Label.TextStyle.Font.Size = 30
+        p.X.Label.Padding = font.Length(5)
+        p.X.Tick.Label.Font.Size = 30
 
-        p.Y.Label.TextStyle.Font.Size = 36
-        p.Y.Label.Padding = font.Length(20)
-        p.Y.Tick.Label.Font.Size = 36
+        p.Y.Label.TextStyle.Font.Size = 30
+        p.Y.Label.Padding = font.Length(5)
+        p.Y.Tick.Label.Font.Size = 30
 
-        p.Legend.TextStyle.Font.Size = 28
+        p.Legend.TextStyle.Font.Size = 30
     }
 
     // Draw lines for the top and right edges
