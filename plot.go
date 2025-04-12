@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1} // 4,12 CS2 phase-matching
+    setsToPlotCABS := []int{0} // 4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -521,7 +521,10 @@ func main() {
         cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
         fmt.Println("*Data normalized by " + normalize + "*\n")
         logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
-
+      } else if normalize == "Peak" {
+        cabsData = normalizeByPeak(setsToPlotCABS, cabsData)
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
       }
 
       binCabsSets := []int{}
@@ -1806,7 +1809,7 @@ func plotCABS(
     plotter.YErrors
   }
 
-  title := l + " " + sample + " CABS"
+  title := l + " " + sample + " CoBS"
   xlabel := "Frequency (GHz)"
   var ylabel string
   if normalize == "Powers" {
@@ -1820,63 +1823,86 @@ func plotCABS(
   var xtickLabels, ytickLabels []string
   if normalize == "Peak" && !manual {
 
-    ylabel = "Spectral Density (relative)"
+    if len(sets) > 1 {
+      ylabel = "Spectral Density (relative)"
+    } else {
+      ylabel = "Arbitrary Units"
+    }
     yrange = []float64{0, 1.1}
-    yticks = []float64{0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1}
+    yticks = []float64{0, 0.2, 0.4, 0.6, 0.8, 1.0}
     ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
 
     // Auto x-axes
-    xmax := 0.
+    xmax := 0.0
     xmin := cabsData[0][0][0]
+
+    // Find overall min/max across all sets
     for _, set := range sets {
-      if cabsData[set][0][0] < xmin {
-        xmin = cabsData[set][0][0]
-      }
-      if cabsData[set][0][len(cabsData[set][0])-1] > xmax {
-        xmax = cabsData[set][0][len(cabsData[set][0])-1]
-      }
+        if cabsData[set][0][0] < xmin {
+            xmin = cabsData[set][0][0]
+        }
+        lastIdx := len(cabsData[set][0]) - 1
+        if cabsData[set][0][lastIdx] > xmax {
+            xmax = cabsData[set][0][lastIdx]
+        }
     }
 
+    // Decide main tick spacing (xtick) and # of decimals (displayDigits)
     xrange = []float64{xmin, xmax}
-    xtick := 0.
+    xtick := 0.0
     displayDigits := 2
+
     switch {
-      case (xmax - xmin)/8 > 0.25:
+    case (xmax - xmin)/8 > 0.25:
         xtick = 0.5
         displayDigits = 1
-      case (xmax - xmin)/8 > 0.1:
+    case (xmax - xmin)/8 > 0.1:
         xtick = 0.25
-      case (xmax - xmin)/8 > 0.075:
+    case (xmax - xmin)/8 > 0.075:
         xtick = 0.075
-      case (xmax - xmin)/8 > 0.05:
+    case (xmax - xmin)/8 > 0.05:
         xtick = 0.05
-      case (xmax - xmin)/8 > 0.025:
+    case (xmax - xmin)/8 > 0.025:
         xtick = 0.025
-      case (xmax - xmin)/8 > 0.01:
+    case (xmax - xmin)/8 > 0.01:
         xtick = 0.02
-      case (xmax - xmin)/8 > 0.0075:
+    case (xmax - xmin)/8 > 0.0075:
         xtick = 0.0075
-      case (xmax - xmin)/8 > 0.005:
+    case (xmax - xmin)/8 > 0.005:
         xtick = 0.005
-      case (xmax - xmin)/8 > 0.0025:
+    case (xmax - xmin)/8 > 0.0025:
         xtick = 0.0025
-      case (xmax - xmin)/8 > 0.001:
+    case (xmax - xmin)/8 > 0.001:
+        xtick = 0.001
+    default:
         xtick = 0.001
     }
 
-    firstTick := 0.
-    for m := float64(int(xmin)); m <= xmin; m += xtick {
-      firstTick = m
+    // Use half of xtick for unlabeled in-between ticks
+    minorTick := xtick / 5
+
+    // Start at or just below xmin, in multiples of halfTick
+    firstTick := math.Floor(xmin / minorTick) * minorTick
+    for firstTick > xmin {
+        firstTick -= minorTick
     }
-    //fmt.Printf(strconv.FormatFloat(firstTick, 'f', 2, 64))
-    //fmt.Printf(strconv.FormatFloat(xtick, 'f', 2, 64))
-    for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
-      xticks = append(xticks, firstTick + xtick*i)
-      if int(i)%2 != 0 {
-        xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
-      } else {
-        xtickLabels = append(xtickLabels, "")
-      }
+
+    // Prepare a printf format for the labeled ticks
+    format := "%." + strconv.Itoa(displayDigits) + "f"
+
+    // Generate ticks at minorTick steps, labeling every other one
+    i := 0
+    for x := firstTick; x <= xmax+1e-9; x += minorTick {
+        xticks = append(xticks, x)
+
+        if i%5 == 0 {
+            // Every other tick gets a label
+            xtickLabels = append(xtickLabels, fmt.Sprintf(format, x))
+        } else {
+            // In-between ticks are unlabeled
+            xtickLabels = append(xtickLabels, "")
+        }
+        i++
     }
 
   } else if manual {
@@ -2210,7 +2236,7 @@ func plotCABS(
   p.Legend.Add("12.1 GHz", plotGuideLine)
   */
 
-  savePlot(p, "CABS", logpath)
+  savePlot(p, title, logpath)
 
   return logFile
 }
@@ -3435,6 +3461,69 @@ func (noTicks) Ticks(min, max float64) []plot.Tick {
     return []plot.Tick{} // no ticks
 }
 
+// majorMinorTicker holds a slice of major tick values (which will be labeled)
+// and an integer telling how many unlabeled minor ticks to insert between
+// consecutive major ticks.
+type majorMinorTicker struct {
+    Major  []float64 // e.g. {0, 0.1, 0.2, 0.3, ..., 1.0, 1.1}
+    NMinor int       // e.g. 5 means 5 evenly spaced minor ticks between each major
+}
+
+// Ticks implements the plot.Ticker interface.
+func (mmt majorMinorTicker) Ticks(min, max float64) []plot.Tick {
+    var ticks []plot.Tick
+
+    // Walk through each major tick in the slice
+    for i := 0; i < len(mmt.Major); i++ {
+        majorVal := mmt.Major[i]
+
+        // Skip if outside the plot range
+        if majorVal < min || majorVal > max {
+            continue
+        }
+
+        // This major tick is labeled; label it with a simple "%.1f" format
+        // (change as needed).
+        label := fmt.Sprintf("%.1f", majorVal)
+
+        // Add the labeled major tick
+        ticks = append(ticks, plot.Tick{
+            Value: majorVal,
+            Label: label,
+        })
+
+        // If there's a "next" major tick, fill in minor ticks between
+        if i < len(mmt.Major)-1 {
+            nextMajor := mmt.Major[i+1]
+
+            // how wide is the gap between major ticks?
+            gap := nextMajor - majorVal
+            if gap <= 0 {
+                // no gap or invalid data
+                continue
+            }
+
+            // spacing between minor ticks
+            minorStep := gap / float64(mmt.NMinor+1)
+
+            // generate the minor ticks
+            for k := 1; k <= mmt.NMinor; k++ {
+                minorVal := majorVal + float64(k)*minorStep
+                // skip if out of range
+                if minorVal < min || minorVal > max {
+                    continue
+                }
+                // Add the unlabeled minor tick
+                ticks = append(ticks, plot.Tick{
+                    Value: minorVal,
+                    Label: "", // no label for minor
+                })
+            }
+        }
+    }
+    return ticks
+}
+
 func plotJoyDivisionCABS(
     sets []int,
     cabsData [][][]float64, // cabsData[set][0]=freq, [1]=sig, [2]=err (optional)
@@ -3984,9 +4073,11 @@ func normalizeByPeak(
 		}
 
 		// σ
-		for i, v := range cabsData[set][2] {
-			cabsData[set][2][i] = v / globalMax
-		}
+    if len(cabsData[set]) > 2 {
+      for i, v := range cabsData[set][2] {
+  			cabsData[set][2][i] = v / globalMax
+  		}
+    }
 	}
 
 	return cabsData
@@ -5080,123 +5171,140 @@ func goPlotLinewidths(
 }
 
 func prepPlot(
-  title, xlabel, ylabel, legend string,
-  xrange, yrange, xtick, ytick []float64,
-  xtickLabels, ytickLabels []string,
-  slide bool,
+    title, xlabel, ylabel, legend string,
+    xrange, yrange, xtick, ytick []float64,
+    xtickLabels, ytickLabels []string,
+    slide bool,
 ) (
-  *plot.Plot,
-  *plotter.Line, *plotter.Line,
+    *plot.Plot,
+    *plotter.Line, *plotter.Line,
 ) {
+    p := plot.New()
+    p.BackgroundColor = color.RGBA{A: 0}
+    p.Title.Text = title
+    p.Title.TextStyle.Font.Typeface = "liberation"
+    p.Title.TextStyle.Font.Variant = "Sans"
 
-  p := plot.New()
-  p.BackgroundColor = color.RGBA{A:0}
-  p.Title.Text = title
-  p.Title.TextStyle.Font.Typeface = "liberation"
-  p.Title.TextStyle.Font.Variant = "Sans"
+    // Remove outer margin:
+    // p.Padding = 0
 
-  p.X.Label.Text = xlabel
-  p.X.Label.TextStyle.Font.Variant = "Sans"
-  p.X.LineStyle.Width = vg.Points(1.5)
-  p.X.Min = xrange[0]
-  p.X.Max = xrange[1]
-  p.X.Tick.LineStyle.Width = vg.Points(1.5)
-  p.X.Tick.Label.Font.Variant = "Sans"
+    // X Axis
+    p.X.Label.Text = xlabel
+    p.X.Label.TextStyle.Font.Variant = "Sans"
+    p.X.LineStyle.Width = vg.Points(2.5)
+    p.X.Min = xrange[0]
+    p.X.Max = xrange[1]
+    p.X.Tick.LineStyle.Width = vg.Points(1.5)
+    p.X.Tick.Label.Font.Variant = "Sans"
+    // Remove horizontal padding so the left/right edges line up:
+    p.X.Padding = 0
 
-  xticks := []plot.Tick{}
-  for i, v := range xtick {
-    xticks = append(xticks, plot.Tick{Value: v, Label: xtickLabels[i]})
-  }
+    // Build manual X ticks
+    xticksVals := []plot.Tick{}
+    for i, v := range xtick {
+        xticksVals = append(xticksVals, plot.Tick{
+            Value: v,
+            Label: xtickLabels[i],
+        })
+    }
+    p.X.Tick.Marker = plot.ConstantTicks(xticksVals)
 
-  p.X.Tick.Marker = plot.ConstantTicks(xticks)
-  p.X.Padding = vg.Points(-8) // -12.5
+    // Y Axis
+    p.Y.Label.Text = ylabel
+    p.Y.Label.TextStyle.Font.Typeface = "liberation"
+    p.Y.Label.TextStyle.Font.Variant = "Sans"
+    p.Y.LineStyle.Width = vg.Points(2.5)
+    p.Y.Min = yrange[0]
+    p.Y.Max = yrange[1]
+    p.Y.Tick.LineStyle.Width = vg.Points(1.5)
+    p.Y.Tick.Label.Font.Variant = "Sans"
+    // Remove vertical padding so the top/bottom edges line up:
+    p.Y.Padding = 0
 
-  p.Y.Label.Text = ylabel
-  p.Y.Label.TextStyle.Font.Typeface = "liberation"
-  p.Y.Label.TextStyle.Font.Variant = "Sans"
-  p.Y.LineStyle.Width = vg.Points(1.5)
-  p.Y.Min = yrange[0]
-  p.Y.Max = yrange[1]
-  p.Y.Tick.LineStyle.Width = vg.Points(1.5)
-  p.Y.Tick.Label.Font.Variant = "Sans"
+    // Build manual Y ticks
+    yticksVals := []plot.Tick{}
+    for i, v := range ytick {
+        yticksVals = append(yticksVals, plot.Tick{
+            Value: v,
+            Label: ytickLabels[i],
+        })
+    }
+    p.Y.Tick.Marker = majorMinorTicker{
+        Major:  []float64{0.0, 0.2, 0.4,
+                          0.6, 0.8, 1.0},
+        NMinor: 5, // 5 minor ticks between each major
+    }
 
-  yticks := []plot.Tick{}
-  for i, v := range ytick {
-    yticks = append(yticks, plot.Tick{Value: v, Label: ytickLabels[i]})
-  }
+    // Legend
+    p.Legend.TextStyle.Font.Variant = "Sans"
+    p.Legend.Top = true
+    p.Legend.XOffs = vg.Points(-50)
+    p.Legend.YOffs = vg.Points(0)
+    p.Legend.Padding = vg.Points(10)
+    p.Legend.ThumbnailWidth = vg.Points(50)
+    p.Legend.Add(legend)
 
-  p.Y.Tick.Marker = plot.ConstantTicks(yticks)
-  p.Y.Padding = vg.Points(-0.5) // -6
+    // Adjust font sizes depending on slide or not
+    if slide {
+        p.Title.TextStyle.Font.Size = 80
+        p.Title.Padding = font.Length(80)
 
-  p.Legend.TextStyle.Font.Variant = "Sans"
-  p.Legend.Top = true
-  p.Legend.XOffs = vg.Points(-50)
-  p.Legend.YOffs = vg.Points(0)
-  p.Legend.Padding = vg.Points(10)
-  p.Legend.ThumbnailWidth = vg.Points(50)
-  p.Legend.Add(legend)
+        p.X.Label.TextStyle.Font.Size = 56
+        p.X.Label.Padding = font.Length(40)
+        p.X.Tick.Label.Font.Size = 56
 
-  if slide {
-    p.Title.TextStyle.Font.Size = 80
-    p.Title.Padding = font.Length(80)
+        p.Y.Label.TextStyle.Font.Size = 56
+        p.Y.Label.Padding = font.Length(40)
+        p.Y.Tick.Label.Font.Size = 56
 
-    p.X.Label.TextStyle.Font.Size = 56
-    p.X.Label.Padding = font.Length(40)
+        p.Legend.TextStyle.Font.Size = 56
+    } else {
+        p.Title.TextStyle.Font.Size = 50
+        p.Title.Padding = font.Length(50)
 
-    p.X.Tick.Label.Font.Size = 56
+        p.X.Label.TextStyle.Font.Size = 36
+        p.X.Label.Padding = font.Length(20)
+        p.X.Tick.Label.Font.Size = 36
 
-    p.Y.Label.TextStyle.Font.Size = 56
-    p.Y.Label.Padding = font.Length(40)
+        p.Y.Label.TextStyle.Font.Size = 36
+        p.Y.Label.Padding = font.Length(20)
+        p.Y.Tick.Label.Font.Size = 36
 
-    p.Y.Tick.Label.Font.Size = 56
+        p.Legend.TextStyle.Font.Size = 28
+    }
 
-    p.Legend.TextStyle.Font.Size = 56
-  } else {
-    p.Title.TextStyle.Font.Size = 50
-    p.Title.Padding = font.Length(50)
+    // Draw lines for the top and right edges
+    // so we have a complete "box" around the plot
+    t := make(plotter.XYs, 2)
+    r := make(plotter.XYs, 2)
 
-    p.X.Label.TextStyle.Font.Size = 36
-    p.X.Label.Padding = font.Length(20)
+    // top line
+    t[0].X = xrange[0]
+    t[0].Y = yrange[1]
+    t[1].X = xrange[1]
+    t[1].Y = yrange[1]
 
-    p.X.Tick.Label.Font.Size = 36
+    tAxis, err := plotter.NewLine(t)
+    if err != nil {
+        panic(err)
+    }
+    // match bottom axis width:
+    tAxis.LineStyle.Width = p.X.LineStyle.Width
 
-    p.Y.Label.TextStyle.Font.Size = 36
-    p.Y.Label.Padding = font.Length(20)
+    // right line
+    r[0].X = xrange[1]
+    r[0].Y = yrange[0]
+    r[1].X = xrange[1]
+    r[1].Y = yrange[1]
 
-    p.Y.Tick.Label.Font.Size = 36
+    rAxis, err := plotter.NewLine(r)
+    if err != nil {
+        panic(err)
+    }
+    // match left axis width:
+    rAxis.LineStyle.Width = p.Y.LineStyle.Width
 
-    p.Legend.TextStyle.Font.Size = 28
-  }
-
-  // Enclose plot
-  t := make(plotter.XYs, 2)
-  r := make(plotter.XYs, 2)
-
-  // Top
-  t[0].X = xrange[0]
-  t[0].Y = yrange[1]
-  t[1].X = xrange[1]
-  t[1].Y = yrange[1]
-
-  tAxis, err := plotter.NewLine(t)
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
-
-  // Right
-  r[0].X = xrange[1]
-  r[0].Y = yrange[0]
-  r[1].X = xrange[1]
-  r[1].Y = yrange[1]
-
-  rAxis, err := plotter.NewLine(r)
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }
-
-  return p, tAxis, rAxis
+    return p, tAxis, rAxis
 }
 
 func palette(

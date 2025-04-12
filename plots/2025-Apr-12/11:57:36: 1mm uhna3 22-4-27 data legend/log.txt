@@ -1,0 +1,8 @@
+Sample: UHNA3
+Runtime note: 1mm uhna3 22-4-27 data legend
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
