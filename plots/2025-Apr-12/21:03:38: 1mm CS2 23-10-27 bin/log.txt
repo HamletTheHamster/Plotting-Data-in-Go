@@ -1,0 +1,39 @@
+Sample: CS2
+Runtime note: 1mm CS2 23-10-27 bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
+
+Run 16
+	Data taken: 23-10-27
+	Label: 13.75
+	Start Time (h:m:s): 15:44:15
+	End Time(h:m:s): 15:49:47
+	Pump Laser: 1548.808 nm
+	Probe Laser: 1548.918 nm
+	Pump-Probe Separation: 13.75 GHz
+	Stokes Filter: 1548.844 nm
+	Probe Filter: 1548.954 nm
+	Pump Power: 70.300 mW
+	Stokes Power: 29.860 mW
+	Probe Power: 49.340 mW
+	Lock-in Range: 0.04
+	Dwell Time: 0.100000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 2350000000.00 Hz
+	Stop Frequency: 2700000000.00 Hz
+	Step Size: 2004560.00 Hz
+	Number of Averages: 5
+	Data Collection Note: 
+
+	Fit Parameters (Fano=false):
+
+		Amp: 1.1347432974750031
+		Cen: 2.4832795914653376
+		Wid: 0.10364648057844329
+		C:   -0.23625341536843877

@@ -1,0 +1,8 @@
+Sample: UHNA3
+Runtime note: 1mm UHNA3
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*

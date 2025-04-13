@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{1} // 4,12 CS2 phase-matching
+    setsToPlotCABS := []int{17} // 17  4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -501,7 +501,7 @@ func main() {
 
       binCabsSets := []int{}
       if len(binCabsSets) > 0 {
-        binMHz := 11.
+        binMHz := 18.
         logFile = logBinning(
           logFile, binCabsSets, binMHz,
           )
@@ -529,7 +529,7 @@ func main() {
 
       binCabsSets := []int{}
       if len(binCabsSets) > 0 {
-        binMHz := 11.
+        binMHz := 10.
         logFile = logBinning(
           logFile, binCabsSets, binMHz,
           )
@@ -1828,7 +1828,7 @@ func plotCABS(
     } else {
       ylabel = "Arbitrary Units"
     }
-    yrange = []float64{0, 1.1}
+    yrange = []float64{0.3, 1.1}
     yticks = []float64{0, 0.2, 0.4, 0.6, 0.8, 1.0}
     ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
 
@@ -2053,7 +2053,7 @@ func plotCABS(
       e.LineStyle.Color = palette(set, false, "")
 
       plotSet.GlyphStyle.Color = palette(set, false, "")
-      plotSet.GlyphStyle.Radius = vg.Points(7) //3
+      plotSet.GlyphStyle.Radius = vg.Points(8) //3
       plotSet.GlyphStyle.Shape = draw.CircleGlyph{}
       //plotSet.GlyphStyle.FillColor = color.RGBA{R: 31, G: 211, B: 172, A: 100}
 
@@ -2068,7 +2068,7 @@ func plotCABS(
       }
 
       plotSet.GlyphStyle.Color = palette(set, false, "")
-      plotSet.GlyphStyle.Radius = vg.Points(5) //3
+      plotSet.GlyphStyle.Radius = vg.Points(8) //3
       plotSet.Shape = draw.CircleGlyph{}
 
       p.Add(plotSet, t, r)
@@ -2209,7 +2209,7 @@ func plotCABS(
 
     l.GlyphStyle.Color = palette(set, false, "")
     //l.GlyphStyle.Fill = color.RGBA{R: 31, G: 211, B: 172, A: 100}
-    l.GlyphStyle.Radius = vg.Points(7) //6
+    l.GlyphStyle.Radius = vg.Points(8) //6
     l.GlyphStyle.Shape = draw.CircleGlyph{}
 
     // Handle the legend abbreviation
@@ -5357,7 +5357,7 @@ func prepPlot(
     p.Y.Tick.Label.Font.Variant = "Sans"
     p.Y.Tick.Length = 0
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = -6
+    p.Y.Padding = -10
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
@@ -5390,24 +5390,24 @@ func prepPlot(
         p.Title.Padding = font.Length(5)
 
         p.X.Label.TextStyle.Font.Size = 56
-        p.X.Label.Padding = font.Length(5)
+        p.X.Label.Padding = font.Length(10)
         p.X.Tick.Label.Font.Size = 56
 
         p.Y.Label.TextStyle.Font.Size = 56
-        p.Y.Label.Padding = font.Length(5)
+        p.Y.Label.Padding = font.Length(10)
         p.Y.Tick.Label.Font.Size = 56
 
         p.Legend.TextStyle.Font.Size = 56
     } else {
         p.Title.TextStyle.Font.Size = 40
-        p.Title.Padding = font.Length(5)
+        p.Title.Padding = font.Length(15)
 
         p.X.Label.TextStyle.Font.Size = 35
-        p.X.Label.Padding = font.Length(10)
+        p.X.Label.Padding = font.Length(15)
         p.X.Tick.Label.Font.Size = 30
 
         p.Y.Label.TextStyle.Font.Size = 35
-        p.Y.Label.Padding = font.Length(10)
+        p.Y.Label.Padding = font.Length(15)
         p.Y.Tick.Label.Font.Size = 30
 
         p.Legend.TextStyle.Font.Size = 30
@@ -5433,7 +5433,7 @@ func prepPlot(
 
     // right line
     r[0].X = xrange[1]
-    r[0].Y = yrange[0]
+    r[0].Y = yrange[0] - .1
     r[1].X = xrange[1]
     r[1].Y = yrange[1]
 
@@ -5623,17 +5623,17 @@ func savePlot(
 
   path := logpath + "/" + name
 
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
+  if err := p.Save(18*vg.Inch, 15*vg.Inch, path + ".png"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
 
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
+  if err := p.Save(18*vg.Inch, 15*vg.Inch, path + ".svg"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }
 
-  if err := p.Save(15*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
+  if err := p.Save(18*vg.Inch, 15*vg.Inch, path + ".pdf"); err != nil {
     fmt.Println(err)
     os.Exit(1)
   }

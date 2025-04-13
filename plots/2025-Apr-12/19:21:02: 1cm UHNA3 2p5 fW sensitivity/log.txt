@@ -1,0 +1,39 @@
+Sample: UHNA3
+Runtime note: 1cm UHNA3 2p5 fW sensitivity
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
+
+Run 1
+	Data taken: 24-05-30
+	Label: ~2.5 fW Sensitivity
+	Start Time (h:m:s): 14:31:03
+	End Time(h:m:s): 14:39:04
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.073 nm
+	Probe Filter: 1549.109 nm
+	Pump Power: 1.030 mW
+	Stokes Power: 1.050 mW
+	Probe Power: 0.003 mW
+	Lock-in Range: 0.02
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 9000000000.00 Hz
+	Stop Frequency: 9360000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: short run SNR 10+
+
+	Fit Parameters (Fano=false):
+
+		Amp: 93.33580584294903
+		Cen: 9.158017518676802
+		Wid: 6.25938030994923e-05
+		C:   0.13992992673993584
