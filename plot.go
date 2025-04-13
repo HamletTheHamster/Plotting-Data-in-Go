@@ -325,7 +325,7 @@ func main() {
 
     //setsToPlotCABS := []int{0} // 17  4,12 CS2 phase-matching
 
-    setsToPlotCABS := rangeInt(0, 20)
+    setsToPlotCABS := rangeInt(0, 75)
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalize,
@@ -365,7 +365,7 @@ func main() {
         case "CS2":
           initialParams = []float64{0.9, 2.5, 0.05, 0, 1} //amp, cen, wid, C, q
         case "UHNA3":
-          initialParams = []float64{170, 9.145, .08, 0, 0} // (q is Fano asymmetry)
+          initialParams = []float64{1, 9.145, .08, 0, 0} // (q is Fano asymmetry)
         case "pak1chip3-20um4":
           initialParams = []float64{5, 10.8, .1, 0, 0}
         case "wiggly":
@@ -477,7 +477,7 @@ func main() {
         initialParams = optimizedParams[set]
 
         // Fano Fit peak values
-        phaseMatchPeaks[set] = optimizedParams[set][0]
+        phaseMatchPeaks[set] = -optimizedParams[set][0]
         //fmt.Printf("optimizedParams[set][0]: %f\n\n",optimizedParams[set][0])
         //fmt.Printf("peak signal point cabsData[set][1][83]: %f\n\n", cabsData[set][1][83])
 
@@ -525,7 +525,7 @@ func main() {
       )
     } else {
 
-      binCabsSets := []int{0,1}
+      binCabsSets := []int{}
       if len(binCabsSets) > 0 {
         binMHz := 10.
         logFile = logBinning(
@@ -2395,9 +2395,9 @@ func axes(
     switch sample {
     case "1cmUHNA3":
       xrange := []float64{0, 45}
-      yrange := []float64{0, 3.5}
+      yrange := []float64{0, 1}
       xtick := []float64{0, 5, 10, 15, 20, 25, 30, 35, 40, 45}
-      ytick := []float64{0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5}
+      ytick := []float64{0, 0.1, 1, 1.5, 2, 2.5, 3, 3.5}
       xtickLabel := []string{"", "5", "", "15", "", "25", "", "35", "", ""}
       ytickLabel := []string{"", "0.5", "", "1.5", "", "2.5", "", "3.5"}
 
@@ -2990,11 +2990,11 @@ func plotSinc(
 	title := l + " " + sample + " Phase-Matching Bandwidth"
   //title = "4. Negative Sloped Offset"
 	xlabel := "Pump-Probe Separation (GHz)"
-	ylabel := "Peak Spectral Density (mV)"
+	ylabel := "Peak Spectral Density (relative)"
   legend := ""
 
-  /* Auto Axes
-  xmin, xmax, ymin, ymax := 0., 0., 0., 0.
+  // Auto Axes
+  xmin, xmax, ymin, ymax := 0., 42.25, 0., 1.1
   for i, v := range phaseMatchData[0] {
     if v > xmax {
       xmax = v
@@ -3009,13 +3009,13 @@ func plotSinc(
 
   xtick := 0.
   displayDigits := 2
-  if (xmax - xmin)/8 > 5 {
+  if (xmax - xmin)/10 > 5 {
     xtick = 5
-  } else if (xmax - xmin)/8 > 2.5 {
-    xtick = 2.5
-  } else if (xmax - xmin)/8 > 1 {
+  } else if (xmax - xmin)/10 > 2.5 {
+    xtick = 2
+  } else if (xmax - xmin)/10 > 1 {
     xtick = 1
-  } else if (xmax - xmin)/8 > 0.5 {
+  } else if (xmax - xmin)/10 > 0.5 {
     xtick = 0.5
   }
   firstTick := 0.
@@ -3026,7 +3026,7 @@ func plotSinc(
   xtickLabels := []string{}
   for i := 0.; firstTick + xtick*i <= xmax - xtick/2; i++ {
     xticks = append(xticks, firstTick + xtick*i)
-    if int(i)%2 != 0 {
+    if int(i)%5 == 0 {
       xtickLabels = append(xtickLabels, strconv.FormatFloat(firstTick + xtick*i, 'f', displayDigits, 64))
     } else {
       xtickLabels = append(xtickLabels, "")
@@ -3046,14 +3046,14 @@ func plotSinc(
   }
   yticks = append(yticks, ymax)
   ytickLabels = append(ytickLabels, "")
-  */
 
-  // Manual Axes
-  xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("sinc", "1cmUHNA3", "")
-  if err != nil {
-    fmt.Println(err)
-    os.Exit(1)
-  }//
+
+  // // Manual Axes
+  // xrange, yrange, xticks, yticks, xtickLabels, ytickLabels, err := axes("sinc", "1cmUHNA3", "")
+  // if err != nil {
+  //   fmt.Println(err)
+  //   os.Exit(1)
+  // }//
 
   p, t, r := prepPlot(
     title, xlabel, ylabel, legend,
@@ -3067,16 +3067,16 @@ func plotSinc(
 		log.Fatalf("Could not create line for the first series: %v", err)
 	}
 	scatter.GlyphStyle.Color = palette(0, false, "")
-  scatter.GlyphStyle.Radius = vg.Points(8) //3
+  scatter.GlyphStyle.Radius = vg.Points(12) //3
   scatter.Shape = draw.CircleGlyph{}
 
 
-  /* Plot theoretical sinc^2
+  // Plot theoretical sinc^2
   c := 299792458.0 // speed of light in m/s
   uhna3Index := 1.47 // middle of range
-  length = 0.0094
+  length = 0.0095
 
-  scalingFactor := 12.0
+  scalingFactor := 4.0
 
   // Uncertainty bounds for theoretical line
   uhna3IndexLower := 1.46 // Lower bound of the refractive index
@@ -3143,17 +3143,19 @@ func plotSinc(
   }
 
 
-  /* Apply vertical offset to theoretical points
+  // Apply vertical offset to theoretical points
   for i := 0; i < numPoints; i++ {
-    theoreticalPts[i].Y += 0.2
-    theoreticalPtsUpper[i].Y += 0.2
-    theoreticalPtsLower[i].Y += 0.2
-  }*/
+    theoreticalPts[i].Y += 0.06
+    theoreticalPtsUpper[i].Y += 0.06
+    theoreticalPtsLower[i].Y += 0.06
+  }
 
-  /* Apply slanted vertical offset to theoretical points
-  for i := 0; i < numPoints; i++ {
-    theoreticalPts[i].Y -= 0.0015*float64(i)*75/1000
-  }*//*
+  // // Apply slanted vertical offset to theoretical points
+  // for i := 0; i < numPoints; i++ {
+  //   theoreticalPts[i].Y -= 0.0005*float64(i)*75/1000
+  //   theoreticalPtsUpper[i].Y -= 0.0005*float64(i)*75/1000
+  //   theoreticalPtsLower[i].Y -= 0.0005*float64(i)*75/1000
+  // }
 
   // Adjust the number of points to exclude from the beginning
   startIndex := 45
@@ -3163,12 +3165,16 @@ func plotSinc(
     log.Fatalf("Could not create line for theoretical sinc^2: %v", err)
   }
   line.Color = color.RGBA{R: 255, G: 78, B: 96, A: 255} // Red line for theoretical plot
-  line.Width = vg.Points(10)
+  line.Width = vg.Points(16)
 
   // Create legend entry for theoretical line
-  theoreticalLegendLabel := fmt.Sprintf("Theoretical (L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
-  p.Legend.Add(theoreticalLegendLabel, line)
-  p.Legend.Add("Experimental", scatter)
+  //theoreticalLegendLabel := fmt.Sprintf("Theory(L = %.2f cm, n = %.2f)", length*1e2, uhna3Index)
+  p.Legend.XOffs = vg.Points(-75)
+  p.Legend.YOffs = vg.Points(-25)
+  //p.Legend.Padding = vg.Points(20)
+  p.Legend.ThumbnailWidth = vg.Points(100)
+  p.Legend.Add("Theory  ", line)
+  p.Legend.Add("Observed  ", scatter)
 
   // Create the shaded area between the lower and upper bounds
   fillBounds := make(plotter.XYs, 2*(numPoints-startIndex))
@@ -3194,9 +3200,9 @@ func plotSinc(
   polygonBounds.LineStyle.Width = vg.Length(0) // No border
 
   // Add the polygons, line, and scatter to the plot
-  p.Add(polygonBounds, line, scatter, t, r)*/
+  p.Add(line, scatter, t, r) // polygonBounds,
 
-  p.Add(scatter, t, r)
+  //p.Add(scatter, t, r)
 
   savePlot(p, "Phase-Match", logpath)
 }
@@ -5368,7 +5374,7 @@ func prepPlot(
     p.Y.Tick.Label.Font.Variant = "Sans"
     p.Y.Tick.Length = 0
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = -10
+    p.Y.Padding = -4
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
