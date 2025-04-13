@@ -1,0 +1,9 @@
+Sample: CS2
+Runtime note: 1cm CS2 22-8-17 bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
+Run 1 binned to 11.000 MHz

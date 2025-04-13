@@ -1,4 +1,4 @@
 Date,Label,Sets,Pump,Stokes,Probe,Frequency,Signal,Num Avgs,Notes
-,12 GHz P-Pr,1,103.6,34.27,36.84,1/frequency.csv,1/signal.csv,0,probe 1549.096 filter 1549.116 - success: 48 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1CM
-,9 GHz P-Pr,2,102.9,37.67,35.24,2/frequency.csv,2/signal.csv,0,probe 1549.072 filter 1549.092 - success: 8 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1CM
-,6 GHz P-Pr,3,103.2,37.12,35.12,3/frequency.csv,3/signal.csv,0,probe 1549.048 filter 1549.068 - success: 13 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1CM
+,1 cm CS2,1,103.6,34.27,36.84,1/frequency.csv,1/signal.csv,0,probe 1549.096 filter 1549.116 - success: 48 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1 cm 12 GHz P-Pr
+,9 GHz P-Pr,2,102.9,37.67,35.24,2/frequency.csv,2/signal.csv,0,probe 1549.072 filter 1549.092 - success: 8 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1 cm
+,6 GHz P-Pr,3,103.2,37.12,35.12,3/frequency.csv,3/signal.csv,0,probe 1549.048 filter 1549.068 - success: 13 uV - ABSOLUTELY MUST BE LONG LENGTH CS2 = 1 cm

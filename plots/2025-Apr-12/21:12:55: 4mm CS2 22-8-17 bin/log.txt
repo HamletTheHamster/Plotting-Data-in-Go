@@ -1,0 +1,8 @@
+Sample: CS2
+Runtime note: 4mm CS2 22-8-17 bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*

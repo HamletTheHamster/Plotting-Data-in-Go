@@ -323,7 +323,7 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{17} // 17  4,12 CS2 phase-matching
+    setsToPlotCABS := []int{0} // 17  4,12 CS2 phase-matching
 
     //setsToPlotCABS := rangeInt(0, 20)
 
@@ -501,7 +501,7 @@ func main() {
 
       binCabsSets := []int{}
       if len(binCabsSets) > 0 {
-        binMHz := 18.
+        binMHz := 11.
         logFile = logBinning(
           logFile, binCabsSets, binMHz,
           )
@@ -517,6 +517,16 @@ func main() {
       )
     } else {
 
+      binCabsSets := []int{0}
+      if len(binCabsSets) > 0 {
+        binMHz := 10.
+        logFile = logBinning(
+          logFile, binCabsSets, binMHz,
+          )
+        cabsData = binCabs(binCabsSets, cabsData, binMHz)
+      }
+    }
+
       if normalize == "Powers" {
         cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
         fmt.Println("*Data normalized by " + normalize + "*\n")
@@ -526,16 +536,6 @@ func main() {
         fmt.Println("*Data normalized by " + normalize + "*\n")
         logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
       }
-
-      binCabsSets := []int{}
-      if len(binCabsSets) > 0 {
-        binMHz := 10.
-        logFile = logBinning(
-          logFile, binCabsSets, binMHz,
-          )
-        cabsData = binCabs(binCabsSets, cabsData, binMHz)
-      }
-    }
 
     if theoreticalSpectra {
       plotTheoreticalSpectra(
@@ -1788,6 +1788,8 @@ func plotCABS(
     l = ""
   case 0.001:
     l = "1 mm"
+  case 0.002:
+    l = "2 mm"
   case 0.008:
     l = "8 mm"
   case 0.01:
@@ -1796,6 +1798,8 @@ func plotCABS(
     l = "4 mm"
   case 0.0000005:
     l = "500 nm"
+  case 0.000001:
+    l = "1 μm"
   case 0.0001:
     l = "100 μm"
   case 0.00001:
@@ -1828,7 +1832,7 @@ func plotCABS(
     } else {
       ylabel = "Arbitrary Units"
     }
-    yrange = []float64{0.3, 1.1}
+    yrange = []float64{0.0, 1.2}
     yticks = []float64{0, 0.2, 0.4, 0.6, 0.8, 1.0}
     ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
 
@@ -1856,10 +1860,10 @@ func plotCABS(
     case (xmax - xmin)/5 > 0.25:
         xtick = 0.5
         displayDigits = 1
-    case (xmax - xmin)/5 > 0.1:
+    case (xmax - xmin)/5 > 0.2:
         xtick = 0.25
     case (xmax - xmin)/5 > 0.075:
-        xtick = 0.075
+        xtick = 0.1
     case (xmax - xmin)/5 > 0.05:
         xtick = 0.05
     case (xmax - xmin)/5 > 0.025:
@@ -1868,11 +1872,11 @@ func plotCABS(
         xtick = 0.02
     case (xmax - xmin)/5 > 0.0075:
         xtick = 0.0075
-    case (xmax - xmin) > 0.005:
+    case (xmax - xmin)/5 > 0.005:
         xtick = 0.005
-    case (xmax - xmin) > 0.0025:
+    case (xmax - xmin)/5 > 0.0025:
         xtick = 0.0025
-    case (xmax - xmin) > 0.001:
+    case (xmax - xmin)/5 > 0.001:
         xtick = 0.001
     default:
         xtick = 0.001
@@ -5357,7 +5361,7 @@ func prepPlot(
     p.Y.Tick.Label.Font.Variant = "Sans"
     p.Y.Tick.Length = 0
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = -10
+    p.Y.Padding = -7
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
@@ -5433,7 +5437,7 @@ func prepPlot(
 
     // right line
     r[0].X = xrange[1]
-    r[0].Y = yrange[0] - .1
+    r[0].Y = yrange[0] //- .2
     r[1].X = xrange[1]
     r[1].Y = yrange[1]
 
@@ -5454,6 +5458,8 @@ func palette(
 ) (
   color.RGBA,
 ) {
+
+  brush = brush+2
 
   if coolingExperiment == "pump-probe" {
     if dark {

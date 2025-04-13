@@ -1,0 +1,8 @@
+Sample: TeO2
+Runtime note: 1um TeO2 23-7-4
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*

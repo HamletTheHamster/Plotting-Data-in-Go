@@ -1,0 +1,9 @@
+Sample: TeO2
+Runtime note: 500nm TeO2 23-6-5 bin
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 15.000 MHz
+*Data normalized by Peak*
