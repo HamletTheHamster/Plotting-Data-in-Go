@@ -1809,7 +1809,7 @@ func plotCABS(
     plotter.YErrors
   }
 
-  title := l + " " + sample + " CoBS"
+  title := "CoBS Measurement: " + l + " " + sample
   xlabel := "Frequency (Ω/2π) (GHz)"
   var ylabel string
   if normalize == "Powers" {
@@ -5402,11 +5402,11 @@ func prepPlot(
         p.Title.TextStyle.Font.Size = 40
         p.Title.Padding = font.Length(5)
 
-        p.X.Label.TextStyle.Font.Size = 30
+        p.X.Label.TextStyle.Font.Size = 35
         p.X.Label.Padding = font.Length(10)
         p.X.Tick.Label.Font.Size = 30
 
-        p.Y.Label.TextStyle.Font.Size = 30
+        p.Y.Label.TextStyle.Font.Size = 35
         p.Y.Label.Padding = font.Length(10)
         p.Y.Tick.Label.Font.Size = 30
 
