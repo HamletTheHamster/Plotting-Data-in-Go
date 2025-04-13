@@ -1,0 +1,40 @@
+Sample: pak1chip3-20um4
+Runtime note: August 2024 waveguides chip no chip
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
+
+Run 2
+	Data taken: 24-09-29
+	Label: Chip
+	Start Time (h:m:s): 17:31:17
+	End Time(h:m:s): 19:02:10
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.04 nm
+	Pump-Probe Separation: 5.00 GHz
+	Stokes Filter: 1549.0867 nm
+	Probe Filter: 1549.123 nm
+	Pump Power: 3.800 mW
+	Stokes Power: 9.840 mW
+	Probe Power: 12.300 mW
+	Lock-in Range: 0.80
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10600000000.00 Hz
+	Stop Frequency: 11000000000.00 Hz
+	Step Size: 2004567.00 Hz
+	Number of Averages: 20
+	Data Collection Note: SYNTHETIC DATA FROM DIFFERENT DAYS - 24-09-20 2 MHz step data (2nd set) pak1chip3-20um4
+
+	Fit Parameters (Fano=false):
+
+		Amp: 0.8512978500713984
+		Cen: 10.832356694947396
+		Wid: -0.02626391084435195
+		C:   0.006227547773703284
+*Data normalized by Peak*

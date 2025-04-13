@@ -1,0 +1,4 @@
+Date,Label,Run,Start Time,End Time (hr:min:sec),Pump,Stokes,Probe,Frequency,Signal,Range,Dwell,Bandwidth,Data Rate,Order,Start Frequency,Stop Frequency,Step,Notes
+23-04-21,500 nm TeO2,1,13:19:16,15:11:36,58.6,16.08,22.71,500 nm sample/frequency.csv,500 nm sample/signal.csv,0.04,1,1000,1.842000e+09,8,1.190000e+10,1.240000e+10,5.004560e+05,note 40mV range could have been 20mV
+23-06-05,1 μm TeO2,2,14:13:58,16:50:53,69.5,25.1,40.52,2/frequency.csv,2/signal.csv,0.02,1,1000,1.842000e+09,8,1.180000e+10,1.250000e+10,5.045600e+05, WOOO looks so sharp and centered
+23-06-05,1 um TeO2,2,09:55:57,11:14:20,71.0,26.4,38.78,1/frequency.csv,1/signal.csv,0.02,1,1000,1.842000e+09,8,1.180000e+10,1.250000e+10,1.004560e+06, success - 12.1 GHz feature

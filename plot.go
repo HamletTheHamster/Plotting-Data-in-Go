@@ -323,9 +323,9 @@ func main() {
 
   } else if cabs {
 
-    setsToPlotCABS := []int{0} // 17  4,12 CS2 phase-matching
+    //setsToPlotCABS := []int{0} // 17  4,12 CS2 phase-matching
 
-    //setsToPlotCABS := rangeInt(0, 20)
+    setsToPlotCABS := rangeInt(0, 20)
 
     cabsData, sigUnit := getCABSData(
       setsToPlotCABS, lock, sigFilepath, freqFilepath, normalize,
@@ -346,6 +346,14 @@ func main() {
         fmt.Println("*Data normalized by " + normalize + "*\n")
         logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
       } else if normalize == "Peak" {
+        cabsData = normalizeByPeak(setsToPlotCABS, cabsData)
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
+      } else if normalize == "PowersPeak" {
+        cabsData = normalizeByPowers(setsToPlotCABS, cabsData, pumpPowers, stokesPowers, probePowers)
+        fmt.Println("*Data normalized by " + normalize + "*\n")
+        logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
+
         cabsData = normalizeByPeak(setsToPlotCABS, cabsData)
         fmt.Println("*Data normalized by " + normalize + "*\n")
         logFile = append(logFile, fmt.Sprintf("*Data normalized by %s*\n", normalize))
@@ -517,7 +525,7 @@ func main() {
       )
     } else {
 
-      binCabsSets := []int{0}
+      binCabsSets := []int{0,1}
       if len(binCabsSets) > 0 {
         binMHz := 10.
         logFile = logBinning(
@@ -1813,7 +1821,7 @@ func plotCABS(
     plotter.YErrors
   }
 
-  title := "CoBS Measurement: " + l + " " + sample
+  title := "CoBS: " + l + " " + sample
   xlabel := "Frequency (Ω/2π) (GHz)"
   var ylabel string
   if normalize == "Powers" {
@@ -1825,14 +1833,14 @@ func plotCABS(
 
   var xrange, yrange, xticks, yticks []float64
   var xtickLabels, ytickLabels []string
-  if normalize == "Peak" && !manual {
+  if normalize == "Peak" || normalize == "PowersPeak" && !manual {
 
     if len(sets) > 1 {
       ylabel = "Spectral Density (relative)"
     } else {
       ylabel = "Arbitrary Units"
     }
-    yrange = []float64{0.0, 1.2}
+    yrange = []float64{0.0, 1.1}
     yticks = []float64{0, 0.2, 0.4, 0.6, 0.8, 1.0}
     ytickLabels = []string{"", "", "0.2", "", "0.4", "", "0.6", "", "0.8", "", "1.0", ""}
 
@@ -2030,8 +2038,7 @@ func plotCABS(
     slide,
   )
 
-  for i, set := range sets {
-
+   for i, set := range sets {
     pts := buildData(cabsData[set])
 
     if len(cabsData[set]) > 2 {
@@ -5361,7 +5368,7 @@ func prepPlot(
     p.Y.Tick.Label.Font.Variant = "Sans"
     p.Y.Tick.Length = 0
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = -7
+    p.Y.Padding = -10
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
@@ -5437,7 +5444,7 @@ func prepPlot(
 
     // right line
     r[0].X = xrange[1]
-    r[0].Y = yrange[0] //- .2
+    r[0].Y = yrange[0] //- .01
     r[1].X = xrange[1]
     r[1].Y = yrange[1]
 
@@ -5459,7 +5466,11 @@ func palette(
   color.RGBA,
 ) {
 
-  brush = brush+2
+  // if brush == 0 {
+  //   brush = brush+2
+  // } else if brush == 1 {
+  //   brush = brush+5
+  // }
 
   if coolingExperiment == "pump-probe" {
     if dark {

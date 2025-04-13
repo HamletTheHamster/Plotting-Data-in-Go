@@ -1,0 +1,9 @@
+Sample: TeO2
+Runtime note: 1um TeO2 23-6-21
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+Run 1 binned to 10.000 MHz
+*Data normalized by Peak*

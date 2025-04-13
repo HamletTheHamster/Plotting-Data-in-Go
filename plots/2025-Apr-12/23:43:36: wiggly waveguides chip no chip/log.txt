@@ -1,0 +1,71 @@
+Sample: wiggly
+Runtime note: wiggly waveguides chip no chip
+
+*CABS Data*
+
+*Data gathered from Lock-in*
+
+*Data normalized by Peak*
+
+Run 1
+	Data taken: 25-03-08
+	Label: wiggly waveguide
+	Start Time (h:m:s): 14:38:32
+	End Time(h:m:s): 14:51:46
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.119 nm
+	Pump Power: 1.000 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 1.50
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10500000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: big signal at 10.85 GHz
+
+	Fit Parameters (Fano=false):
+
+		Amp: 0.6115606492622014
+		Cen: 10.84529111200628
+		Wid: 0.024130412271559397
+		C:   -0.004900134142847809
+
+Run 2
+	Data taken: 25-03-08
+	Label: no-chip
+	Start Time (h:m:s): 15:22:16
+	End Time(h:m:s): 15:35:35
+	Pump Laser: 1549 nm
+	Probe Laser: 1549.02 nm
+	Pump-Probe Separation: 2.50 GHz
+	Stokes Filter: 1549.087 nm
+	Probe Filter: 1549.119 nm
+	Pump Power: 1.800 mW
+	Stokes Power: 1.000 mW
+	Probe Power: 1.000 mW
+	Lock-in Range: 1.50
+	Dwell Time: 1.000000000 s
+	Lock-in Bandwidth: 100.00 Hz
+	Lock-in Bandwidth Order: 8
+	Data Sampling Rate: 1842000000.00 Sa/s
+	Start Frequency: 10500000000.00 Hz
+	Stop Frequency: 11100000000.00 Hz
+	Step Size: 5004567.00 Hz
+	Number of Averages: 5
+	Data Collection Note: identical signal at 10.85 GHz
+
+	Fit Parameters (Fano=false):
+
+		Amp: 0.6134240379215898
+		Cen: 10.821273461891474
+		Wid: 0.023655917593844975
+		C:   -0.006799827545224647
+*Data normalized by Peak*
