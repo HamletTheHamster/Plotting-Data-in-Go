@@ -5191,6 +5191,123 @@ func goPlotLinewidths(
   savePlot(p, "linewidths", logpath)
 }
 
+// Define a custom Plotter for inward-facing ticks + spaced labels.
+type inwardTicks struct{}
+
+// Plot draws tick marks pointing inward (up for X axis, right for Y axis)
+// and draws custom labels with a small offset from each axis.
+func (it inwardTicks) Plot(c draw.Canvas, p *plot.Plot) {
+    // Tick lengths (in points).
+    // 1 point = 1/72 inch
+    const majorTickLenX = 10.0
+    const majorTickLenY = 10.0
+    minorTickLenX := majorTickLenX / 2
+    minorTickLenY := majorTickLenY / 2
+
+    // How far the label text should be placed from the axis line (in points).
+    xLabelOffset := vg.Length(10) // distance below the X-axis baseline
+    yLabelOffset := vg.Length(10) // distance to the left of the Y-axis baseline
+
+    // Axis line styles
+    xTickStyle := p.X.Tick.LineStyle
+    yTickStyle := p.Y.Tick.LineStyle
+
+    // Label text styles (font, size, color) are set from p.X.Tick.Label, p.Y.Tick.Label
+    xLabelStyle := p.X.Tick.Label
+    yLabelStyle := p.Y.Tick.Label
+
+    xLabelStyle.Color = color.Black
+    xLabelStyle.Font.Typeface = "liberation"
+    xLabelStyle.Font.Variant = "Sans"
+    yLabelStyle.Color = color.Black
+    yLabelStyle.Font.Typeface = "liberation"
+    yLabelStyle.Font.Variant = "Sans"
+
+    // Baseline for X (horizontal at bottom) and Y (vertical at left)
+    xAxisY := c.Min.Y
+    yAxisX := c.Min.X
+
+    //
+    // 1) Draw X-axis ticks + labels
+    //
+    xTicks := p.X.Tick.Marker.Ticks(p.X.Min, p.X.Max)
+    for _, t := range xTicks {
+        if t.Value < p.X.Min || t.Value > p.X.Max {
+            continue // skip ticks outside the range
+        }
+        // Convert tick value to canvas X coordinate
+        xCanvas := c.X(p.X.Norm(t.Value))
+
+        // Major vs. minor tick length
+        length := majorTickLenX
+        isMajor := (t.Label != "")
+        if !isMajor {
+            length = minorTickLenX
+        }
+
+        // Draw the inward tick line going "up" from baseline
+        c.StrokeLine2(xTickStyle, xCanvas, xAxisY, xCanvas, xAxisY+vg.Length(length))
+
+        // If it’s a major tick, draw the label slightly *below* the baseline
+        // (since c.Min.Y is the bottom edge, we go downward by subtracting offset)
+        if isMajor {
+            lblPt := vg.Point{
+                X: xCanvas - 5.875*majorTickLenY,
+                Y: xAxisY - 4.4*majorTickLenX - xLabelOffset, // a bit below the axis line
+            }
+            // Center horizontally, anchor the top of the text at lblPt.Y
+            // so the text extends downward below lblPt.Y
+            lblStyle := xLabelStyle
+            lblStyle.XAlign = 0.5
+            lblStyle.YAlign = 0.5
+
+            c.FillText(lblStyle, lblPt, t.Label)
+        }
+    }
+
+    //
+    // 2) Draw Y-axis ticks + labels
+    //
+    yTicks := p.Y.Tick.Marker.Ticks(p.Y.Min, p.Y.Max)
+    for _, t := range yTicks {
+        if t.Value < p.Y.Min || t.Value > p.Y.Max {
+            continue
+        }
+        // Convert tick value to canvas Y coordinate
+        yCanvas := c.Y(p.Y.Norm(t.Value))
+
+        // Major vs. minor tick length
+        length := majorTickLenY
+        isMajor := (t.Label != "")
+        if !isMajor {
+            length = minorTickLenY
+        }
+
+        // Draw the inward tick line going "right" from baseline
+        c.StrokeLine2(yTickStyle, yAxisX, yCanvas, yAxisX+vg.Length(length), yCanvas)
+
+        // If it’s a major tick, draw the label to the *left* of the axis line
+        if isMajor {
+            lblPt := vg.Point{
+                X: yAxisX - 7.1*majorTickLenY - yLabelOffset,
+                Y: yCanvas - 2.8*majorTickLenY,
+            }
+            // Right-align horizontally (so the text extends left),
+            // center vertically on the tick position
+            lblStyle := yLabelStyle
+            lblStyle.XAlign = 0.5
+            lblStyle.YAlign = 0.5
+
+            c.FillText(lblStyle, lblPt, t.Label)
+        }
+    }
+}
+
+// DataRange means "don't change the plotted data range."
+func (it inwardTicks) DataRange() (xmin, xmax, ymin, ymax float64) {
+    return math.Inf(1), math.Inf(-1), math.Inf(1), math.Inf(-1)
+}
+
 func prepPlot(
     title, xlabel, ylabel, legend string,
     xrange, yrange, xtick, ytick []float64,
@@ -5213,9 +5330,10 @@ func prepPlot(
     p.X.Min = xrange[0]
     p.X.Max = xrange[1]
     p.X.Tick.LineStyle.Width = vg.Points(2.5)
-    p.X.Tick.Label.Font.Variant = "Sans"
+    p.X.Tick.Label.Color = color.RGBA{0,0,0,0}
     // Remove horizontal padding so the left/right edges line up:
-    p.X.Padding = -5
+    p.X.Padding = -2
+    p.X.Tick.Length = 0
 
     // Build manual X ticks
     xticksVals := []plot.Tick{}
@@ -5235,10 +5353,11 @@ func prepPlot(
     p.Y.Min = yrange[0]
     p.Y.Max = yrange[1]
     p.Y.Tick.LineStyle.Width = vg.Points(2.5)
+    p.Y.Tick.Label.Color = color.RGBA{0,0,0,0}
     p.Y.Tick.Label.Font.Variant = "Sans"
-    p.Y.Tick.Length = -8
+    p.Y.Tick.Length = 0
     // Remove vertical padding so the top/bottom edges line up:
-    p.Y.Padding = -5
+    p.Y.Padding = -6
 
     // Build manual Y ticks
     yticksVals := []plot.Tick{}
@@ -5254,6 +5373,8 @@ func prepPlot(
         NMinor: 5, // 5 minor ticks between each major
     }
 
+    p.Add(inwardTicks{})
+
     // Legend
     p.Legend.TextStyle.Font.Variant = "Sans"
     p.Legend.Top = true
@@ -5261,7 +5382,6 @@ func prepPlot(
     p.Legend.YOffs = vg.Points(0)
     p.Legend.Padding = vg.Points(10)
     p.Legend.ThumbnailWidth = vg.Points(50)
-    //addLegendBox(p)
     p.Legend.Add(legend)
 
     // Adjust font sizes depending on slide or not
@@ -5283,11 +5403,11 @@ func prepPlot(
         p.Title.Padding = font.Length(5)
 
         p.X.Label.TextStyle.Font.Size = 30
-        p.X.Label.Padding = font.Length(5)
+        p.X.Label.Padding = font.Length(10)
         p.X.Tick.Label.Font.Size = 30
 
         p.Y.Label.TextStyle.Font.Size = 30
-        p.Y.Label.Padding = font.Length(5)
+        p.Y.Label.Padding = font.Length(10)
         p.Y.Tick.Label.Font.Size = 30
 
         p.Legend.TextStyle.Font.Size = 30
